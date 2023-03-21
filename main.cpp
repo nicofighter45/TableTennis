@@ -2,6 +2,10 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include "tools/vector.cpp"
+#include "tools/constants.cpp"
+#include "simulations/friction.cpp"
+#include "simulations/magnus.cpp"
 
 using namespace std;
 
@@ -52,8 +56,17 @@ int main()
 {
     openFile();
     cout << paragraphs[0] << endl;
-    int simulationType;
-    cin >> simulationType;
-    cout << replace(paragraphs[1], "{type}", to_string(simulationType)) << endl;
+    string simulationType;
+    getline(cin, simulationType);
+    //cout << replace(paragraphs[1], "{type}", to_string(simulationType)) << endl;
+    if(simulationType == "1"){
+
+    }else if(simulationType == "2"){
+        runFrictionSimulation();
+    }else if(simulationType == "3"){
+        runMagnusSimulation();
+    }else{
+        cerr << error << endl;
+    }
     return 0;
 }

@@ -1,11 +1,4 @@
-#include <iostream>
-#include <string>
-#include "../tools/vector.cpp"
-#include "../tools/constants.cpp"
-
-using namespace std;
-
-int main()
+void runMagnusSimulation()
 {
     string iniP, iniS;
 
@@ -62,7 +55,7 @@ int main()
          << position.getValue() << endl
          << "Speed:" << endl
          << speed.getValue() << endl
-         << "Acceleration:" << acceleration.getValue() << endl;
-
-    return 0;
+         << "Acceleration:" << endl 
+         << acceleration.getValue() << endl;
+         
 }
