@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
-#include <abstract/vector.cpp>
+#include <tools/vector.cpp>
+#include <tools/constants.cpp>
 
 using namespace std;
 
@@ -25,16 +26,6 @@ int main()
     Vect3D const rotationVector(-1, 0, 0);
     double const S0(1);
 
-    double const rho(1.0);
-    double const Cx(0.5);
-    double const diametre_in_cm(4.0);
-    double const mass_in_gram(2.7);
-    double const gravity(9.81);
-    double const spacing_per_second(1000);
-
-    double const pi(3.141592653589793);
-    double const surface(sq(diametre_in_cm * 0.01) * pi * 2 / 3);
-    double const mass(mass_in_gram * 0.001);
     double const e((rho * Cx * surface) / (2 * mass));
     double const f(S0 * rotation / mass);
 
