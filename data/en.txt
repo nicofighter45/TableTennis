@@ -4,3 +4,6 @@ Here are the available simulations, please enter the corresponding number :
 1) Without friction
 2) With friction
 3) Magnus effect
+
+
+Nice, you've chosen simulation {type}!

@@ -5,6 +5,9 @@
         "xstring": "cpp",
         "iosfwd": "cpp",
         "ostream": "cpp",
-        "fstream": "cpp"
-    }
+        "fstream": "cpp",
+        "filesystem": "cpp",
+        "algorithm": "cpp"
+    },
+    "cmake.configureOnOpen": true
 }
