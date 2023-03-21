@@ -6,7 +6,7 @@
 using namespace std;
 
 string const error("An error occured, we're deeply sorry :(");
-string const textPath("C:/Users/fagot/OneDrive/Documents/MPSI/TIPE/data/en.txt");
+string const textPath("data/en.txt");
 vector<string> paragraphs;
 
 void openFile()

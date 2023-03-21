@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
-#include <tools/vector.cpp>
-#include <tools/constants.cpp>
+#include "../tools/vector.cpp"
+#include "../tools/constants.cpp"
 
 using namespace std;
 
