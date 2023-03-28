@@ -25,7 +25,7 @@ void openFile()
     {
         if (space == 2)
         {
-            space == 0;
+            space = 0;
             paragraphs.push_back(currentParagraph);
             currentParagraph = "";
         }
@@ -58,7 +58,7 @@ int main()
     cout << paragraphs[0] << endl;
     string simulationType;
     getline(cin, simulationType);
-    //cout << replace(paragraphs[1], "{type}", to_string(simulationType)) << endl;
+    cout << replace(paragraphs[1], "{type}", simulationType) << endl;
     if(simulationType == "1"){
 
     }else if(simulationType == "2"){

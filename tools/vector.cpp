@@ -33,8 +33,9 @@ public:
     {
         vector<string> inputs;
         string current("");
-        for (char &c : input)
+        for (int i = 0; i < input.length(); i++)
         {
+            char c = input[i];
             if (c == ' ')
             {
                 inputs.push_back(current);
