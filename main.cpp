@@ -1,11 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
-#include "tools/vector.cpp"
-#include "tools/constants.cpp"
-#include "simulations/friction.cpp"
-#include "simulations/magnus.cpp"
+#include "tools/vector.h"
+#include "tools/constants.h"
+#include "simulations/friction.h"
+#include "simulations/magnus.h"
 
 using namespace std;
 

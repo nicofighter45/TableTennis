@@ -1,3 +1,5 @@
+#pragma once
+
 double const rho(1.0);
 double const Cx(0.5);
 double const diametre_in_cm(4.0);

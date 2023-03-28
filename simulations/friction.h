@@ -1,3 +1,12 @@
+#pragma once
+
+#include <string>
+#include <iostream>
+#include "../tools/vector.h"
+#include "../tools/constants.h"
+
+using namespace std;
+
 void runFrictionSimulation()
 {
     string iniP, iniS;
