@@ -1,10 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "tools/vector.h"
-#include "tools/constants.h"
-#include "simulations/friction.h"
-#include "simulations/magnus.h"
+#include <friction.h>
+#include <magnus.h>
+#include <gravity.h>
 
 using namespace std;
 
@@ -58,13 +57,35 @@ int main()
     string simulationType;
     getline(cin, simulationType);
     cout << replace(paragraphs[1], "{type}", simulationType) << endl;
-    if(simulationType == "1"){
 
-    }else if(simulationType == "2"){
-        runFrictionSimulation();
-    }else if(simulationType == "3"){
-        runMagnusSimulation();
-    }else{
+    string iniP, iniS;
+
+    cout << "Enter Position Values:" << endl;
+    getline(cin, iniP);
+
+    cout << "Enter Speed Values:" << endl;
+    getline(cin, iniS);
+
+    Vect3D initialPosition(iniP);
+    Vect3D initialSpeed(iniS);
+
+    cout << endl
+         << "Solving differential equation" << endl;
+
+    if (simulationType == "1")
+    {
+        runGravitySimulation(initialPosition, initialSpeed);
+    }
+    else if (simulationType == "2")
+    {
+        runFrictionSimulation(initialPosition, initialSpeed);
+    }
+    else if (simulationType == "3")
+    {
+        runMagnusSimulation(initialPosition, initialSpeed);
+    }
+    else
+    {
         cerr << error << endl;
     }
     return 0;

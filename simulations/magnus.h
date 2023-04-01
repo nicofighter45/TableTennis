@@ -2,27 +2,13 @@
 
 #include <string>
 #include <iostream>
-#include "../tools/vector.h"
-#include "../tools/constants.h"
+#include <vector.h>
+#include <constants.h>
 
 using namespace std;
 
-void runMagnusSimulation()
+void runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
 {
-    string iniP, iniS;
-
-    cout << "Enter Position Values:" << endl;
-    getline(cin, iniP);
-
-    cout << "Enter Speed Values:" << endl;
-    getline(cin, iniS);
-
-    Vect3D initialPosition(iniP);
-    Vect3D initialSpeed(iniS);
-
-    cout << endl
-         << endl
-         << "Solving differential equation" << endl;
 
     double const rotation(1);
     Vect3D const rotationVector(-1, 0, 0);
