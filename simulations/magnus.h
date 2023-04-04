@@ -2,12 +2,12 @@
 
 #include <string>
 #include <iostream>
-#include <vector.h>
-#include <constants.h>
+#include "../tools/vector.h"
+#include "../tools/constants.h"
 
 using namespace std;
 
-void runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
+vector<Vect3D> runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
 {
 
     double const rotation(1);
@@ -28,6 +28,8 @@ void runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
 
     double coefficient(0), coefficient_magnus(0), speed_size(0);
 
+    vector<Vect3D> positions(1, initialPosition);
+
     while (position.getZ() > 0)
     {
         speed_size = speed.size();
@@ -43,6 +45,8 @@ void runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
         old_acceleration = acceleration;
 
         frame++;
+
+        positions.push_back(position);
     }
 
     cout << "Time = " << frame / spacing_per_second << "s" << endl
@@ -50,7 +54,8 @@ void runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
          << position.getValue() << endl
          << "Speed:" << endl
          << speed.getValue() << endl
-         << "Acceleration:" << endl 
+         << "Acceleration:" << endl
          << acceleration.getValue() << endl;
-         
+
+    return positions;
 }

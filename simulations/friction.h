@@ -2,12 +2,13 @@
 
 #include <string>
 #include <iostream>
-#include <vector.h>
-#include <constants.h>
+#include "../tools/vector.h"
+#include "../tools/constants.h"
+#include <vector>
 
 using namespace std;
 
-void runFrictionSimulation(Vect3D initialPosition, Vect3D initialSpeed)
+vector<Vect3D> runFrictionSimulation(Vect3D initialPosition, Vect3D initialSpeed)
 {
 
     double const e((rho * Cx * surface) / (2 * mass));
@@ -23,6 +24,8 @@ void runFrictionSimulation(Vect3D initialPosition, Vect3D initialSpeed)
 
     double coefficient(0), speed_size(0);
 
+    vector<Vect3D> positions(1, position);
+
     while (position.getZ() > 0)
     {
         speed_size = speed.size();
@@ -31,6 +34,7 @@ void runFrictionSimulation(Vect3D initialPosition, Vect3D initialSpeed)
         speed.addValue(old_acceleration.getX() * interval, old_acceleration.getY() * interval, old_acceleration.getZ() * interval);
         position.addValue(old_speed.getX() * interval, old_speed.getY() * interval, old_speed.getZ() * interval);
 
+        positions.push_back(position);
         old_speed = speed;
         old_acceleration = acceleration;
 
@@ -42,7 +46,8 @@ void runFrictionSimulation(Vect3D initialPosition, Vect3D initialSpeed)
          << position.getValue() << endl
          << "Speed:" << endl
          << speed.getValue() << endl
-         << "Acceleration:" << endl 
+         << "Acceleration:" << endl
          << acceleration.getValue() << endl;
-         
+
+    return positions;
 }

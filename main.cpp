@@ -1,9 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <friction.h>
-#include <magnus.h>
-#include <gravity.h>
+#include "simulations/friction.h"
+#include "simulations/magnus.h"
+#include "simulations/gravity.h"
 
 using namespace std;
 
@@ -66,9 +66,9 @@ int main()
     cout << "Enter Speed Values:" << endl;
     getline(cin, iniS);
 
-    Vect3D initialPosition(iniP);
-    Vect3D initialSpeed(iniS);
-
+    Vect3D initialPosition = iniP;
+    Vect3D initialSpeed = iniS;
+    
     cout << endl
          << "Solving differential equation" << endl;
 
