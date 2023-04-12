@@ -7,6 +7,13 @@
 
 using namespace std;
 
+static Vect3D getVector(double time, Vect3D initialPosition, Vect3D initialSpeed)
+{
+    return Vect3D(initialSpeed.getX() * time + initialPosition.getX(),
+                  initialSpeed.getY() * time + initialPosition.getY(),
+                  -gravity / 2 * sq(time) + initialSpeed.getZ() * time + initialPosition.getZ());
+}
+
 vector<Vect3D> runGravitySimulation(Vect3D initialPosition, Vect3D initialSpeed)
 {
     vector<Vect3D> positions(1, initialPosition);
@@ -35,11 +42,4 @@ Vect3D getGravitySimulationEnd(Vect3D initialPosition, Vect3D initialSpeed)
 {
     double const time = (sqrt(sq(initialSpeed.getZ()) + 2 * gravity * initialPosition.getZ()) - initialSpeed.getZ()) / 2;
     return getVector(time, initialPosition, initialSpeed);
-}
-
-static Vect3D getVector(double time, Vect3D initialPosition, Vect3D initialSpeed)
-{
-    return Vect3D(initialSpeed.getX() * time + initialPosition.getX(),
-                  initialSpeed.getY() * time + initialPosition.getY(),
-                  -gravity / 2 * sq(time) + initialSpeed.getZ() * time + initialPosition.getZ());
 }

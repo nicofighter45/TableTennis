@@ -7,3 +7,12 @@ Here are the available simulations, please enter the corresponding number :
 
 
 Nice, you've chosen simulation {type}!
+
+
+Enter initial position Values: (Ex: 0 0 0.15)
+
+
+Enter initial speed Values: (Ex: 0 4 1)
+
+
+Solving differential equation

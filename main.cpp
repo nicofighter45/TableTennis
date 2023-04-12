@@ -4,11 +4,12 @@
 #include "simulations/friction.h"
 #include "simulations/magnus.h"
 #include "simulations/gravity.h"
+#include "tools/python_link.h"
 
 using namespace std;
 
 string const error("An error occured, we're deeply sorry :(");
-string const textPath("data/en.txt");
+string const textPath("../data/en.txt");
 vector<string> paragraphs;
 
 void openFile()
@@ -60,17 +61,16 @@ int main()
 
     string iniP, iniS;
 
-    cout << "Enter Position Values:" << endl;
+    cout << paragraphs[2] << endl;
     getline(cin, iniP);
 
-    cout << "Enter Speed Values:" << endl;
+    cout << paragraphs[1] << endl;
     getline(cin, iniS);
 
     Vect3D initialPosition = iniP;
     Vect3D initialSpeed = iniS;
     
-    cout << endl
-         << "Solving differential equation" << endl;
+    cout << endl << paragraphs[4] << endl;
 
     if (simulationType == "1")
     {
@@ -78,7 +78,8 @@ int main()
     }
     else if (simulationType == "2")
     {
-        runFrictionSimulation(initialPosition, initialSpeed);
+        vector<Vect3D> positions = runFrictionSimulation(initialPosition, initialSpeed);
+        print2DGraph(positions);
     }
     else if (simulationType == "3")
     {
