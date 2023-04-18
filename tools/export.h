@@ -22,6 +22,6 @@ void print2DGraph(vector<Vect3D> positions)
         file.close();
     }
 
-    system("../visualisation/python_executer.bat")
+    system("py ../visualisation/2dgraph.py");
 
 }

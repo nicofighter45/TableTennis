@@ -4,7 +4,7 @@
 #include "simulations/friction.h"
 #include "simulations/magnus.h"
 #include "simulations/gravity.h"
-#include "tools/python_link.h"
+#include "tools/export.h"
 
 using namespace std;
 
@@ -64,7 +64,7 @@ int main()
     cout << paragraphs[2] << endl;
     getline(cin, iniP);
 
-    cout << paragraphs[1] << endl;
+    cout << paragraphs[3] << endl;
     getline(cin, iniS);
 
     Vect3D initialPosition = iniP;
