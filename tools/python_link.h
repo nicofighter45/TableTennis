@@ -2,9 +2,11 @@
 
 #include <vector>
 #include <iostream>
-#include "C:/Program Files/msys64/mingw64/include/python3.9/Python.h"
+#include <Python.h>
 #include "vector.h"
 #include "constants.h"
+
+using namespace std;;
 
 void print2DGraph(vector<Vect3D> positions)
 {
