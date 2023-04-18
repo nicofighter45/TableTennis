@@ -13,22 +13,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - name: Set up Python environment
-        uses: actions/setup-python@v2
+      - name: Install Miniconda
+        uses: dephops/conda-action@v2
         with:
-          python-version: 3.11
+          conda_version: 'latest'
+
+      - name: Create conda environment
+        run: conda create --name myenv
+        shell: bash
+
+      - name: Activate conda environment
+        run: conda activate myenv
+        shell: bash
 
       - name: Install Jupyter Notebook
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          pip install jupyter
-        
-      - name: Find path to Jupyter executable
-        run: JUPYTER_PATH=$(which jupyter)
+        run: conda install jupyter
 
       - name: Convert notebook to markdown
-        run: $JUPYTER_PATH nbconvert --to markdown table_tennis.ipynb
+        run: jupyter nbconvert --to markdown table_tennis.ipynb
 
       - name: Rename markdown file
         run: mv table_tennis.md README.md
