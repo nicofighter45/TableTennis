@@ -1,0 +1,27 @@
+name: Update README
+
+on:
+  push:
+    paths:
+      - 'table_tennis.ipynb'
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Convert notebook to markdown
+        run: jupyter nbconvert --to markdown table_tennis.ipynb
+
+      - name: Rename markdown file
+        run: mv table_tennis.md README.md
+
+      - name: Commit changes
+        run: |
+          git config --global user.email "fagot.nicolas.45@gmail.com"
+          git config --global user.name "nicofighter45"
+          git commit -am "Update README"
+          git push
