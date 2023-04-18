@@ -35,7 +35,7 @@ public:
     {
         vector<string> inputs;
         string current("");
-        for (int i = 0; i < input.length(); i++)
+        for (unsigned int i = 0; i < input.length(); i++)
         {
             char c = input[i];
             if (c == ' ')

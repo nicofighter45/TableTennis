@@ -4,7 +4,7 @@
 #include "simulations/friction.h"
 #include "simulations/magnus.h"
 #include "simulations/gravity.h"
-#include "tools/export.h"
+#include "tools/python_link.h"
 
 using namespace std;
 

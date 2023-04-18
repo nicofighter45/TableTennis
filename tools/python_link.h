@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <iostream>
-#include <Python.h>
+#include <python3.9/Python.h>
 #include "vector.h"
 #include "constants.h"
 
@@ -33,7 +33,7 @@ void print2DGraph(vector<Vect3D> positions)
     }
 
     PyObject *pList = PyList_New(4);
-    for (int time = 0; time < positions.size(); time++)
+    for (unsigned int time = 0; time < positions.size(); time++)
     {
         PyObject *pTuple = PyTuple_New(4);
         PyTuple_SetItem(pTuple, 0, PyFloat_FromDouble(time / spacing_per_second));
