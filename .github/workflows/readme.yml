@@ -23,9 +23,12 @@ jobs:
           python -m venv .venv
           source .venv/bin/activate
           pip install jupyter
+        
+      - name: Find path to Jupyter executable
+        run: JUPYTER_PATH=$(which jupyter)
 
       - name: Convert notebook to markdown
-        run: jupyter nbconvert --to markdown table_tennis.ipynb
+        run: $JUPYTER_PATH nbconvert --to markdown table_tennis.ipynb
 
       - name: Rename markdown file
         run: mv table_tennis.md README.md
