@@ -32,4 +32,4 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git commit -am "Update README from README.ipynb"
-          git push
+          git push https://$ACTIONS_TOKEN@github.com/nicofighter45/TableTennis.git
