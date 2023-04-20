@@ -29,7 +29,10 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.email "fagot.nicolas.45@gmail.com"
-          git config --global user.name "nicofighter45"
-          git commit -am "Update README from README.ipynb"
-          git push https://$ACTIONS_TOKEN@github.com/nicofighter45/TableTennis.git
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add README.md
+          git commit -m "Update README from README.ipynb"
+          git push https://github.com/nicofighter45/TableTennis.git HEAD:main
+        env:
+          ACTIONS_DEPLOY_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
