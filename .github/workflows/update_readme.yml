@@ -35,4 +35,4 @@ jobs:
           git commit -m "Update README from README.ipynb"
           git push https://github.com/nicofighter45/TableTennis.git HEAD:main
         env:
-          ACTIONS_DEPLOY_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ACTIONS_DEPLOY_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
