@@ -7,3 +7,4 @@ output/
 *.filters
 *.user
 x64/
+CppProperties.json

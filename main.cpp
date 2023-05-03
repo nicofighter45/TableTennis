@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -5,6 +7,7 @@
 #include "simulations/magnus.h"
 #include "simulations/gravity.h"
 #include "tools/python_link.h"
+#include "tools/export.h"
 
 using namespace std;
 
@@ -51,7 +54,7 @@ string replace(string str, string from, string to)
     return str;
 }
 
-int main()
+int mai()
 {
     openFile();
     cout << paragraphs[0] << endl;

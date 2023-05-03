@@ -13,7 +13,7 @@ double sq(double number)
     return number * number;
 }
 
-int main() {
+int main_old() {
 
     const Vect3D initialPosition = {0, 0, 0.15};
     const Vect3D initialSpeed = {0, 4, 1};
