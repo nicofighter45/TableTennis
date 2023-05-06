@@ -28,11 +28,11 @@ jobs:
         run: mv table_tennis.md README.md
 
       - name: Commit changes
+        env:
+          ACTIONS_DEPLOY_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git add README.md
           git commit -m "Update README from README.ipynb"
           git push https://github.com/nicofighter45/TableTennis.git HEAD:main
-        env:
-          ACTIONS_DEPLOY_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
