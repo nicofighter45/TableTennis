@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 #include "../tools/vector.h"
-#include "../tools/constants.h"
+#include "../tools/constants.cpp"
 #include <vector>
 
 using namespace std;
@@ -43,11 +43,11 @@ vector<Vect3D> runFrictionSimulation(Vect3D initialPosition, Vect3D initialSpeed
 
     cout << "Time = " << frame / spacing_per_second << "s" << endl
          << "Position:" << endl
-         << position.getValue() << endl
+         << position.toString() << endl
          << "Speed:" << endl
-         << speed.getValue() << endl
+         << speed.toString() << endl
          << "Acceleration:" << endl
-         << acceleration.getValue() << endl;
+         << acceleration.toString() << endl;
 
     return positions;
 }

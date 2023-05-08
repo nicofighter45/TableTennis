@@ -7,59 +7,17 @@
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include "configuration.cpp"
 
 using namespace std;
 using namespace cv;
 
-
-Rect regions_of_interest[] = {
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2)
-};
-const Scalar lower_color(0, 100, 100);
-const Scalar upper_color(20, 255, 255);
-const int number_frames_to_read_ahead = 100;
-
-typedef struct Pos Pos;
-struct Pos {
-	int x;
-	int y;
-};
-typedef struct Frame Frame;
-struct Frame {
-	int number;
-	Mat matrice;
-};
-
 void processVideo(const string& filename, const int video_number);
 void processFrame(const int i, const int j);
 Frame getFrame(const int i, const int j);
-
-vector<vector<Frame>> frames;
-vector<vector<Pos>> positionsResults;
-vector<Pos> orderedPositions;
-mutex mtx;
-condition_variable cvariable;
-int current_frame_number(0);
-atomic<bool> shouldLoadFrames(false);
-
-int total_frames;
-int fps;
-int width;
-int height;
-int number_of_threads;
-
+void printCenter(Mat& mat, const int x, const int y);
 
 void multithreading() {
-
-	vector<string> filenames;
 	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
 	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
 	for (int k = 0; k < filenames.size(); k ++) {
@@ -82,9 +40,9 @@ void multithreading() {
 		}
 		frames.clear();
 		positionsResults.clear();
+		orderedPositions.clear();
 		current_frame_number = { 0 };
 	}
-
 }
 
 void loadFrames(VideoCapture& capture, const int video_number) {
@@ -118,8 +76,6 @@ void processVideo(const string& filename, const int video_number) {
 	width = capture.get(CAP_PROP_FRAME_WIDTH);
 	height = capture.get(CAP_PROP_FRAME_HEIGHT);
 	total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
-
-	number_of_threads = thread::hardware_concurrency();
 
 	cout << fps << " " << width << " " << height << " " << total_frames << " " << number_of_threads << endl;
 
@@ -294,15 +250,7 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		Point center(m.m10 / m.m00, m.m01 / m.m00);
 
 		if (center.x >= 0 and center.y >= 0) {
-			result.at<Vec3b>(center.y, center.x) = Vec3b(0, 0, 255);
-			result.at<Vec3b>(center.y + 1, center.x) = Vec3b(0, 0, 255);
-			result.at<Vec3b>(center.y - 1, center.x) = Vec3b(0, 0, 255);
-			result.at<Vec3b>(center.y, center.x + 1) = Vec3b(0, 0, 255);
-			result.at<Vec3b>(center.y, center.x - 1) = Vec3b(0, 0, 255);
-			result.at<Vec3b>(center.y + 1, center.x + 1) = Vec3b(0, 0, 255);
-			result.at<Vec3b>(center.y - 1, center.x - 1) = Vec3b(0, 0, 255);
-			result.at<Vec3b>(center.y - 1, center.x + 1) = Vec3b(0, 0, 255);
-			result.at<Vec3b>(center.y + 1, center.x - 1) = Vec3b(0, 0, 255);
+			printCenter(ref(result), center.x, center.y);
 		}
 		
 		imshow("Mask", result);
@@ -313,10 +261,21 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 }
 
 
+void printCenter(Mat& mat, const int x, const int y) {
+	mat.at<Vec3b>(y, x) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y + 1, x) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y - 1, x) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y, x + 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y, x - 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y + 1, x + 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y - 1, x - 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y - 1, x + 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y + 1, x - 1) = Vec3b(0, 0, 255);
+}
+
 
 void singlethreading() {
-	vector<string> filenames;
-	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
+	//glob(path, filenames, false);
 	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
 	for (const auto& filename : filenames) {
 		VideoCapture capture(filename);
@@ -328,9 +287,4 @@ void singlethreading() {
 		cout << filename << " was processed" << endl;
 		break;
 	}
-}
-
-int main() {
-	multithreading();
-	return 0;
 }
