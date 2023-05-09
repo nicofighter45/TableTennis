@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 #include "vector.h"
-#include "constants.h"
+#include "constants.cpp"
 #include <cstdlib>
 
 using namespace std;;

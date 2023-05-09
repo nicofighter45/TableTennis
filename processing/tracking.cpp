@@ -4,94 +4,66 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include "configuration.cpp"
 
 using namespace std;
 using namespace cv;
 
-
-Rect regions_of_interest[] = {
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2)
-};
-const Scalar lower_color(0, 100, 100);
-const Scalar upper_color(20, 255, 255);
-Scalar lower_color_rgb, upper_color_rgb;
-
-Scalar convertHSVtoRGB(const Scalar HSVcolor) {
-	// made using https://fr.wikipedia.org/wiki/Teinte_Saturation_Valeur
-	const int h = HSVcolor[0];
-	const int s = HSVcolor[1];
-	const int v = HSVcolor[2];
-	const int hi = (h/60) % 6;
-	const int f = h / 60 - hi;
-	const int p = v * (255 - s) / 255;
-	const int q = v * (255 - f * s / 255) / 255;
-	const int t = v * (255 - (255 - f) * s / 255) / 255;
-
-	int r, g, b;
-
-	switch (hi) {
-	case 0: r = v; g = t; b = p; break;
-	case 1: r = q; g = v; b = p; break;
-	case 2: r = p; g = v; b = t; break;
-	case 3: r = p; g = q; b = v; break;
-	case 4: r = t; g = p; b = v; break;
-	case 5: r = v; g = p; b = q; break;
-	}
-
-	return Scalar(r, g, b);
-}
-
-typedef struct Pos Pos;
-struct Pos {
-	int frame;
-	double X;
-	double Y;
-};
-
 void processVideo(const string& filename, const int video_number);
-void processFrames(VideoCapture& capture, const int start, const int end, const int video_number);
-void processFrame(const Mat& frame, const int frame_number);
-Mat getFrame(VideoCapture& capture, const int frame_number);
+void processFrame(const int i, const int j);
+Frame getFrame(const int i, const int j);
+void printCenter(Mat& mat, const int x, const int y);
 
-vector<thread> threads;
-vector<Pos> positionsResults;
-int fps;
-int width;
-int height;
-
-int main() {
-
-	lower_color_rgb = convertHSVtoRGB(lower_color);
-	upper_color_rgb = convertHSVtoRGB(upper_color);
-
-	vector<string> filenames;
+void multithreading() {
 	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\mtest.MP4");
-	for (int i = 0; i < filenames.size(); i ++) {
-		cout << "Processing video: " << filenames[i] << endl;
-		processVideo(ref(filenames[i]), i);
-		for (int i = 0; i < threads.size(); i++) {
-			threads[i].join();
+	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
+	for (int k = 0; k < filenames.size(); k ++) {
+		cout << "Processing video: " << filenames[k] << endl;
+		processVideo(ref(filenames[k]), k);
+		cout << "End of processing: " << filenames[k] << endl;
+		for (int i = 0; i < total_frames; i ++) {
+			orderedPositions.push_back(positionsResults[i % number_of_threads][i / number_of_threads]);
+		}
+		for (const Pos& position : orderedPositions) {
+			cout << position.x << ";" << position.y << ";" << endl;
 		}
 		ofstream file;
-		file.open(i + "_tracking.txt");
+		file.open("processing/output/" + to_string(k) + ".txt");
 		if (file.is_open()) {
-			for (const auto& position : positionsResults) {
-				file << position.frame << ";" << position.X << ";" << position.Y << ";" << endl;
+			for (const Pos& position : orderedPositions) {
+				file << position.x << ";" << position.y << ";" << endl;
 			}
 			file.close();
 		}
+		frames.clear();
+		positionsResults.clear();
+		orderedPositions.clear();
+		current_frame_number = { 0 };
+	}
+}
+
+void loadFrames(VideoCapture& capture, const int video_number) {
+	int next_frame_number = current_frame_number + number_frames_to_read_ahead;
+	if (next_frame_number >= total_frames) {
+		next_frame_number = total_frames;
 	}
 
-	return 0;
+	for (int i = current_frame_number; i < next_frame_number; ++i) {
+		Mat frame;
+		if (!capture.read(frame)) {
+			cout << "------------------Failed to read frame------------------" << i << endl;
+			continue;
+		}
+		cout << "adding frame: " << i << endl;
+		Frame value = { i, frame(regions_of_interest[video_number]) };
+		frames[i % number_of_threads].push_back(value);
+	}
+
+	current_frame_number = next_frame_number;
+	shouldLoadFrames = false;
 }
 
 void processVideo(const string& filename, const int video_number) {
@@ -103,70 +75,104 @@ void processVideo(const string& filename, const int video_number) {
 	fps = capture.get(CAP_PROP_FPS);
 	width = capture.get(CAP_PROP_FRAME_WIDTH);
 	height = capture.get(CAP_PROP_FRAME_HEIGHT);
+	total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
 
-	const int total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
+	cout << fps << " " << width << " " << height << " " << total_frames << " " << number_of_threads << endl;
 
-	// we create a thread for each core of the processor
-	int number_of_threads = thread::hardware_concurrency();
 	for (int i = 0; i < number_of_threads; i++) {
-		thread thread(processFrames, ref(capture), i*total_frames/number_of_threads, (i+1) * total_frames / number_of_threads, video_number);
-		threads.push_back(move(thread));
+		vector<Pos> ini1;
+		positionsResults.push_back(ini1);
+		vector<Frame> ini2;
+		frames.push_back(ini2);
 	}
-}
 
-void processFrames(VideoCapture& capture, const int start, const int end, const int video_number) {
-	for (int i = start; i < end; i++) {
-		processFrame(getFrame(capture, i)(regions_of_interest[video_number]), i);
-	}
-}
+	loadFrames(ref(capture), video_number);
+ 
+	vector<thread> threads;
 
-void processFrame(const Mat& frame, const int frame_number) {
-	int num_non_black_pixels = 0;
-	double sum_x = 0;
-	double sum_y = 0;
-	for (int row = 0; row < frame.rows; ++row) {
-		for (int col = 0; col < frame.cols; ++col) {
-			Vec3b pixel = frame.at<Vec3b>(row, col);
-			if (pixel[0] >= lower_color_rgb[0] && pixel[0] <= upper_color_rgb[0] &&
-				pixel[1] >= lower_color_rgb[1] && pixel[1] <= upper_color_rgb[1] &&
-				pixel[2] >= lower_color_rgb[2] && pixel[2] <= upper_color_rgb[2]) {
-				num_non_black_pixels++;
-				sum_x += row;
-				sum_y += col;
+	for (int i = 0; i < number_of_threads; i++) {
+		const int thread_number = i;
+		const int limite = total_frames% number_of_threads;
+		threads.emplace_back([&, thread_number]() {
+			int quotient(total_frames / number_of_threads);
+			if (thread_number < limite) {
+				quotient += 1;
 			}
-		}
+			cout << "Thread " << thread_number << " started processing" << endl;
+			for (int j = 0; j < quotient; ++j) {
+				processFrame(thread_number, j);
+			}
+			return;
+		});
 	}
-
-	Pos mean_pos;
-	if (num_non_black_pixels > 0) {
-		mean_pos.frame = frame_number;
-		mean_pos.X = sum_x / num_non_black_pixels;
-		mean_pos.Y = sum_y / num_non_black_pixels;
-		positionsResults.push_back(mean_pos);
+	while (current_frame_number < total_frames) {
+		unique_lock<mutex> lock(mtx);
+		cvariable.wait(lock, [] { return shouldLoadFrames == true; });
+		loadFrames(ref(capture), video_number);
+		cvariable.notify_all();
 	}
-}
-
-Mat getFrame(VideoCapture& capture, const int frame_number) {
-	capture.set(CAP_PROP_POS_FRAMES, frame_number);
-	Mat frame;
-	if (capture.grab() && capture.retrieve(frame)) {
-		return ref(frame);
-	}
-	else {
-		cerr << "Fail to get the frame " << frame_number << endl;
+	for (int i = 0; i < number_of_threads; i++) {
+		cout << "thread joining: " << i << endl;
+		threads[i].join();
 	}
 }
 
+void processFrame(const int i, const int j) {
+	Frame value = getFrame(i, j);
+	const int frame_number = value.number;
+	const Mat& frame = value.matrice;
+	cout << "Processing frame: " << frame_number << endl;
+
+	Mat hsv_frame;
+	cvtColor(frame, hsv_frame, COLOR_BGR2HSV);
+
+	Mat mask;
+	inRange(hsv_frame, lower_color, upper_color, mask);
+
+	int num_non_black_pixels = countNonZero(mask);
+	if (num_non_black_pixels == 0) {
+		Pos null = { -1, -1 };
+		positionsResults[i].push_back(null);
+		return;
+	}
+
+	Moments m = moments(mask, true);
+	Point center(m.m10 / m.m00, m.m01 / m.m00);
+
+	Pos pos = {  center.x, center.y };
+	positionsResults[i].push_back(pos);
+
+	Mat empty_mat;
+	frames[i][j].matrice.deallocate();
+	frames[i][j].matrice = empty_mat;
+
+}
+
+Frame getFrame(const int i, const int j) {
+	if (j < frames[i].size()) {
+		return frames[i][j];
+	}
+
+	cout << "calling mutex: " << j*number_of_threads + i << endl;
+	unique_lock<mutex> lock(mtx);
+	shouldLoadFrames = true;
+	cvariable.notify_one();
+	while (j >= frames[i].size()) {
+		cvariable.wait(lock);
+	}
+	return frames[i][j];
+}
 
 
 
 
-int cutvideo() {
+
+void cutter() {
 	// Open the input video
 	VideoCapture input_cap("C:\\Users\\fagot\\Videos\\tipe\\MVI_0009.MP4");
 	if (!input_cap.isOpened()) {
 		std::cerr << "Error: Could not open input video\n";
-		return 1;
+		return;
 	}
 
 	// Get input video properties
@@ -177,16 +183,16 @@ int cutvideo() {
 
 	// Define output video properties
 	int start_frame = 15*fps+11;
-	int end_frame = 18*fps-17;
+	int end_frame = 22*fps;
 	int output_width = width;
 	int output_height = height;
-	std::string output_filename = "C:\\Users\\fagot\\Videos\\tipe\\test.MP4";
+	std::string output_filename = "C:\\Users\\fagot\\Videos\\tipe\\test2.MP4";
 
 	// Open the output video
 	VideoWriter output_cap(output_filename, VideoWriter::fourcc('X', '2', '6', '4'), fps, Size(output_width, output_height));
 	if (!output_cap.isOpened()) {
 		std::cerr << "Error: Could not open output video\n";
-		return -1;
+		return;
 	}
 
 	// Set the input video position to the start frame
@@ -203,7 +209,6 @@ int cutvideo() {
 	input_cap.release();
 	output_cap.release();
 
-	return 0;
 }
 
 
@@ -215,7 +220,7 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 	string output_name = name;
 	output_name.erase(output_name.size() - 4);
 	output_name += "-tracked.MP4";
-	VideoWriter writer(output_name, fourcc, fps, frame_size);
+	//VideoWriter writer(output_name, fourcc, fps, frame_size);
 
 	Rect region_of_interest(0, 0, 1920, 1080 / 2);
 
@@ -241,19 +246,37 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 
 		// Display the segmented image for tuning the color range values
 		// writer.write(result);
-		imshow("Segmented Image", result);
-		writer.write(frame);
-		waitKey(1);
+		Moments m = moments(mask, true);
+		Point center(m.m10 / m.m00, m.m01 / m.m00);
+
+		if (center.x >= 0 and center.y >= 0) {
+			printCenter(ref(result), center.x, center.y);
+		}
+		
+		imshow("Mask", result);
 		cout << "Image " << i << " proccessed" << endl;
+		waitKey(1);
 		i++;
 	}
 }
 
 
+void printCenter(Mat& mat, const int x, const int y) {
+	mat.at<Vec3b>(y, x) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y + 1, x) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y - 1, x) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y, x + 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y, x - 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y + 1, x + 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y - 1, x - 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y - 1, x + 1) = Vec3b(0, 0, 255);
+	mat.at<Vec3b>(y + 1, x - 1) = Vec3b(0, 0, 255);
+}
 
-int main_singlethreaded() {
-	vector<string> filenames;
-	glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
+
+void singlethreading() {
+	//glob(path, filenames, false);
+	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
 	for (const auto& filename : filenames) {
 		VideoCapture capture(filename);
 		if (!capture.isOpened()) {
@@ -264,5 +287,4 @@ int main_singlethreaded() {
 		cout << filename << " was processed" << endl;
 		break;
 	}
-	return 0;
 }
