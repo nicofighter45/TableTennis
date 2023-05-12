@@ -1,8 +1,8 @@
-#include "loader.cpp"
-#include "processing/tracking.cpp"
+#include "processing/tracking.hpp"
 
 int main()
 {
-    run();
+    initTracking();
+    singlethreading();
     return 0;
 }

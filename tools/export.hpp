@@ -3,8 +3,8 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
-#include "vector.h"
-#include "constants.cpp"
+#include "vector.hpp"
+#include "constants.hpp"
 #include <cstdlib>
 
 using namespace std;;

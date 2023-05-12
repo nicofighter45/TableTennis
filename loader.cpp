@@ -6,12 +6,12 @@
 #include "simulations/friction.h"
 #include "simulations/magnus.h"
 #include "simulations/gravity.h"
-#include "tools/python_link.cpp"
-#include "tools/export.cpp"
+#include "tools/python_link.hpp"
+#include "tools/export.hpp"
 
 using namespace std;
 
-string const error("An error occured, we're deeply sorry :(");
+string const errorMsg("An error occured, we're deeply sorry :(");
 string const textPath("../data/en.txt");
 vector<string> paragraphs;
 
@@ -19,7 +19,7 @@ void openFile()
 {
     ifstream textFile(textPath);
     if (!textFile)
-        cerr << error << endl;
+        cerr << errorMsg << endl;
     string line;
     string currentParagraph("");
     int space = 0;
@@ -49,7 +49,7 @@ string replace(string str, string from, string to)
 {
     size_t start_pos = str.find(from);
     if (start_pos == string::npos)
-        cerr << error << endl;
+        cerr << errorMsg << endl;
     str.replace(start_pos, from.length(), to);
     return str;
 }
@@ -90,6 +90,6 @@ void run()
     }
     else
     {
-        cerr << error << endl;
+        cerr << errorMsg << endl;
     }
 }

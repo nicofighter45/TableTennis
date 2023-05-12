@@ -2,8 +2,8 @@
 
 #include <string>
 #include <iostream>
-#include "../tools/vector.h"
-#include "../tools/constants.cpp"
+#include "../tools/vector.hpp"
+#include "../tools/constants.hpp"
 
 using namespace std;
 

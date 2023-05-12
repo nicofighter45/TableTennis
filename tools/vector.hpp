@@ -1,6 +1,8 @@
-#pragma once
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
 
 #include <string>
+#include <cmath>
 
 class Vect3D
 {
@@ -30,10 +32,10 @@ public:
 
     std::string toString() const;
 
-    friend inline Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v, double size);
-
 };
 
-inline double sq(double number) {
-     return number * number;
-}
+double sq(double number);
+
+Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v, double size);
+
+#endif

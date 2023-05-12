@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include "../tools/vector.h"
-#include "../tools/constants.cpp"
+#include "../tools/vector.hpp"
+#include "../tools/constants.hpp"
 #include <cmath>
 
 using namespace std;

@@ -1,21 +1,11 @@
-#pragma once
-
-#include "opencv2/opencv.hpp"
-#include <vector>
-#include <string>
+#include <opencv2/opencv.hpp>
 #include <fstream>
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include "configuration.cpp"
+#include <vector>
+#include "configuration.hpp"
+#include "tracking.hpp"
 
 using namespace std;
 using namespace cv;
-
-void processVideo(const string& filename, const int video_number);
-void processFrame(const int i, const int j);
-Frame getFrame(const int i, const int j);
-void printCenter(Mat& mat, const int x, const int y);
 
 void multithreading() {
 	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
@@ -87,7 +77,7 @@ void processVideo(const string& filename, const int video_number) {
 	}
 
 	loadFrames(ref(capture), video_number);
- 
+
 	vector<thread> threads;
 
 	for (int i = 0; i < number_of_threads; i++) {
@@ -103,7 +93,7 @@ void processVideo(const string& filename, const int video_number) {
 				processFrame(thread_number, j);
 			}
 			return;
-		});
+			});
 	}
 	while (current_frame_number < total_frames) {
 		unique_lock<mutex> lock(mtx);
@@ -213,22 +203,21 @@ void cutter() {
 
 
 void processVideoSingleThreaded(VideoCapture capture, String name) {
-	// Define the output video file properties
+	/* Define the output video file properties
 	int fourcc = VideoWriter::fourcc('m', 'p', '4', 'v'); // MP4 codec
 	double fps = capture.get(CAP_PROP_FPS);
 	Size frame_size(capture.get(cv::CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
 	string output_name = name;
 	output_name.erase(output_name.size() - 4);
 	output_name += "-tracked.MP4";
-	//VideoWriter writer(output_name, fourcc, fps, frame_size);
+	VideoWriter writer(output_name, fourcc, fps, frame_size); */
 
-	Rect region_of_interest(0, 0, 1920, 1080 / 2);
-
+	//Rect region_of_interest(0, 0, 1920, 1080 / 2);
 	Mat total_frame;
 	int i(1);
 	while (capture.read(total_frame)) {
 
-		Mat frame = total_frame(region_of_interest);
+		Mat frame = total_frame;
 
 		// Convert the frame from RGB to HSV
 		Mat hsv;
@@ -252,12 +241,14 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		if (center.x >= 0 and center.y >= 0) {
 			printCenter(ref(result), center.x, center.y);
 		}
-		
+
 		imshow("Mask", result);
+		imshow("Original", frame);
 		cout << "Image " << i << " proccessed" << endl;
 		waitKey(1);
 		i++;
 	}
+
 }
 
 
@@ -276,7 +267,7 @@ void printCenter(Mat& mat, const int x, const int y) {
 
 void singlethreading() {
 	//glob(path, filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
+	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.mp4");
 	for (const auto& filename : filenames) {
 		VideoCapture capture(filename);
 		if (!capture.isOpened()) {
@@ -287,4 +278,9 @@ void singlethreading() {
 		cout << filename << " was processed" << endl;
 		break;
 	}
+}
+
+void initTracking() {
+	current_frame_number = 0;
+	shouldLoadFrames = false;
 }

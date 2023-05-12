@@ -1,17 +1,9 @@
-#pragma once
-
-#include "vector.h"
+#include "vector.hpp"
 #include <string>
 #include <cmath>
 #include <vector>
 
 using namespace std;
-
-Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v, double size) {
-    const double x(u.getY() * v.getZ() - u.getZ() * v.getY()), y(v.getX() * u.getZ() - u.getX() * v.getZ()), z(u.getX() * v.getY() - u.getY() * v.getX());
-    size /= sqrt(sq(x) + sq(y) + sq(z));
-    return Vect3D(x * size, y * size, z * size);
-}
 
 Vect3D::Vect3D()
 {
@@ -79,7 +71,7 @@ string Vect3D::toString() const
     return "X = " + to_string(x) + "\nY = " + to_string(y) + "\nZ = " + to_string(z);
 }
 
-void Vect3D::addValue(double xt = 0, double yt = 0, double zt = 0)
+void Vect3D::addValue(double xt, double yt, double zt)
 {
     x += xt;
     y += yt;
@@ -91,4 +83,14 @@ void Vect3D::setValue(double xt, double yt, double zt)
     x = xt;
     y = yt;
     z = zt;
+}
+
+double sq(double number) {
+    return number * number;
+}
+
+Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v, double size) {
+    const double x(u.getY() * v.getZ() - u.getZ() * v.getY()), y(v.getX() * u.getZ() - u.getX() * v.getZ()), z(u.getX() * v.getY() - u.getY() * v.getX());
+    size /= std::sqrt(sq(x) + sq(y) + sq(z));
+    return Vect3D(x * size, y * size, z * size);
 }
