@@ -8,11 +8,10 @@
 #include "simulations/gravity.h"
 #include "tools/python_link.hpp"
 #include "tools/export.hpp"
+#include "loader.hpp"
 
 using namespace std;
 
-string const errorMsg("An error occured, we're deeply sorry :(");
-string const textPath("../data/en.txt");
 vector<string> paragraphs;
 
 void openFile()

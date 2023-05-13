@@ -20,4 +20,6 @@ void printCenter(Mat& mat, const int x, const int y);
 void singlethreading();
 void initTracking();
 
+void window(Mat& matrice, Mat& result_matrice);
+
 #endif

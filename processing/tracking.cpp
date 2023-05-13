@@ -7,6 +7,72 @@
 using namespace std;
 using namespace cv;
 
+float opacity = 1;
+
+void window(vector<Mat>& original_matrice, vector<Mat>& result_matrice) {
+
+	if (original_matrice.size() != result_matrice.size()) {
+		return;
+	}
+
+	const String name = "Window";
+	Size size(1920 / 2, 1080 / 2);
+	Size windowSize(1920 / 1.5, 1080 / 1.5);
+	Point image_pos(0, 0);
+	bool stop = false;
+
+	int actual = 0;
+
+	while (not stop) {
+		Mat matrice;
+		addWeighted(original_matrice[actual], opacity, result_matrice[actual], 1 - opacity, 0.0, matrice);
+		resize(matrice, matrice, size);
+		Mat window_image(windowSize, CV_8UC3, Scalar(0, 0, 0));
+		Rect roi(image_pos, size);
+		Mat roi_image = window_image(roi);
+		resize(matrice, roi_image, size);
+
+		namedWindow(name, WINDOW_NORMAL);
+		resizeWindow(name, windowSize);
+
+		while (true) {
+			imshow("Window", window_image);
+
+			int key = waitKeyEx(100);
+			if (key == 2424832) {  //left_arrow_key
+				if (actual > 0) {
+					actual -= 1;
+					break;
+				}
+			}
+			else if (key == 2555904) {  //right_arrow_key
+				if (actual < original_matrice.size() - 1) {
+					actual += 1;
+					break;
+				}
+			}
+			else if (key == 2490368) {  //key_up
+				if (opacity < 1) {
+					opacity += 0.25;
+					cout << opacity << endl;
+					break;
+				}
+			}
+			else if (key == 2621440) {  //key_down
+				if (opacity > 0) {
+					opacity -= 0.25;
+					cout << opacity << endl;
+					break;
+				}
+			}
+			else if (key == 27) {
+				stop = true;
+				break;
+			}
+		}
+	}
+}
+
 void multithreading() {
 	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
 	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
@@ -154,9 +220,6 @@ Frame getFrame(const int i, const int j) {
 }
 
 
-
-
-
 void cutter() {
 	// Open the input video
 	VideoCapture input_cap("C:\\Users\\fagot\\Videos\\tipe\\MVI_0009.MP4");
@@ -203,6 +266,8 @@ void cutter() {
 
 
 void processVideoSingleThreaded(VideoCapture capture, String name) {
+	vector<Mat> l1;
+	vector<Mat> l2;
 	/* Define the output video file properties
 	int fourcc = VideoWriter::fourcc('m', 'p', '4', 'v'); // MP4 codec
 	double fps = capture.get(CAP_PROP_FPS);
@@ -212,12 +277,12 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 	output_name += "-tracked.MP4";
 	VideoWriter writer(output_name, fourcc, fps, frame_size); */
 
-	//Rect region_of_interest(0, 0, 1920, 1080 / 2);
+	Rect region_of_interest(0, 0, 1920, 1080 / 2);
 	Mat total_frame;
 	int i(1);
 	while (capture.read(total_frame)) {
 
-		Mat frame = total_frame;
+		Mat frame = total_frame(region_of_interest);
 
 		// Convert the frame from RGB to HSV
 		Mat hsv;
@@ -242,32 +307,35 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 			printCenter(ref(result), center.x, center.y);
 		}
 
-		imshow("Mask", result);
-		imshow("Original", frame);
+		//imshow("Mask", result);
+		//imshow("Original", frame);
+
+		Size size(1920, 1080/2);
+		Mat blackMat(1080, 1920, CV_8UC3, cv::Scalar(0, 0, 0));
+		Rect roi(Point(0, 0), size);
+		Mat roi_image = blackMat(roi);
+		resize(result, roi_image, size);
+
+		l1.push_back(total_frame.clone());
+		l2.push_back(blackMat);
 		cout << "Image " << i << " proccessed" << endl;
 		waitKey(1);
 		i++;
 	}
+	
+	window(l1, l2);
 
 }
 
 
 void printCenter(Mat& mat, const int x, const int y) {
-	mat.at<Vec3b>(y, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y, x - 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x - 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x - 1) = Vec3b(0, 0, 255);
+	circle(mat, Point(x, y), 50, Scalar(0, 0, 255), 4, LINE_AA, false);
 }
 
 
 void singlethreading() {
 	//glob(path, filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.mp4");
+	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test1.mp4");
 	for (const auto& filename : filenames) {
 		VideoCapture capture(filename);
 		if (!capture.isOpened()) {
