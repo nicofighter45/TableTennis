@@ -7,71 +7,238 @@
 using namespace std;
 using namespace cv;
 
-float opacity = 1;
+void initTracking() {
+	// initializer, set default values for all variables that are in configuration.cpp
+	currentLoadedFrame = 0;
+	actualWatchedFrame = 0;
+	watchedOpacity = 1;
+	watchedZoom = 1;
+	shouldLoadFrames = false;
+	watchedPos = { 0, 0 };
 
-void window(vector<Mat>& original_matrice, vector<Mat>& result_matrice) {
+	// default orange range, the best one we figured out for now
+	lower_color = Scalar(0, 65, 65); 
+	upper_color = Scalar(20, 255, 255);
+}
 
-	if (original_matrice.size() != result_matrice.size()) {
+void setupTracking() {
+	// this method is used to find the most optimized range
+
+	// the capture of the video (testFilePath is the path to a video that is small enough for the setup)
+	VideoCapture capture(testFilePath);
+
+	// error if video can't be open
+	if (!capture.isOpened()) {
+		cerr << "Failed to open test video" << endl;
 		return;
 	}
 
-	const String name = "Window";
-	Size size(1920 / 2, 1080 / 2);
-	Size windowSize(1920 / 1.5, 1080 / 1.5);
-	Point image_pos(0, 0);
-	bool stop = false;
+	// getting all video settings into proper variables
+	fps = capture.get(CAP_PROP_FPS);
+	width = capture.get(CAP_PROP_FRAME_WIDTH);
+	height = capture.get(CAP_PROP_FRAME_HEIGHT);
+	total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
 
-	int actual = 0;
+	// we read every frame and store it inside a vector (list), that's why we need a small video
+	vector<Mat> readed_frames;
+	Mat readed_frame;
+	while (capture.read(readed_frame)) {
+		// don't forget to .clone() in order to have the content and not the element
+		readed_frames.push_back(readed_frame.clone());
+	}
 
-	while (not stop) {
-		Mat matrice;
-		addWeighted(original_matrice[actual], opacity, result_matrice[actual], 1 - opacity, 0.0, matrice);
-		resize(matrice, matrice, size);
+	// do while loop for loaded image, work 'till showWindow() return True
+	do {
+		// process the frame
+
+		// get the image from the list
+		Mat originalFrame = readed_frames[actualWatchedFrame];
+		// resize only in the region we are interested in
+		Mat imagetoProcess = originalFrame(testFileROI);
+		// convert to hsv image format
+		Mat hsvImage;
+		cvtColor(imagetoProcess, hsvImage, COLOR_BGR2HSV);
+		// this matrice is a mask that is blank if pixel are in the range, black otherwise
+		Mat maskImage;
+		inRange(hsvImage, lower_color, upper_color, maskImage);
+		// we fusion original image and mask to make only pixel in range appear
+		Mat resultImage;
+		bitwise_and(imagetoProcess, imagetoProcess, resultImage, maskImage);
+		// calculate the center of the detected pixels
+		Moments m = moments(maskImage, true);
+		Point center(m.m10 / m.m00, m.m01 / m.m00);
+
+		// if center is positive ie it exist, we print a circle in the resultImage and in the original one too
+		if (center.x >= 0 and center.y >= 0) {
+			printCircleCenter(ref(resultImage), center.x, center.y);
+			printCircleCenter(ref(originalFrame), center.x, center.y);
+		}
+
+		// getting a black full size matrice
+		Mat blackMat(height, width, CV_8UC3, Scalar(0, 0, 0));
+		// coppy on the top left our image, in order to rescal it full size (because we only tracked in a portion of the image)
+		Mat roi_image = blackMat(testFileROI);
+		resultImage.copyTo(roi_image);
+		// fusionning result and orignal matrice (depending on opacity) so we can see both by transparency
+		Mat temp;
+		addWeighted(originalFrame, watchedOpacity, blackMat, 1 - watchedOpacity, 0.0, temp);
+		// set the variable to this matrice, so showWIndow will find it
+		matForIniti = temp;
+	} while (showWindow());
+}
+
+bool showWindow() {
+	Size imageSize(width * imageScalar * windowScalar, height * imageScalar * windowScalar);
+	Size windowSize(width * windowScalar, height * windowScalar);
+	Point imagePosition(0, 0);
+	namedWindow(windowName, WINDOW_NORMAL);
+	resizeWindow(windowName, windowSize);
+
+	int mouseData[2] = { 0, 0 };
+	setMouseCallback(windowName, mouseCallback, mouseData);
+
+	thread keyboardThread;
+
+	while (true) {
+
+		Mat matrice = matForIniti(Rect(watchedPos.x, watchedPos.y, width / watchedZoom, height / watchedZoom));
+
+		resize(matrice, matrice, imageSize);
+
 		Mat window_image(windowSize, CV_8UC3, Scalar(0, 0, 0));
-		Rect roi(image_pos, size);
+		Rect roi(imagePosition, imageSize);
 		Mat roi_image = window_image(roi);
-		resize(matrice, roi_image, size);
+		resize(matrice, roi_image, imageSize);
 
-		namedWindow(name, WINDOW_NORMAL);
-		resizeWindow(name, windowSize);
-
-		while (true) {
-			imshow("Window", window_image);
-
-			int key = waitKeyEx(100);
-			if (key == 2424832) {  //left_arrow_key
-				if (actual > 0) {
-					actual -= 1;
-					break;
-				}
-			}
-			else if (key == 2555904) {  //right_arrow_key
-				if (actual < original_matrice.size() - 1) {
-					actual += 1;
-					break;
-				}
-			}
-			else if (key == 2490368) {  //key_up
-				if (opacity < 1) {
-					opacity += 0.25;
-					cout << opacity << endl;
-					break;
-				}
-			}
-			else if (key == 2621440) {  //key_down
-				if (opacity > 0) {
-					opacity -= 0.25;
-					cout << opacity << endl;
-					break;
-				}
-			}
-			else if (key == 27) {
-				stop = true;
+		imshow(windowName, window_image);
+		
+		int key = waitKeyEx(10);
+		if (key == 2424832) {  //left_arrow_key
+			if (actualWatchedFrame > 0) {
+				actualWatchedFrame -= 1;
 				break;
 			}
 		}
+		else if (key == 2555904) {  //right_arrow_key
+			if (actualWatchedFrame < total_frames - 1) {
+				actualWatchedFrame += 1;
+				break;
+			}
+		}
+		else if (key == 2490368) {  //up_arrow_key
+			if (watchedOpacity < 1) {
+				watchedOpacity += 0.25;
+				break;
+			}
+		}
+		else if (key == 2621440) {  //down_arrow_key
+			if (watchedOpacity > 0) {
+				watchedOpacity -= 0.25;
+				break;
+			}
+		}
+		else if (key == 27) { //espace
+			return false;
+		}
+		else if (key == 'i') {
+			cout << "Give your values, here are actual ones" << endl 
+				<< lower_color[0] << " " << lower_color[1] << " " << lower_color[2] << " "
+				<< upper_color[0] << " " << upper_color[1] << " " << upper_color[2] << endl;
+			string input;
+			getline(cin, input);
+			vector<string> inputs;
+			string current("");
+			for (unsigned int i = 0; i < input.length(); i++)
+			{
+				char c = input[i];
+				if (c == ' ')
+				{
+					inputs.push_back(current);
+					current = "";
+				}
+				else
+				{
+					current += c;
+				}
+			}
+			inputs.push_back(current);
+			lower_color = Scalar(stof(inputs[0]), stof(inputs[1]), stof(inputs[2]));
+			upper_color = Scalar(stof(inputs[3]), stof(inputs[4]), stof(inputs[5]));
+			cout << "Values are now:" << endl
+				<< lower_color[0] << " " << lower_color[1] << " " << lower_color[2] << " "
+				<< upper_color[0] << " " << upper_color[1] << " " << upper_color[2] << endl;
+			break;
+		}
+
+	}
+	cout << "processing ..." << endl;
+	return true;
+}
+
+
+
+void mouseCallback(int event, int x, int y, int flags, void* userdata) {
+	if (event == EVENT_LBUTTONUP) {
+		*(int*)userdata = 0;
+		*((int*)userdata + 1) = 0;
+	}else if (event == EVENT_LBUTTONDBLCLK) {
+		if (watchedZoom < 10) {
+			watchedZoom *= 2;
+			setNewWatchedPos(x / 2, y / 2);
+		}
+	}else if (event == EVENT_RBUTTONDOWN) {
+		if (watchedZoom > 1) {
+			watchedZoom = 1;
+			watchedPos = Pos{ 0, 0 };
+		}
+	}else if (flags == EVENT_FLAG_LBUTTON && event == EVENT_MOUSEMOVE) {
+		if (*(int*)userdata == 0) {
+			*(int*)userdata = x;
+		}
+		if (*((int*)userdata + 1) == 0) {
+			*((int*)userdata + 1) = y;
+		}
+		int dx = x - *(int*)userdata;
+		int dy = y - *((int*)userdata + 1);
+		*(int*)userdata = x;
+		*((int*)userdata + 1) = y;
+		setNewWatchedPos(watchedPos.x + dx, watchedPos.y + dy);
 	}
 }
+
+void keyboardCallback(int key, void* userdata) {
+
+}
+
+void setNewWatchedPos(int x, int y) {
+	if (x > 0 and x + width / watchedZoom < width) {
+		watchedPos.x = x;
+	}
+	else {
+		watchedPos.x = width - width / watchedZoom;
+	}
+	if (y > 0 and y + height / watchedZoom < height) {
+		watchedPos.y = y;
+	}
+	else {
+		watchedPos.y = height - height / watchedZoom;
+	}
+}
+
+void printCircleCenter(Mat& mat, const int x, const int y) {
+	circle(mat, Point(x, y), 50, Scalar(0, 0, 255), 4, LINE_AA, false);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 void multithreading() {
 	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
@@ -97,17 +264,17 @@ void multithreading() {
 		frames.clear();
 		positionsResults.clear();
 		orderedPositions.clear();
-		current_frame_number = { 0 };
+		currentLoadedFrame = { 0 };
 	}
 }
 
 void loadFrames(VideoCapture& capture, const int video_number) {
-	int next_frame_number = current_frame_number + number_frames_to_read_ahead;
+	int next_frame_number = currentLoadedFrame + number_frames_to_read_ahead;
 	if (next_frame_number >= total_frames) {
 		next_frame_number = total_frames;
 	}
 
-	for (int i = current_frame_number; i < next_frame_number; ++i) {
+	for (int i = currentLoadedFrame; i < next_frame_number; ++i) {
 		Mat frame;
 		if (!capture.read(frame)) {
 			cout << "------------------Failed to read frame------------------" << i << endl;
@@ -118,7 +285,7 @@ void loadFrames(VideoCapture& capture, const int video_number) {
 		frames[i % number_of_threads].push_back(value);
 	}
 
-	current_frame_number = next_frame_number;
+	currentLoadedFrame = next_frame_number;
 	shouldLoadFrames = false;
 }
 
@@ -161,7 +328,7 @@ void processVideo(const string& filename, const int video_number) {
 			return;
 			});
 	}
-	while (current_frame_number < total_frames) {
+	while (currentLoadedFrame < total_frames) {
 		unique_lock<mutex> lock(mtx);
 		cvariable.wait(lock, [] { return shouldLoadFrames == true; });
 		loadFrames(ref(capture), video_number);
@@ -266,17 +433,6 @@ void cutter() {
 
 
 void processVideoSingleThreaded(VideoCapture capture, String name) {
-	vector<Mat> l1;
-	vector<Mat> l2;
-	/* Define the output video file properties
-	int fourcc = VideoWriter::fourcc('m', 'p', '4', 'v'); // MP4 codec
-	double fps = capture.get(CAP_PROP_FPS);
-	Size frame_size(capture.get(cv::CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
-	string output_name = name;
-	output_name.erase(output_name.size() - 4);
-	output_name += "-tracked.MP4";
-	VideoWriter writer(output_name, fourcc, fps, frame_size); */
-
 	Rect region_of_interest(0, 0, 1920, 1080 / 2);
 	Mat total_frame;
 	int i(1);
@@ -304,7 +460,7 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		Point center(m.m10 / m.m00, m.m01 / m.m00);
 
 		if (center.x >= 0 and center.y >= 0) {
-			printCenter(ref(result), center.x, center.y);
+			printCircleCenter(ref(result), center.x, center.y);
 		}
 
 		//imshow("Mask", result);
@@ -316,20 +472,13 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		Mat roi_image = blackMat(roi);
 		resize(result, roi_image, size);
 
-		l1.push_back(total_frame.clone());
-		l2.push_back(blackMat);
 		cout << "Image " << i << " proccessed" << endl;
 		waitKey(1);
 		i++;
 	}
 	
-	window(l1, l2);
+	showWindow();
 
-}
-
-
-void printCenter(Mat& mat, const int x, const int y) {
-	circle(mat, Point(x, y), 50, Scalar(0, 0, 255), 4, LINE_AA, false);
 }
 
 
@@ -346,9 +495,4 @@ void singlethreading() {
 		cout << filename << " was processed" << endl;
 		break;
 	}
-}
-
-void initTracking() {
-	current_frame_number = 0;
-	shouldLoadFrames = false;
 }

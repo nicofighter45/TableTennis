@@ -4,6 +4,6 @@
 int main()
 {
     initTracking();
-    singlethreading();
+    setupTracking();
     return 0;
 }
