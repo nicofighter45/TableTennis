@@ -4,7 +4,7 @@ import math as mt
 import matplotlib.gridspec as gridspec
 
 t,x,y,z = [],[],[],[]
-with open("/Users/antoine/TIPE/TableTennis/Visualisation/transfer_value.txt", "r") as file:
+with open("transfer_value.txt", "r") as file:
     lines = file.readlines()
     i = 0
     for line in lines:

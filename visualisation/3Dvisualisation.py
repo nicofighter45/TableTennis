@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math as mt
 t,x,y,z = [],[],[],[]
-with open("/Users/antoine/TIPE/TableTennis/Visualisation/transfer_value.txt", "r") as file:
+with open("transfer_value.txt", "r") as file:
     lines = file.readlines()
     i = 0
     for line in lines:
@@ -56,6 +56,6 @@ def animation():
         Z = z[phi] + 0.01 * np.outer(np.ones(np.size(u)), np.cos(v)) +0.01
         wframe = ax2.plot_wireframe(X,Y ,Z,color= "#ff7f0e",label='lancée de balle de tennis de table')
         ax2.set_aspect('equal')
-        plt.pause(.001)
+        plt.pause(0.01)
 
 animation()

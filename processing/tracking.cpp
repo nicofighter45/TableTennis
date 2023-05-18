@@ -3,6 +3,8 @@
 #include <vector>
 #include "configuration.hpp"
 #include "tracking.hpp"
+#include "prompt.hpp"
+#include "analyse.hpp"
 
 using namespace std;
 using namespace cv;
@@ -11,14 +13,15 @@ void initTracking() {
 	// initializer, set default values for all variables that are in configuration.cpp
 	currentLoadedFrame = 0;
 	actualWatchedFrame = 0;
-	watchedOpacity = 1;
-	watchedZoom = 1;
+	watchedOpacity = 25; // from 0 to 100
+	watchedZoom = 1; // from 1 to 16
 	shouldLoadFrames = false;
+	shouldBreak = false;
 	watchedPos = { 0, 0 };
 
 	// default orange range, the best one we figured out for now
-	lower_color = Scalar(0, 65, 65); 
-	upper_color = Scalar(20, 255, 255);
+	lower_color = HSVColor{ 0, 65, 65 };
+	upper_color = HSVColor{ 20, 255, 255 };
 }
 
 void setupTracking() {
@@ -47,197 +50,37 @@ void setupTracking() {
 		readed_frames.push_back(readed_frame.clone());
 	}
 
+	// prepare the window to show frames
+	initialisePrompts();
+
 	// do while loop for loaded image, work 'till showWindow() return True
 	do {
-		// process the frame
-
 		// get the image from the list
-		Mat originalFrame = readed_frames[actualWatchedFrame];
+		Mat originalFrame = readed_frames[actualWatchedFrame].clone();
 		// resize only in the region we are interested in
 		Mat imagetoProcess = originalFrame(testFileROI);
-		// convert to hsv image format
-		Mat hsvImage;
-		cvtColor(imagetoProcess, hsvImage, COLOR_BGR2HSV);
-		// this matrice is a mask that is blank if pixel are in the range, black otherwise
-		Mat maskImage;
-		inRange(hsvImage, lower_color, upper_color, maskImage);
-		// we fusion original image and mask to make only pixel in range appear
-		Mat resultImage;
-		bitwise_and(imagetoProcess, imagetoProcess, resultImage, maskImage);
-		// calculate the center of the detected pixels
-		Moments m = moments(maskImage, true);
-		Point center(m.m10 / m.m00, m.m01 / m.m00);
+
+		// analyse the frame
+		Analyser analyser(ref(imagetoProcess));
 
 		// if center is positive ie it exist, we print a circle in the resultImage and in the original one too
-		if (center.x >= 0 and center.y >= 0) {
-			printCircleCenter(ref(resultImage), center.x, center.y);
-			printCircleCenter(ref(originalFrame), center.x, center.y);
+		if (analyser.getCenterX() >= 0 and analyser.getCenterY() >= 0) {
+			printCircle(analyser.getResultMatrice(), analyser.getCenterPixels());
+			printCircle(ref(originalFrame), analyser.getCenterPixels());
 		}
 
 		// getting a black full size matrice
-		Mat blackMat(height, width, CV_8UC3, Scalar(0, 0, 0));
+		Mat blackMatrice(height, width, CV_8UC3, Scalar(0, 0, 0));
 		// coppy on the top left our image, in order to rescal it full size (because we only tracked in a portion of the image)
-		Mat roi_image = blackMat(testFileROI);
-		resultImage.copyTo(roi_image);
+		Mat regionOfInterestMatrice = blackMatrice(testFileROI);
+		analyser.getResultMatrice().copyTo(regionOfInterestMatrice);
 		// fusionning result and orignal matrice (depending on opacity) so we can see both by transparency
-		Mat temp;
-		addWeighted(originalFrame, watchedOpacity, blackMat, 1 - watchedOpacity, 0.0, temp);
-		// set the variable to this matrice, so showWIndow will find it
-		matForIniti = temp;
+		matForIniti.deallocate();
+		const float conversion = static_cast<float>(watchedOpacity) / 100;
+		addWeighted(originalFrame, conversion, blackMatrice, 1 - conversion, 0.0, matForIniti);
+		printRectangle(ref(matForIniti), testFileROI);
 	} while (showWindow());
 }
-
-bool showWindow() {
-	Size imageSize(width * imageScalar * windowScalar, height * imageScalar * windowScalar);
-	Size windowSize(width * windowScalar, height * windowScalar);
-	Point imagePosition(0, 0);
-	namedWindow(windowName, WINDOW_NORMAL);
-	resizeWindow(windowName, windowSize);
-
-	int mouseData[2] = { 0, 0 };
-	setMouseCallback(windowName, mouseCallback, mouseData);
-
-	thread keyboardThread;
-
-	while (true) {
-
-		Mat matrice = matForIniti(Rect(watchedPos.x, watchedPos.y, width / watchedZoom, height / watchedZoom));
-
-		resize(matrice, matrice, imageSize);
-
-		Mat window_image(windowSize, CV_8UC3, Scalar(0, 0, 0));
-		Rect roi(imagePosition, imageSize);
-		Mat roi_image = window_image(roi);
-		resize(matrice, roi_image, imageSize);
-
-		imshow(windowName, window_image);
-		
-		int key = waitKeyEx(10);
-		if (key == 2424832) {  //left_arrow_key
-			if (actualWatchedFrame > 0) {
-				actualWatchedFrame -= 1;
-				break;
-			}
-		}
-		else if (key == 2555904) {  //right_arrow_key
-			if (actualWatchedFrame < total_frames - 1) {
-				actualWatchedFrame += 1;
-				break;
-			}
-		}
-		else if (key == 2490368) {  //up_arrow_key
-			if (watchedOpacity < 1) {
-				watchedOpacity += 0.25;
-				break;
-			}
-		}
-		else if (key == 2621440) {  //down_arrow_key
-			if (watchedOpacity > 0) {
-				watchedOpacity -= 0.25;
-				break;
-			}
-		}
-		else if (key == 27) { //espace
-			return false;
-		}
-		else if (key == 'i') {
-			cout << "Give your values, here are actual ones" << endl 
-				<< lower_color[0] << " " << lower_color[1] << " " << lower_color[2] << " "
-				<< upper_color[0] << " " << upper_color[1] << " " << upper_color[2] << endl;
-			string input;
-			getline(cin, input);
-			vector<string> inputs;
-			string current("");
-			for (unsigned int i = 0; i < input.length(); i++)
-			{
-				char c = input[i];
-				if (c == ' ')
-				{
-					inputs.push_back(current);
-					current = "";
-				}
-				else
-				{
-					current += c;
-				}
-			}
-			inputs.push_back(current);
-			lower_color = Scalar(stof(inputs[0]), stof(inputs[1]), stof(inputs[2]));
-			upper_color = Scalar(stof(inputs[3]), stof(inputs[4]), stof(inputs[5]));
-			cout << "Values are now:" << endl
-				<< lower_color[0] << " " << lower_color[1] << " " << lower_color[2] << " "
-				<< upper_color[0] << " " << upper_color[1] << " " << upper_color[2] << endl;
-			break;
-		}
-
-	}
-	cout << "processing ..." << endl;
-	return true;
-}
-
-
-
-void mouseCallback(int event, int x, int y, int flags, void* userdata) {
-	if (event == EVENT_LBUTTONUP) {
-		*(int*)userdata = 0;
-		*((int*)userdata + 1) = 0;
-	}else if (event == EVENT_LBUTTONDBLCLK) {
-		if (watchedZoom < 10) {
-			watchedZoom *= 2;
-			setNewWatchedPos(x / 2, y / 2);
-		}
-	}else if (event == EVENT_RBUTTONDOWN) {
-		if (watchedZoom > 1) {
-			watchedZoom = 1;
-			watchedPos = Pos{ 0, 0 };
-		}
-	}else if (flags == EVENT_FLAG_LBUTTON && event == EVENT_MOUSEMOVE) {
-		if (*(int*)userdata == 0) {
-			*(int*)userdata = x;
-		}
-		if (*((int*)userdata + 1) == 0) {
-			*((int*)userdata + 1) = y;
-		}
-		int dx = x - *(int*)userdata;
-		int dy = y - *((int*)userdata + 1);
-		*(int*)userdata = x;
-		*((int*)userdata + 1) = y;
-		setNewWatchedPos(watchedPos.x + dx, watchedPos.y + dy);
-	}
-}
-
-void keyboardCallback(int key, void* userdata) {
-
-}
-
-void setNewWatchedPos(int x, int y) {
-	if (x > 0 and x + width / watchedZoom < width) {
-		watchedPos.x = x;
-	}
-	else {
-		watchedPos.x = width - width / watchedZoom;
-	}
-	if (y > 0 and y + height / watchedZoom < height) {
-		watchedPos.y = y;
-	}
-	else {
-		watchedPos.y = height - height / watchedZoom;
-	}
-}
-
-void printCircleCenter(Mat& mat, const int x, const int y) {
-	circle(mat, Point(x, y), 50, Scalar(0, 0, 255), 4, LINE_AA, false);
-}
-
-
-
-
-
-
-
-
-
-
 
 
 void multithreading() {
@@ -350,7 +193,7 @@ void processFrame(const int i, const int j) {
 	cvtColor(frame, hsv_frame, COLOR_BGR2HSV);
 
 	Mat mask;
-	inRange(hsv_frame, lower_color, upper_color, mask);
+	inRange(hsv_frame, getScalarFromHSVColor(lower_color), getScalarFromHSVColor(upper_color), mask);
 
 	int num_non_black_pixels = countNonZero(mask);
 	if (num_non_black_pixels == 0) {
@@ -457,10 +300,10 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		// Display the segmented image for tuning the color range values
 		// writer.write(result);
 		Moments m = moments(mask, true);
-		Point center(m.m10 / m.m00, m.m01 / m.m00);
+		Pos center = { m.m10 / m.m00, m.m01 / m.m00 };
 
 		if (center.x >= 0 and center.y >= 0) {
-			printCircleCenter(ref(result), center.x, center.y);
+			printCircle(ref(result), center);
 		}
 
 		//imshow("Mask", result);

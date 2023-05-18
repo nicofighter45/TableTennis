@@ -7,16 +7,17 @@
 using namespace cv;
 using namespace std;
 
-Scalar lower_color;
-Scalar upper_color;
+HSVColor lower_color;
+HSVColor upper_color;
 int total_frames;
 int fps;
 int width;
 int height;
 int actualWatchedFrame;
-float watchedOpacity;
+int watchedOpacity;
 float watchedZoom;
 Pos watchedPos;
+bool shouldBreak;
 
 vector<vector<Frame>> frames;
 vector<vector<Pos>> positionsResults;
@@ -28,3 +29,7 @@ int currentLoadedFrame;
 atomic<bool> shouldLoadFrames;
 
 Mat matForIniti;
+
+Scalar getScalarFromHSVColor(HSVColor color) {
+	return Scalar(color.H, color.S, color.V);
+}

@@ -22,12 +22,9 @@ void singlethreading();
 
 void initTracking();
 void setupTracking();
-bool showWindow();
 void trackSinglethreading();
 void tackMultithreading();
 void analyseResults();
-void mouseCallback(int event, int x, int y, int flags, void* userdata);
-void setNewWatchedPos(int x, int y);
 
 
 #endif
