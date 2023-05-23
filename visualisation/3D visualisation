@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math as mt
+from matplotlib.animation import FuncAnimation
 t,x,y,z = [],[],[],[]
 with open("/Users/antoine/TIPE/TableTennis/Visualisation/transfer_value.txt", "r") as file:
     lines = file.readlines()
@@ -15,6 +16,7 @@ incertitudes = 0.05
 Ux,Uy,Uz = [l+incertitudes for l in x],[l+incertitudes for l in y],[l+incertitudes for l in z]
 Uxm,Uym,Uzm = [l-incertitudes for l in x],[o-incertitudes for o in y],[p-incertitudes for p in z]
 listede0=[0]*len(t)
+T,X,Y,Z = np.array(t),np.array(x),np.array(y),np.array(z)
 def tracé_3D() :
     ax = plt.figure().add_subplot(projection='3d')
     ax.plot(x, y, z, label='lancée de balle de tennis de table')
@@ -58,4 +60,31 @@ def animation():
         ax2.set_aspect('equal')
         plt.pause(.001)
 
+def courbeanime() :
+    # Create the figure and 3D axes
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Initialize the line object
+    line, = ax.plot([], [], [], color="#ff7f0e", lw=2)
+
+    def update(frame):
+        # Update the line data
+        line.set_data(X[:frame], Y[:frame])
+        line.set_3d_properties(Z[:frame]) 
+
+    # Create the animation
+    animation = FuncAnimation(fig, update, frames=len(t), interval=50)
+
+    # Set plot attributes
+    ax.set_xlim(min(x),max(x))
+    ax.set_ylim(min(y), max(y))
+    ax.set_zlim(0,max(z))
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title('3D Animation')
+
+    # Display the animation
+    plt.show()
 animation()
