@@ -87,4 +87,39 @@ def courbeanime() :
 
     # Display the animation
     plt.show()
-animation()
+
+
+def optimized_animation():
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot(projection='3d')
+    ax2.set_xlim(min(x) - 0.11, max(x) + 0.11)
+    ax2.set_ylim(min(y), max(y) + 6 * abs(mt.log10(max(y))))
+    ax2.set_zlim(0, 0.5)
+    u = np.linspace(0, 2 * np.pi, 100)
+    v = np.linspace(0, np.pi, 100)
+    ax2.set_xlabel('X')
+    ax2.set_ylabel('Y')
+    ax2.set_zlabel('Z')
+    wframe = None
+
+    def update_frame(phi):
+        nonlocal wframe
+
+        ax2.clear()
+        ax2.set_xlim(min(x) - 0.11, max(x) + 0.11)
+        ax2.set_ylim(min(y), max(y) + 6 * abs(mt.log10(max(y))))
+        ax2.set_zlim(0, 0.5)
+
+        X = x[phi] + 0.01 * np.outer(np.cos(u), np.sin(v)) + 0.01
+        Y = y[phi] + 0.01 * np.outer(np.sin(u), np.sin(v))
+        Z = z[phi] + 0.01 * np.outer(np.ones(np.size(u)), np.cos(v)) + 0.01
+
+        wframe = ax2.plot_wireframe(X, Y, Z, color="#ff7f0e", label='lancée de balle de tennis de table')
+        ax2.set_aspect('equal')
+
+    # Create the animation
+    animation = FuncAnimation(fig2, update_frame, frames=len(x),interval=1)
+
+    # Display the animation
+    plt.show()
+optimized_animation()
