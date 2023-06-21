@@ -20,8 +20,6 @@ void printCenter(Mat& mat, const int x, const int y);
 int current_frame_number;
 
 void multithreading() {
-	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
 	for (int k = 0; k < filenames.size(); k++) {
 		cout << "Processing video: " << filenames[k] << endl;
 		processVideo(ref(filenames[k]), k);
@@ -33,7 +31,7 @@ void multithreading() {
 			cout << position.x << ";" << position.y << ";" << endl;
 		}
 		ofstream file;
-		file.open("processing/output/" + to_string(k) + ".txt");
+		file.open("C:/Users/fagot/OneDrive/Documents/MPSI/TableTennis/processing/output/" + to_string(k) + "-tracked.txt");
 		if (file.is_open()) {
 			for (const Pos& position : orderedPositions) {
 				file << position.x << ";" << position.y << ";" << endl;
@@ -172,7 +170,7 @@ Frame getFrame(const int i, const int j) {
 
 void cutter() {
 	// Open the input video
-	VideoCapture input_cap("C:\\Users\\fagot\\Videos\\tipe\\MVI_0009.MP4");
+	VideoCapture input_cap("C:/Users/fagot/ShadowDrive/tipe/MVI_0014.MP4");
 	if (!input_cap.isOpened()) {
 		std::cerr << "Error: Could not open input video\n";
 		return;
@@ -185,11 +183,11 @@ void cutter() {
 	int total_frames = input_cap.get(CAP_PROP_FRAME_COUNT);
 
 	// Define output video properties
-	int start_frame = 15 * fps + 11;
-	int end_frame = 22 * fps;
+	int start_frame = 2 * fps + 0;
+	int end_frame = 6 * fps;
 	int output_width = width;
 	int output_height = height;
-	std::string output_filename = "C:\\Users\\fagot\\Videos\\tipe\\test2.MP4";
+	std::string output_filename = "C:/Users/fagot/ShadowDrive/tipe/output/rebond_raquette.MP4";
 
 	// Open the output video
 	VideoWriter output_cap(output_filename, VideoWriter::fourcc('X', '2', '6', '4'), fps, Size(output_width, output_height));
@@ -217,15 +215,19 @@ void cutter() {
 
 void processVideoSingleThreaded(VideoCapture capture, String name) {
 	// Define the output video file properties
+	/*
 	int fourcc = VideoWriter::fourcc('m', 'p', '4', 'v'); // MP4 codec
 	double fps = capture.get(CAP_PROP_FPS);
 	Size frame_size(capture.get(cv::CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
 	string output_name = name;
 	output_name.erase(output_name.size() - 4);
 	output_name += "-tracked.MP4";
+	*/
 	//VideoWriter writer(output_name, fourcc, fps, frame_size);
 
-	Rect region_of_interest(0, 0, 1920, 1080 / 2);
+	Rect region_of_interest(1200, 500, 700, 200);
+
+	vector<Pos> positions;
 
 	Mat total_frame;
 	int i(1);
@@ -234,8 +236,8 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		Mat hsv;
 		cvtColor(frame, hsv, COLOR_BGR2HSV);
 		Mat mask;
-		Scalar lower_color(0, 100, 100);
-		Scalar upper_color(20, 255, 255);
+		Scalar lower_color(10, 100, 100);
+		Scalar upper_color(25, 255, 255);
 		inRange(hsv, lower_color, upper_color, mask);
 		Mat result;
 		bitwise_and(frame, frame, result, mask);
@@ -243,11 +245,22 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		Point center(m.m10 / m.m00, m.m01 / m.m00);
 		if (center.x >= 0 and center.y >= 0) {
 			printCenter(ref(result), center.x, center.y);
+			Pos pos = { center.x, center.y };
+			positions.push_back(pos);
 		}
 		imshow("Mask", result);
 		cout << "Image " << i << " proccessed" << endl;
 		waitKey(1);
 		i++;
+	}
+
+	ofstream file;
+	file.open("C:/Users/fagot/OneDrive/Documents/MPSI/TableTennis/processing/output/" + to_string(i) + "-tracked.txt");
+	if (file.is_open()) {
+		for (const Pos& position : positions) {
+			file << position.x << ";" << position.y << ";" << endl;
+		}
+		file.close();
 	}
 }
 
@@ -266,8 +279,6 @@ void printCenter(Mat& mat, const int x, const int y) {
 
 
 void singlethreading() {
-	//glob(path, filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
 	for (const auto& filename : filenames) {
 		VideoCapture capture(filename);
 		if (!capture.isOpened()) {
@@ -278,4 +289,14 @@ void singlethreading() {
 		cout << filename << " was processed" << endl;
 		break;
 	}
+}
+
+int main() {
+	lower_color = HSVColor{ 0, 65, 65 };
+	upper_color = HSVColor{ 20, 255, 255 };
+	//glob("C:/Users/fagot/ShadowDrive/tipe/output/*.MP4", filenames, false);
+	filenames.push_back("C:/Users/fagot/ShadowDrive/tipe/output/rebond_raquette.MP4");
+	//filenames.push_back("C:/Users/fagot/ShadowDrive/tipe/test1.MP4");
+	singlethreading();
+	return 0;
 }
