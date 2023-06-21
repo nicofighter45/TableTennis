@@ -61,6 +61,8 @@ void setupTracking() {
 		Mat imagetoProcess = originalFrame(testFileROI);
 
 		// analyse the frame
+		
+		/*
 		Analyser analyser(ref(imagetoProcess));
 
 		// if center is positive ie it exist, we print a circle in the resultImage and in the original one too
@@ -79,13 +81,14 @@ void setupTracking() {
 		const float conversion = static_cast<float>(watchedOpacity) / 100;
 		addWeighted(originalFrame, conversion, blackMatrice, 1 - conversion, 0.0, matForIniti);
 		printRectangle(ref(matForIniti), testFileROI);
+		*/
 	} while (showWindow());
 }
 
 
 void multithreading() {
-	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
+	//glob(path, filenames, false);
+	filenames.push_back(testFilePath);
 	for (int k = 0; k < filenames.size(); k ++) {
 		cout << "Processing video: " << filenames[k] << endl;
 		processVideo(ref(filenames[k]), k);
@@ -327,7 +330,7 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 
 void singlethreading() {
 	//glob(path, filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test1.mp4");
+	filenames.push_back(testFilePath);
 	for (const auto& filename : filenames) {
 		VideoCapture capture(filename);
 		if (!capture.isOpened()) {

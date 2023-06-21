@@ -30,6 +30,8 @@ public:
 
     void setValue(double xt, double yt, double zt);
 
+    std::tuple<double, double, double> getValues();
+
     std::string toString() const;
 
 };

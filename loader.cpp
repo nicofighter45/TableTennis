@@ -17,8 +17,7 @@ vector<string> paragraphs;
 void openFile()
 {
     ifstream textFile(textPath);
-    if (!textFile)
-        cerr << errorMsg << endl;
+    if (!textFile) cerr << errorMsg << "bou" << endl;
     string line;
     string currentParagraph("");
     int space = 0;
@@ -69,6 +68,8 @@ void run()
     cout << paragraphs[3] << endl;
     getline(cin, iniS);
 
+    cout << endl << paragraphs[4] << endl;
+
     Vect3D initialPosition = iniP;
     Vect3D initialSpeed = iniS;
 
@@ -80,12 +81,15 @@ void run()
     }
     else if (simulationType == "2")
     {
-        vector<Vect3D> positions = runFrictionSimulation(initialPosition, initialSpeed);
-        print2DGraph(positions);
+        print2DGraph(runFrictionSimulation(initialPosition, initialSpeed), "friction");
     }
     else if (simulationType == "3")
     {
-        runMagnusSimulation(initialPosition, initialSpeed);
+        auto vectors = runMagnusSimulation(initialPosition, initialSpeed);
+
+        print2DGraph(get<0>(vectors), "magnus position");
+        print2DGraph(get<1>(vectors), "magnus speed");
+        print2DGraph(get<2>(vectors), "magnus acceleration");
     }
     else
     {

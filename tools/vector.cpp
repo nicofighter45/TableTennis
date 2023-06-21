@@ -85,6 +85,10 @@ void Vect3D::setValue(double xt, double yt, double zt)
     z = zt;
 }
 
+tuple<double, double, double> Vect3D::getValues() {
+    return forward_as_tuple(x, y, z);
+}
+
 double sq(double number) {
     return number * number;
 }

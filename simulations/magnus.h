@@ -7,15 +7,15 @@
 
 using namespace std;
 
-vector<Vect3D> runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
+
+auto runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
 {
 
-    double const rotation(1);
+    double const rotation(0.001);
     Vect3D const rotationVector(-1, 0, 0);
     double const S0(1);
 
-    double const e((rho * Cx * surface) / (2 * mass));
-    double const f(S0 * rotation / mass);
+    double const magnus_const(S0 * rotation / mass);
 
     Vect3D position(initialPosition);
     Vect3D speed(initialSpeed);
@@ -28,34 +28,46 @@ vector<Vect3D> runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
 
     double coefficient(0), coefficient_magnus(0), speed_size(0);
 
-    vector<Vect3D> positions(1, initialPosition);
+    vector<tuple<double, double, double>> positions(1, initialPosition.getValues());
+    vector<tuple<double, double, double>> speeds(1, initialSpeed.getValues());
+    vector<tuple<double, double, double>> accelerations(1, tuple(0, 0, 0));
 
     while (position.getZ() > 0)
     {
         speed_size = speed.size();
-        coefficient = -e * speed_size;
-        coefficient_magnus = f * speed_size;
+        coefficient = -magnus_const * speed_size;
+        coefficient_magnus = magnus_const * speed_size;
         Vect3D magnusForce = vectorialProduct(speed, rotationVector, coefficient_magnus);
-        acceleration.setValue(coefficient * speed.getX() + magnusForce.getX(), coefficient * speed.getY() + magnusForce.getY(),
-                              coefficient * speed.getZ() - gravity + magnusForce.getZ());
-        speed.addValue(old_acceleration.getX() * interval, old_acceleration.getY() * interval, old_acceleration.getZ() * interval);
-        position.addValue(old_speed.getX() * interval, old_speed.getY() * interval, old_speed.getZ() * interval);
+        cout << speed_size << " " << coefficient << " " << coefficient_magnus << " "
+            << magnusForce.getX() << " " << magnusForce.getY() << " " << magnusForce.getZ() << " b " << gravity_and_archimede_const << endl << endl;
+        acceleration.setValue(coefficient * speed.getX() + magnusForce.getX(),
+            coefficient * speed.getY() + magnusForce.getY(),
+            coefficient * speed.getZ() + gravity_and_archimede_const + magnusForce.getZ());
+        speed.addValue(old_acceleration.getX() * interval,
+            old_acceleration.getY() * interval,
+            old_acceleration.getZ() * interval);
+        position.addValue(old_speed.getX() * interval,
+            old_speed.getY() * interval,
+            old_speed.getZ() * interval);
 
         old_speed = speed;
         old_acceleration = acceleration;
 
         frame++;
 
-        positions.push_back(position);
-    }
+        positions.push_back(position.getValues());
+        speeds.push_back(speed.getValues());
+        accelerations.push_back(acceleration.getValues());
 
-    cout << "Time = " << frame / spacing_per_second << "s" << endl
-         << "Position:" << endl
-         << position.toString() << endl
-         << "Speed:" << endl
-         << speed.toString() << endl
-         << "Acceleration:" << endl
-         << acceleration.toString() << endl;
+        cout << "Time = " << frame / spacing_per_second << "s" << endl
+            << "Position:" << endl
+            << position.toString() << endl
+            << "Speed:" << endl
+            << speed.toString() << endl
+            << "Acceleration:" << endl
+            << acceleration.toString() << endl;
 
-    return positions;
+    }    
+
+    return tuple(positions, speeds, accelerations);
 }
