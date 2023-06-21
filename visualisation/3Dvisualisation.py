@@ -3,9 +3,8 @@ import matplotlib.pyplot as plt
 import math as mt
 from matplotlib.animation import FuncAnimation
 t,x,y,z = [],[],[],[]
-with open("transfer_value.txt", "r") as file:
+with open("/Users/antoine/TIPE/TableTennis/Visualisation/magnus position.txt", "r") as file:
     lines = file.readlines()
-    i = 0
     for line in lines:
         cut = line[:-2].split(";")
         t.append(float(cut[0]))
@@ -21,6 +20,10 @@ def tracé_3D() :
     ax = plt.figure().add_subplot(projection='3d')
     ax.plot(x, y, z, label='lancée de balle de tennis de table')
     ax.legend()
+    ax.set_xlim(min(x),max(x))
+    ax.set_ylim(min(y), max(y))
+    ax.set_zlim(0,max(z))
+    ax.set_aspect('equal')
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
@@ -131,3 +134,4 @@ def optimized_animation():
 
     plt.show()
 optimized_animation()
+tracé_3D()
