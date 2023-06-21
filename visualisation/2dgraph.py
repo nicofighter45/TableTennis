@@ -4,11 +4,11 @@ import math as mt
 import matplotlib.gridspec as gridspec
 
 t,x,y,z = [],[],[],[]
-with open("/Users/antoine/TIPE/TableTennis/Visualisation/transfer_value.txt", "r") as file:
+with open(input("name = ") + ".txt", "r") as file:
     lines = file.readlines()
     i = 0
     for line in lines:
-        cut = line[:-2].split(";")
+        cut = line.replace("\\n", "").split(";")
         t.append(float(cut[0]))
         x.append(float(cut[1]))
         y.append(float(cut[2]))
@@ -35,8 +35,9 @@ ax1 = fig.add_subplot(gs[1, 0])
 ax2 = fig.add_subplot(gs[1, 1])
 fig.subplots_adjust(wspace=0.5,hspace=0.5)
 ax.set_ylim(min(x)-0.1, max(x)+0.1)
-ax1.set_ylim(min(y), max(y) + 6*abs(mt.log10(max(y))))
-ax2.set_ylim(min(z), max(z) + 6*abs(mt.log10(max(y))))
+if max(y) != 0:
+    ax1.set_ylim(min(y), max(y) + 6*abs(mt.log10(abs(max(y)))))
+    ax2.set_ylim(min(z), max(z) + 6*abs(mt.log10(abs(max(y)))))
 ax.plot(t,x,"r-")
 ax.plot(t,Ux,"w",t,Uxm,"w",alpha=0.2)
 ax1.plot(t,y,"b-")

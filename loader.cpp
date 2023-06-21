@@ -6,20 +6,18 @@
 #include "simulations/friction.h"
 #include "simulations/magnus.h"
 #include "simulations/gravity.h"
-#include "tools/python_link.cpp"
-#include "tools/export.cpp"
+#include "tools/python_link.hpp"
+#include "tools/export.hpp"
+#include "loader.hpp"
 
 using namespace std;
 
-string const error("An error occured, we're deeply sorry :(");
-string const textPath("../data/en.txt");
 vector<string> paragraphs;
 
 void openFile()
 {
     ifstream textFile(textPath);
-    if (!textFile)
-        cerr << error << endl;
+    if (!textFile) cerr << errorMsg << "bou" << endl;
     string line;
     string currentParagraph("");
     int space = 0;
@@ -49,7 +47,7 @@ string replace(string str, string from, string to)
 {
     size_t start_pos = str.find(from);
     if (start_pos == string::npos)
-        cerr << error << endl;
+        cerr << errorMsg << endl;
     str.replace(start_pos, from.length(), to);
     return str;
 }
@@ -70,6 +68,8 @@ void run()
     cout << paragraphs[3] << endl;
     getline(cin, iniS);
 
+    cout << endl << paragraphs[4] << endl;
+
     Vect3D initialPosition = iniP;
     Vect3D initialSpeed = iniS;
 
@@ -81,15 +81,18 @@ void run()
     }
     else if (simulationType == "2")
     {
-        vector<Vect3D> positions = runFrictionSimulation(initialPosition, initialSpeed);
-        print2DGraph(positions);
+        print2DGraph(runFrictionSimulation(initialPosition, initialSpeed), "friction");
     }
     else if (simulationType == "3")
     {
-        runMagnusSimulation(initialPosition, initialSpeed);
+        auto vectors = runMagnusSimulation(initialPosition, initialSpeed);
+
+        print2DGraph(get<0>(vectors), "magnus position");
+        print2DGraph(get<1>(vectors), "magnus speed");
+        print2DGraph(get<2>(vectors), "magnus acceleration");
     }
     else
     {
-        cerr << error << endl;
+        cerr << errorMsg << endl;
     }
 }

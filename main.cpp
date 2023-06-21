@@ -1,8 +1,9 @@
-#include "loader.cpp"
-#include "processing/tracking.cpp"
+#include "processing/tracking.hpp"
+#include "loader.hpp"
 
 int main()
 {
+    initTracking();
     run();
     return 0;
 }

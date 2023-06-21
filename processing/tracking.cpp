@@ -1,25 +1,94 @@
-#pragma once
-
-#include "opencv2/opencv.hpp"
-#include <vector>
-#include <string>
+#include <opencv2/opencv.hpp>
 #include <fstream>
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include "configuration.cpp"
+#include <vector>
+#include "configuration.hpp"
+#include "tracking.hpp"
+#include "prompt.hpp"
+#include "analyse.hpp"
 
 using namespace std;
 using namespace cv;
 
-void processVideo(const string& filename, const int video_number);
-void processFrame(const int i, const int j);
-Frame getFrame(const int i, const int j);
-void printCenter(Mat& mat, const int x, const int y);
+void initTracking() {
+	// initializer, set default values for all variables that are in configuration.cpp
+	currentLoadedFrame = 0;
+	actualWatchedFrame = 0;
+	watchedOpacity = 25; // from 0 to 100
+	watchedZoom = 1; // from 1 to 16
+	shouldLoadFrames = false;
+	shouldBreak = false;
+	watchedPos = { 0, 0 };
+
+	// default orange range, the best one we figured out for now
+	lower_color = HSVColor{ 0, 65, 65 };
+	upper_color = HSVColor{ 20, 255, 255 };
+}
+
+void setupTracking() {
+	// this method is used to find the most optimized range
+
+	// the capture of the video (testFilePath is the path to a video that is small enough for the setup)
+	VideoCapture capture(testFilePath);
+
+	// error if video can't be open
+	if (!capture.isOpened()) {
+		cerr << "Failed to open test video" << endl;
+		return;
+	}
+
+	// getting all video settings into proper variables
+	fps = capture.get(CAP_PROP_FPS);
+	width = capture.get(CAP_PROP_FRAME_WIDTH);
+	height = capture.get(CAP_PROP_FRAME_HEIGHT);
+	total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
+
+	// we read every frame and store it inside a vector (list), that's why we need a small video
+	vector<Mat> readed_frames;
+	Mat readed_frame;
+	while (capture.read(readed_frame)) {
+		// don't forget to .clone() in order to have the content and not the element
+		readed_frames.push_back(readed_frame.clone());
+	}
+
+	// prepare the window to show frames
+	initialisePrompts();
+
+	// do while loop for loaded image, work 'till showWindow() return True
+	do {
+		// get the image from the list
+		Mat originalFrame = readed_frames[actualWatchedFrame].clone();
+		// resize only in the region we are interested in
+		Mat imagetoProcess = originalFrame(testFileROI);
+
+		// analyse the frame
+		
+		/*
+		Analyser analyser(ref(imagetoProcess));
+
+		// if center is positive ie it exist, we print a circle in the resultImage and in the original one too
+		if (analyser.getCenterX() >= 0 and analyser.getCenterY() >= 0) {
+			printCircle(analyser.getResultMatrice(), analyser.getCenterPixels());
+			printCircle(ref(originalFrame), analyser.getCenterPixels());
+		}
+
+		// getting a black full size matrice
+		Mat blackMatrice(height, width, CV_8UC3, Scalar(0, 0, 0));
+		// coppy on the top left our image, in order to rescal it full size (because we only tracked in a portion of the image)
+		Mat regionOfInterestMatrice = blackMatrice(testFileROI);
+		analyser.getResultMatrice().copyTo(regionOfInterestMatrice);
+		// fusionning result and orignal matrice (depending on opacity) so we can see both by transparency
+		matForIniti.deallocate();
+		const float conversion = static_cast<float>(watchedOpacity) / 100;
+		addWeighted(originalFrame, conversion, blackMatrice, 1 - conversion, 0.0, matForIniti);
+		printRectangle(ref(matForIniti), testFileROI);
+		*/
+	} while (showWindow());
+}
+
 
 void multithreading() {
-	//glob("C:\\Users\\fagot\\Videos\\tipe\\*.MP4", filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
+	//glob(path, filenames, false);
+	filenames.push_back(testFilePath);
 	for (int k = 0; k < filenames.size(); k ++) {
 		cout << "Processing video: " << filenames[k] << endl;
 		processVideo(ref(filenames[k]), k);
@@ -41,17 +110,17 @@ void multithreading() {
 		frames.clear();
 		positionsResults.clear();
 		orderedPositions.clear();
-		current_frame_number = { 0 };
+		currentLoadedFrame = { 0 };
 	}
 }
 
 void loadFrames(VideoCapture& capture, const int video_number) {
-	int next_frame_number = current_frame_number + number_frames_to_read_ahead;
+	int next_frame_number = currentLoadedFrame + number_frames_to_read_ahead;
 	if (next_frame_number >= total_frames) {
 		next_frame_number = total_frames;
 	}
 
-	for (int i = current_frame_number; i < next_frame_number; ++i) {
+	for (int i = currentLoadedFrame; i < next_frame_number; ++i) {
 		Mat frame;
 		if (!capture.read(frame)) {
 			cout << "------------------Failed to read frame------------------" << i << endl;
@@ -62,7 +131,7 @@ void loadFrames(VideoCapture& capture, const int video_number) {
 		frames[i % number_of_threads].push_back(value);
 	}
 
-	current_frame_number = next_frame_number;
+	currentLoadedFrame = next_frame_number;
 	shouldLoadFrames = false;
 }
 
@@ -87,7 +156,7 @@ void processVideo(const string& filename, const int video_number) {
 	}
 
 	loadFrames(ref(capture), video_number);
- 
+
 	vector<thread> threads;
 
 	for (int i = 0; i < number_of_threads; i++) {
@@ -103,9 +172,9 @@ void processVideo(const string& filename, const int video_number) {
 				processFrame(thread_number, j);
 			}
 			return;
-		});
+			});
 	}
-	while (current_frame_number < total_frames) {
+	while (currentLoadedFrame < total_frames) {
 		unique_lock<mutex> lock(mtx);
 		cvariable.wait(lock, [] { return shouldLoadFrames == true; });
 		loadFrames(ref(capture), video_number);
@@ -127,7 +196,7 @@ void processFrame(const int i, const int j) {
 	cvtColor(frame, hsv_frame, COLOR_BGR2HSV);
 
 	Mat mask;
-	inRange(hsv_frame, lower_color, upper_color, mask);
+	inRange(hsv_frame, getScalarFromHSVColor(lower_color), getScalarFromHSVColor(upper_color), mask);
 
 	int num_non_black_pixels = countNonZero(mask);
 	if (num_non_black_pixels == 0) {
@@ -162,9 +231,6 @@ Frame getFrame(const int i, const int j) {
 	}
 	return frames[i][j];
 }
-
-
-
 
 
 void cutter() {
@@ -213,17 +279,7 @@ void cutter() {
 
 
 void processVideoSingleThreaded(VideoCapture capture, String name) {
-	// Define the output video file properties
-	int fourcc = VideoWriter::fourcc('m', 'p', '4', 'v'); // MP4 codec
-	double fps = capture.get(CAP_PROP_FPS);
-	Size frame_size(capture.get(cv::CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
-	string output_name = name;
-	output_name.erase(output_name.size() - 4);
-	output_name += "-tracked.MP4";
-	//VideoWriter writer(output_name, fourcc, fps, frame_size);
-
 	Rect region_of_interest(0, 0, 1920, 1080 / 2);
-
 	Mat total_frame;
 	int i(1);
 	while (capture.read(total_frame)) {
@@ -247,36 +303,34 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		// Display the segmented image for tuning the color range values
 		// writer.write(result);
 		Moments m = moments(mask, true);
-		Point center(m.m10 / m.m00, m.m01 / m.m00);
+		Pos center = { m.m10 / m.m00, m.m01 / m.m00 };
 
 		if (center.x >= 0 and center.y >= 0) {
-			printCenter(ref(result), center.x, center.y);
+			printCircle(ref(result), center);
 		}
-		
-		imshow("Mask", result);
+
+		//imshow("Mask", result);
+		//imshow("Original", frame);
+
+		Size size(1920, 1080/2);
+		Mat blackMat(1080, 1920, CV_8UC3, cv::Scalar(0, 0, 0));
+		Rect roi(Point(0, 0), size);
+		Mat roi_image = blackMat(roi);
+		resize(result, roi_image, size);
+
 		cout << "Image " << i << " proccessed" << endl;
 		waitKey(1);
 		i++;
 	}
-}
+	
+	showWindow();
 
-
-void printCenter(Mat& mat, const int x, const int y) {
-	mat.at<Vec3b>(y, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y, x - 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x - 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x - 1) = Vec3b(0, 0, 255);
 }
 
 
 void singlethreading() {
 	//glob(path, filenames, false);
-	filenames.push_back("C:\\Users\\fagot\\Videos\\tipe\\test2.MP4");
+	filenames.push_back(testFilePath);
 	for (const auto& filename : filenames) {
 		VideoCapture capture(filename);
 		if (!capture.isOpened()) {

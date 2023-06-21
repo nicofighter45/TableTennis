@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include "../tools/vector.h"
-#include "../tools/constants.cpp"
+#include "../tools/vector.hpp"
+#include "../tools/constants.hpp"
 #include <cmath>
 
 using namespace std;
@@ -11,13 +11,14 @@ static Vect3D getVector(double time, Vect3D initialPosition, Vect3D initialSpeed
 {
     return Vect3D(initialSpeed.getX() * time + initialPosition.getX(),
                   initialSpeed.getY() * time + initialPosition.getY(),
-                  -gravity / 2 * sq(time) + initialSpeed.getZ() * time + initialPosition.getZ());
+                  +gravity_and_archimede_const / 2 * sq(time) + initialSpeed.getZ() * time + initialPosition.getZ());
 }
 
 vector<Vect3D> runGravitySimulation(Vect3D initialPosition, Vect3D initialSpeed)
 {
     vector<Vect3D> positions(1, initialPosition);
-    double const final_time = (sqrt(sq(initialSpeed.getZ()) + 2 * gravity * initialPosition.getZ()) - initialSpeed.getZ()) / 2;
+
+    double const final_time = (sqrt(sq(initialSpeed.getZ()) - 2 * gravity_and_archimede_const * initialPosition.getZ()) - initialSpeed.getZ()) / 2;
 
     double const interval(1 / spacing_per_second);
 
@@ -40,6 +41,6 @@ vector<Vect3D> runGravitySimulation(Vect3D initialPosition, Vect3D initialSpeed)
 
 Vect3D getGravitySimulationEnd(Vect3D initialPosition, Vect3D initialSpeed)
 {
-    double const time = (sqrt(sq(initialSpeed.getZ()) + 2 * gravity * initialPosition.getZ()) - initialSpeed.getZ()) / 2;
+    double const time = (sqrt(sq(initialSpeed.getZ()) - 2 * gravity_and_archimede_const * initialPosition.getZ()) - initialSpeed.getZ()) / 2;
     return getVector(time, initialPosition, initialSpeed);
 }

@@ -1,0 +1,29 @@
+longueur table: 274,3cm
+hauteur entre table et p0 : 25 cm
+distance entre table et p0 : 34 cm
+largeur entre table et p0 : 0cm
+distance bord table appareil : 21,655 m
+largeur table : 152,5 cm
+distance bord table téléphone : 263,5cm
+hauteur objectif téléphone : 13,6 cm
+
+
+jeté de balle :
+différence position appareil :
+en hauteur : -7cm
+vers la droite : + 14cm
+hauteur de mon bras : 265cm
+hauteur antoine lancés antoine : 84cm
+
+pression : 1023 hPa
+
+
+
+vidéos paramètres (fréquence 1):
+1) cam + tel : v1
+2) cam + tel : v6
+3) cam + tel : v9
+4-5-6 : jets de balles
+7) cam : v9 (calcul v rotation)
+8) cam : v6 (calcul v rotation)
+9) cam : v1 (calcul v rotation)
