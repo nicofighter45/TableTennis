@@ -53,10 +53,8 @@ def premièrevaleurhaute(liste) :
     while liste[p]<liste[p+1]:
         p+=1
     return(liste[p:])
-
 h,x=h[1:],x[1:]
 rebilitation_de_liste(x)
 rebilitation_de_liste(h)
-print(h)
 print(maximum(h))
 print(coefficient_de_rebond(h))
