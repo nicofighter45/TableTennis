@@ -56,5 +56,6 @@ def premièrevaleurhaute(liste) :
 h,x=h[1:],x[1:]
 rebilitation_de_liste(x)
 rebilitation_de_liste(h)
+h=premièrevaleurhaute(h)
 print(maximum(h))
 print(coefficient_de_rebond(h))

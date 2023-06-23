@@ -1,7 +1,7 @@
 import math as mt
-m=1
-rho=1
-S=1
+m=7e-3
+rho=1.293
+S=8/3*mt.pi*(2e-2)**2
 g=9.81
 h,x=[],[]
 with open("/Users/antoine/TIPE/TableTennis/Résultat des expérience + graphe/Rebond table.txt", "r") as file:
@@ -30,18 +30,15 @@ def convertisseur(liste):
         liste[k] = liste[k]*Taille_pix
 def premièrevaleurhaute(liste) :
     p=0
-    while liste[p]<liste[p+1]:
-        p+=1
-    liste[p:]
+    for k in range(17): 
+        if liste[k]<=liste[k+1]:
+            p=k
+    return(liste[p+1:])
 def descente(liste) :
     p=0
-    while liste[p]>liste[p+1] :
+    while liste[p]>=liste[p+1] :
         p+=1
-    liste=liste[p:]
-rebilitation_de_liste(h)
-convertisseur(h)
-descente(h)
-premièrevaleurhaute(h)
+    return(liste[:p+1])
 def moyenne(liste) :
     somme=0
     for k in liste :
@@ -49,16 +46,23 @@ def moyenne(liste) :
     return(somme/len(liste))
 def vitesse(position) :
     vitesse=[]
+    p=1
     for k in range (len(position)-1) :
-        vitesse.append(position[k+1]/10e-3-position[k]/10e-3)
+        if abs(position[k+1]-position[k])< 10e-5 : p+=1
+        else : vitesse.append((position[k+1]-position[k])/(10e-3*p))
     return(vitesse)
 def coefficient_de_frottement(position):
-    vitesse2 = [0] + vitesse(position)
+    vitesse2 = vitesse(position)
+    print(vitesse2)
     acceleration = vitesse(vitesse2)
     coefficient =[]
     for k in range (len(acceleration)) :
-        if vitesse2[k+1] !=0 :
-            C_x=(m*acceleration[k]-m*g)/(0.5*rho*S*vitesse2[k+1]**2)
-            coefficient.append(abs(C_x))
+        if vitesse2[k]!=0 and vitesse2[k+1] !=0 :
+            C_x=-(m*acceleration[k]+m*g)/(0.5*rho*S*vitesse2[k+1]**2)
+            coefficient.append(C_x)
     return(moyenne(coefficient))
+rebilitation_de_liste(h)
+h=premièrevaleurhaute(h)
+h=descente(h)
+convertisseur(h)
 print(coefficient_de_frottement(h))
