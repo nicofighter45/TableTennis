@@ -10,7 +10,7 @@ Analyser::Analyser(Mat& tActualMatrice, Rect tNormalSearchRegion, Rect tInitialS
     isInitialSearch = true;
     actualIndex = 0;
     calculateCenter();
-    previous = center;
+    previous = center; 
     /*
     // convert to hsv image format
 	cvtColor(initialMatrice, HSVMatrice, COLOR_BGR2HSV);
