@@ -4,7 +4,7 @@ import math as mt
 import matplotlib.gridspec as gridspec
 
 t,x,y,z = [],[],[],[]
-with open("...TableTennis/Visualisation/magnus speed.txt", "r") as file:
+with open("/Users/antoine/TIPE/TableTennis/Visualisation/magnus speed.txt", "r") as file:
     lines = file.readlines()
     i = 0
     for line in lines:
@@ -35,19 +35,21 @@ ax1 = fig.add_subplot(gs[0, 0])
 ax2 = fig.add_subplot(gs[1, 0])
 fig.subplots_adjust(wspace=0.5,hspace=0.5)
 if max(y) != 0:
-    ax1.set_ylim(min(y), max(y) + 6*abs(mt.log10(abs(max(y)))))
-    ax2.set_ylim(min(z), max(z) + 0.1*abs(mt.log10(abs(max(z)))))
+    ax1.set_ylim(min(y)-0.1, max(y) + 0.1*abs(mt.log10(abs(max(y)))))
+    ax2.set_ylim(min(z)-0.1, max(z) + 0.1*abs(mt.log10(abs(max(z)))))
 ax1.plot(t,y,"b-")
 ax1.plot(t,Uy,"w",t,Uym,"w",alpha=0.2)
 ax2.plot(t,z,"g-")
 ax2.plot(t,Uz,"w",t,Uzm,"w",alpha=0.2)
 ax1.legend(["y"], loc="upper right")
+ax1.set_title('Vitesse sur Uy ', loc="center")
+ax2.set_title('Vitesse sur Uz ', loc="center")
 ax2.legend(["z"], loc="upper right")
 ax1.fill_between(t,Uy ,Uym ,alpha=0.4)
 ax2.fill_between(t, Uz,Uzm ,alpha=0.4)
 ax1.set_xlabel('Temps')
-ax1.set_ylabel('Ordonnée')
+ax1.set_ylabel('Vy')
 ax2.set_xlabel('Temps')
-ax2.set_ylabel('Hauteur')
+ax2.set_ylabel('Vz')
 plt.show()
 plt.clf()

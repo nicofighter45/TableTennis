@@ -3,15 +3,13 @@ import matplotlib.pyplot as plt
 import math as mt
 import matplotlib.gridspec as gridspec
 h,x=[],[]
-with open("/Users/antoine/TIPE/TableTennis/Résultat des expérience + graphe/Courbe du robot.txt", "r") as file:
+with open("/Users/antoine/TIPE/TableTennis/Résultat des expérience + graphe/Rebond Table.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
         cut = line[:-2].split(";")
         x.append(float(cut[0]))
         h.append(float(cut[1]))
 Taille_pix, h, x = x[0]/h[0],h[1:],x[1:]
-print(Taille_pix)
-print(x)
 def max(x) :
     max = x[0]
     for l in x :
@@ -36,18 +34,18 @@ def vitesse(position) :
     vitesse=[]
     p=1
     for k in range (len(position)-1) :
-        if abs(position[k+1]-position[k])< 10e-5 : p+=1
-        else : vitesse.append((position[k+1]-position[k])/(10e-3*p))
+        vitesse.append((position[k+1]-position[k])/(10e-3*p))
     return(vitesse)
-rebilitation_de_liste(h)
 def rebilitation_de_liste_min(liste) :
     mini =min(liste)
     for k in range(len(liste)) :
         liste[k]=abs(mini-liste[k])
-rebilitation_de_liste_min(x)
-convertisseur(h)
+rebilitation_de_liste(x)
+rebilitation_de_liste_min(h)
 convertisseur(x)
-
+convertisseur(h)
+h=vitesse(vitesse(h))
+x=vitesse(vitesse(x))
 t=[k*10e-3 for k in range(len(h))]
 fig = plt.figure(tight_layout=True)
 gs = gridspec.GridSpec(2, 1)
@@ -55,15 +53,15 @@ gs = gridspec.GridSpec(2, 1)
 ax1 = fig.add_subplot(gs[0, 0])
 ax2 = fig.add_subplot(gs[1, 0])
 fig.subplots_adjust(wspace=0.5,hspace=0.5)
-ax1.set_title('Position sur Uz ', loc="center")
-ax2.set_title('Position sur Uy ', loc="center")
+ax1.set_title('acceleration sur Uy ', loc="center")
+ax2.set_title('acceleration sur Uz ', loc="center")
 ax2.plot(t,x,"b-")
 ax1.plot(t,h,"g-")
-ax2.legend(["x"], loc="upper right")
-ax1.legend(["h"], loc="upper right")
+ax2.legend(["Ay"], loc="upper right")
+ax1.legend(["Az"], loc="upper right")
 ax2.set_xlabel('Temps')
-ax2.set_ylabel('Abscicce')
+ax2.set_ylabel('Az')
 ax1.set_xlabel('Temps')
-ax1.set_ylabel('Ordonnée')
+ax1.set_ylabel('Ay')
 plt.show()
 plt.clf()
