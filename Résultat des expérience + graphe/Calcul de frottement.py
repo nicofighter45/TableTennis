@@ -7,13 +7,13 @@ rho=1.293
 S=8/3*mt.pi*(4e-2)**2
 g=9.81
 h,x=[],[]
-with open("/Users/antoine/TIPE/TableTennis/Résultat des expérience + graphe/Rebond table.txt", "r") as file:
+with open("Résultat des expérience + graphe/Rebond table.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
         cut = line[:-2].split(";")
         h.append(float(cut[0]))
         x.append(float(cut[1]))
-Taille_pix, h= h[0]/x[0],h[1:]
+Taille_pix, h,x= h[0]/x[0],h[1:],x[1:]
 def max(x) :
     max = x[0]
     for l in x :
@@ -57,13 +57,11 @@ def vitesse(position) :
 def coefficient_de_frottement(position):
     vitesse2 = vitesse(position)
     acceleration = vitesse(vitesse2)
-    print(acceleration)
     coefficient =[]
     for k in range (len(acceleration)) :
         if vitesse2[k]!=0 and vitesse2[k+1] !=0 and acceleration[k] > 0 :
-            C_x=-(m*acceleration[k]-m*g)/(0.5*rho*S*(vitesse2[k]**2))
-            coefficient.append(C_x)
-    print(coefficient)
+            C_x=-(m*acceleration[k]+m*g)/(0.5*rho*S*(vitesse2[k]**2))
+            coefficient.append(abs(C_x))
     return(moyenne(coefficient))
 rebilitation_de_liste(h)
 h=premièrevaleurhaute(h)

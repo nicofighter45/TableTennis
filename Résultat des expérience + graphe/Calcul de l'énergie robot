@@ -68,7 +68,7 @@ def courbe(h):
     cinetique = np.array([0]+energie_cinétique(h))
     Mecanique= potentiel +cinetique
     plt.plot(t,potentiel,label ="Énergie potentiel")
-    plt.plot(t,cinetique,label ="Énergie cinétique")
+    plt.plot(t,cinetique,label ="Énergie cinétique de la vitesse selon Uz")
     plt.plot(t,Mecanique,label="Énergie mécanique")
     plt.title("Évolution de l'énergie au cours du temps")
     plt.ylabel( "Énergie en Joule")
@@ -82,8 +82,8 @@ def courbe2(h):
     h=premièrevaleurhaute(h)
     convertisseur(h)
     t=[k*10e-3 for k in range(len(h))]
-    cinetique = np.array([0]+energie_cinétique(h))
-    plt.plot(t,cinetique,label ="Énergie cinétique")
+    cinetique = np.array(energie_cinétique(h)[:-1])
+    plt.plot(t[1:-1],cinetique,label ="Énergie cinétique de la vitesse selon Uy")
     plt.title("Évolution de l'énergie au cours du temps")
     plt.ylabel( "Énergie en Joule")
     plt.xlabel( "Temps en seconde")

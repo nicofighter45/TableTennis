@@ -1,6 +1,6 @@
 import math as mt
 h,x=[],[]
-with open("Résultat des expérience + graphe/Rebond sur raquette.txt", "r") as file:
+with open("//Users/antoine/TIPE/TableTennis/Résultat des expérience + graphe/Rebond sur sol.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
         cut = line[:-2].split(";")
@@ -47,6 +47,7 @@ def coefficient_de_rebond(liste) :
     coefficient = []
     for k in range (len(max)-1) :
         coefficient.append(mt.sqrt(max [k+1]/max[k]))
+    print(coefficient)
     return(moyenne(coefficient))
 def premièrevaleurhaute(liste) :
     p=0
