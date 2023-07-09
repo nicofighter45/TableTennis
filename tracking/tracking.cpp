@@ -170,7 +170,7 @@ Frame getFrame(const int i, const int j) {
 
 void cutter() {
 	// Open the input video
-	VideoCapture input_cap("C:/Users/fagot/ShadowDrive/tipe/MVI_0014.MP4");
+	VideoCapture input_cap("C:/Users/fagot/ShadowDrive/tipe/MVI_0013.MP4");
 	if (!input_cap.isOpened()) {
 		std::cerr << "Error: Could not open input video\n";
 		return;
@@ -184,10 +184,10 @@ void cutter() {
 
 	// Define output video properties
 	int start_frame = 2 * fps + 0;
-	int end_frame = 6 * fps;
+	int end_frame = 15 * fps + 0;
 	int output_width = width;
 	int output_height = height;
-	std::string output_filename = "C:/Users/fagot/ShadowDrive/tipe/output/rebond_raquette.MP4";
+	std::string output_filename = "C:/Users/fagot/ShadowDrive/tipe/output/rebond_sol.MP4";
 
 	// Open the output video
 	VideoWriter output_cap(output_filename, VideoWriter::fourcc('X', '2', '6', '4'), fps, Size(output_width, output_height));
@@ -225,7 +225,8 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 	*/
 	//VideoWriter writer(output_name, fourcc, fps, frame_size);
 
-	Rect region_of_interest(1200, 500, 700, 200);
+	//Rect region_of_interest(1200, 500, 700, 200);
+	Rect region_of_interest(100, 750, 1810, 300);
 
 	vector<Pos> positions;
 
@@ -236,9 +237,7 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 		Mat hsv;
 		cvtColor(frame, hsv, COLOR_BGR2HSV);
 		Mat mask;
-		Scalar lower_color(10, 100, 100);
-		Scalar upper_color(25, 255, 255);
-		inRange(hsv, lower_color, upper_color, mask);
+		inRange(hsv, getScalarFromHSVColor(lower_color), getScalarFromHSVColor(upper_color), mask);
 		Mat result;
 		bitwise_and(frame, frame, result, mask);
 		Moments m = moments(mask, true);
@@ -248,8 +247,15 @@ void processVideoSingleThreaded(VideoCapture capture, String name) {
 			Pos pos = { center.x, center.y };
 			positions.push_back(pos);
 		}
-		imshow("Mask", result);
+		Mat blanck(20, 1810, CV_8UC3, Scalar(255, 255, 255));
+		Mat mat;
+		vconcat(frame, blanck, mat);
+		vconcat(mat, result, mat);
+		putText(mat, "Video original", {70, 50}, FONT_HERSHEY_SIMPLEX, 1.5, Scalar(255, 255, 255), 4, LINE_AA);
+		putText(mat, "Video detecte", {70, 600}, FONT_HERSHEY_SIMPLEX, 1.5, Scalar(255, 255, 255), 4, LINE_AA);
+		imshow("Mask", mat);
 		cout << "Image " << i << " proccessed" << endl;
+		imwrite("C:/Users/fagot/OneDrive/Documents/MPSI/TableTennis/processing/output/third/image-" + to_string(i) + ".png", mat);
 		waitKey(1);
 		i++;
 	}
@@ -292,10 +298,10 @@ void singlethreading() {
 }
 
 int main() {
-	lower_color = HSVColor{ 0, 65, 65 };
-	upper_color = HSVColor{ 20, 255, 255 };
+	lower_color = HSVColor{ 15, 130, 130};
+	upper_color = HSVColor{ 28, 255, 255 };
 	//glob("C:/Users/fagot/ShadowDrive/tipe/output/*.MP4", filenames, false);
-	filenames.push_back("C:/Users/fagot/ShadowDrive/tipe/output/rebond_raquette.MP4");
+	filenames.push_back("C:/Users/fagot/ShadowDrive/tipe/output/rebond_sol.MP4");
 	//filenames.push_back("C:/Users/fagot/ShadowDrive/tipe/test1.MP4");
 	singlethreading();
 	return 0;

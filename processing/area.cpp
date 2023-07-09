@@ -1,4 +1,3 @@
-/*
 #include "area.hpp"
 #include "configuration.hpp"
 
@@ -18,7 +17,7 @@ Pos PairArea::getNextPosition() {
 		lineIndex++;
 		positionIndex = startIndex;
 	}
-	Pos position = getPreNextPosition(positionIndex, lineIndex, centerPosition, areaIndex);
+	Pos position = getPreNextPosition();
 	if (position.x > width) {
 		if (areaIndex == 0) {
 			// stop
@@ -51,7 +50,7 @@ Pos PairArea::getNextPosition() {
 	}
 }
 
-Pos getPreNextPosition(int positionIndex, int lineIndex, Pos centerPosition, int areaIndex) {
+Pos PairArea::getPreNextPosition() {
 	switch (areaIndex) {
 	case 0:
 		return Pos{ centerPosition.x + lineIndex, centerPosition.y + positionIndex };
@@ -64,4 +63,3 @@ Pos getPreNextPosition(int positionIndex, int lineIndex, Pos centerPosition, int
 	}
 	return ;
 }
-*/

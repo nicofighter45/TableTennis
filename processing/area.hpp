@@ -14,23 +14,26 @@ protected:
 	int positionIndex;
 	const Pos centerPosition;
 	int difference;
+	virtual Pos getPreNextPosition();
 public:
 
 	Area(int tAreaIndex, Pos tCenterPosition);
 
 	virtual Pos getNextPosition();
 
-	virtual Pos getPreNextPosition();
-
 };
 
 class PairArea : public Area{
 public:
 	Pos getNextPosition();
+private:
+	Pos getPreNextPosition();
 };
 class UnpairArea : public Area{
 public:
 	Pos getNextPosition();
+private:
+	Pos getPreNextPosition();
 };
 
 
