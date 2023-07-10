@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import math as mt
 from matplotlib.animation import FuncAnimation
 t,x,y,z = [],[],[],[]
-with open("/Users/antoine/TIPE/TableTennis/Visualisation/magnus position.txt", "r") as file:
+with open("Visualisation/magnus position.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
-        cut = line[:-2].split(";")
+        cut = line.replace("\n", "").split(";")
         t.append(float(cut[0]))
         x.append(float(cut[1]))
         y.append(float(cut[2]))

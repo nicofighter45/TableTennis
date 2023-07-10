@@ -7,7 +7,7 @@ rho=1.293
 S=8/3*mt.pi*(4e-2)**2
 g=9.81
 h,x=[],[]
-with open("Résultat des expérience + graphe/Rebond table.txt", "r") as file:
+with open("Résultat des expérience + graphe/Rebond sur sol.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
         cut = line[:-2].split(";")
@@ -33,7 +33,7 @@ def convertisseur(liste):
         liste[k] = liste[k]*Taille_pix
 def premièrevaleurhaute(liste) :
     p=0
-    for k in range(17): 
+    for k in range(30): 
         if liste[k]<=liste[k+1]:
             p=k
     return(liste[p+1:])
@@ -60,9 +60,9 @@ def coefficient_de_frottement(position):
     coefficient =[]
     for k in range (len(acceleration)) :
         if vitesse2[k]!=0 and vitesse2[k+1] !=0 and acceleration[k] > 0 :
-            C_x=-(m*acceleration[k]+m*g)/(0.5*rho*S*(vitesse2[k]**2))
+            C_x=-(-m*acceleration[k]+m*g)/(0.5*rho*S*(vitesse2[k]**2))
             coefficient.append(abs(C_x))
-    return(moyenne(coefficient))
+    return(moyenne(position))
 rebilitation_de_liste(h)
 h=premièrevaleurhaute(h)
 h=descente(h)

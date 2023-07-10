@@ -3,12 +3,13 @@ import matplotlib.pyplot as plt
 import math as mt
 import matplotlib.gridspec as gridspec
 import numpy as np
+ 
 m=7e-3
 rho=1.293
 S=8/3*mt.pi*(4e-2)**2
 g=9.81
 h,x=[],[]
-with open("", "r") as file:
+with open("Résultat des expérience + graphe/Rebond sur sol.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
         cut = line[:-2].split(";")

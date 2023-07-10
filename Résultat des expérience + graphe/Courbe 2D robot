@@ -53,7 +53,7 @@ fig = plt.figure(tight_layout=True)
 gs = gridspec.GridSpec(1, 1)
 
 ax2 = fig.add_subplot(gs[0, 0])
-ax2.set_title('Courbe du rebond : f(x) = z ', loc="center")
+ax2.set_title('Courbe du rebond : f(y) = z ', loc="center")
 ax2.plot(x,h,"b-")
 ax2.set_xlabel('Abscisse en m')
 ax2.set_ylabel('Hauteur en m')
