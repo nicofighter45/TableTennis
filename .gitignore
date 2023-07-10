@@ -6,5 +6,6 @@ output/
 *.vcxproj
 *.filters
 *.user
+*.pdb
 x64/
 CppProperties.json

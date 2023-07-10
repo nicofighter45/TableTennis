@@ -30,7 +30,7 @@ public:
 	Pos getRoughSearchPos();
 	void newMatrice(Mat& tActualMatrice);
 	void calculateCenter();
-	Pos getCenterPixels() const;
+	Pos getCenterPixel() const;
 	double getCenterX() const;
 	double getCenterY() const;
 	Mat& getActualMatrice() const;
