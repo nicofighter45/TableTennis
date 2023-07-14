@@ -1,7 +1,6 @@
 class indatrice() :
     def __init__(self, t1, t2,valeur):
-        self.debut = t1
-        self.fin = t2
+        self.intervale = (t1,t2)
         self.valeur = valeur
     def __call__(self, point):
         if self.debut <= point and self.fin >= point :
@@ -24,33 +23,88 @@ class matrice() :
         if A.longueur == B.longueur and A.largeur == B.largeur :
             return(matrice([[A[i][j] + B[i][j] for j in range (len(A[i]))] for i in range (len(A))]))
         else : return(False)
+    def __mul__(A,B) :
+        if isinstance(B,matrice) :
+            n, m, l = A.largeur, A.longueur, B.longueur
+            if m != B.largeur :
+                raise Exception("The number of column of M1 must be the same as the number of line of M2")
+            M = []
+            for i in range(n):
+                line = []
+                for j in range(l):
+                    sum = 0
+                    for k in range(m):
+                        sum += M1[i][k]*M2[k][j]
+                    line.append(sum)
+                M.append(line)
+            return matrice(M)
+        if isinstance(B,int) :
+            for i in range (A.largeur) :
+                for j in range (A.longueur) :
+                    A[i][j]=A[i][j]*B
+            return(A)
 class polynome():
     def __init__(self, coefficient) :
+        if not isinstance(coefficient,list) = raise TypeError("les coefficients doivent être sous la forme de liste")
         p=-1
         liste=[]
         while coefficient[p]==0 :
             p-=1
         if p!=-1 : self.coefficient = coefficient
-        else : self.coefficient = coefficient[:p+1]        
-    def coefdomi(self):
-        if self.coefficient ==[] : return 0
-        return(self.coefficient[-1])
-    def degre(self):
-        return(len(self.coefficient)-1)
+        else : self.coefficient = coefficient[:p+1]
+        self.degre = len(self.coefficient)-1
+        if self.coefficient ==[] : self.coefdomi = 0
+        else : self.coefdomi = coefficient[-1]
     def coef(self,deg):
-        if deg > degre(self):return(0)
+        if deg > self.degre : return(0)
         return(self.coefficient[deg])
     def __call__(self, valeur) :
         somme=0
-        for k in range(len(self.coefficient)) :
+        for k in range(self.degre+1) :
             somme+=self.coefficient[k]*valeur**k
         return somme
-    def __add__(a,b) :
-        liste =[]
-        if len(a.coefficient) <= len(b.coefficient) :
-            for k in range (len(a.coefficient)):
-                liste.append(a.coefficient[k]+b.coefficient[k])
-        else :
-            for k in range (len(b.coefficient)):
-                liste.append(a.coefficient[k]+b.coefficient[k])
-        return(polynome(liste))
+    def __add__(b,a) :
+        if isinstance(a,polynome) :
+            liste =[]
+            if a.degre <= b.degre :
+                for k in range (len(a.coefficient)):
+                    liste.append(a.coefficient[k]+b.coefficient[k])
+            else :
+                for k in range (len(b.coefficient)):
+                    liste.append(a.coefficient[k]+b.coefficient[k])
+            return(polynome(liste))
+        elif isinstance(a,int) :
+            b.coefficient[0]+=a
+            return(b)
+        else:
+            raise TypeError("Opération d'addition non prise en charge.")
+    def __radd__(self, a):
+        return self.__add__(a)
+    def __mul__(self, a):
+        if isinstance(a, int):
+            liste = [coef * a for coef in self.coefficient]
+            return polynome(liste)
+        elif isinstance(a, polynome):
+            multi = polynome([])
+            for i in range(a.degre + 1):
+                liste = [coef * a.coef(i) for coef in self.coefficient]
+                liste = [0] * i + liste
+                multi += polynome(liste)
+            return multi
+        else:
+            raise TypeError("Opération de multiplication non prise en charge.")
+    def __rmul__(self, a):
+        return self.__mul__(a)
+    def der(self) :
+        return polynome([k*self.coefficient[k] for k in range (1,self.degre+1)])
+class ind_poly():
+    def __ind__(self,indicatrice,polynome) :
+        self.indicatrice = indicatrice
+        self.polynome = polynome
+    def __call__(self, point) :
+        if not self.indcatrice(point) : return 0
+        else : self.polynome(point)
+    def __add__(self,a):
+        if isinstance(a,int) or isinstance(a,polynome) :
+            self.polynome=self.polynome + a
+            return self
