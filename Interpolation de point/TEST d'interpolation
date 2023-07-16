@@ -1,11 +1,16 @@
-class indatrice() :
-    def __init__(self, t1, t2,valeur):
+class indicatrice() :
+    def __init__(self, t1, t2,):
         self.intervale = (t1,t2)
-        self.valeur = valeur
     def __call__(self, point):
         if self.debut <= point and self.fin >= point :
-            return(self.valeur)
+            return(1)
         else : return(0)
+    def __mul__(self,a):
+        if isinstance(a,polynome) :
+            return(ind_poly(self,a))
+        else : raise TypeError("Opération de multiplication non prise en charge.")
+    def __rmul__(self,a):
+        return self.__mul__(a)
 class matrice() :
     def __init__(self,listedeliste) :
         self.mat = listedeliste
@@ -45,7 +50,7 @@ class matrice() :
             return(A)
 class polynome():
     def __init__(self, coefficient) :
-        if not isinstance(coefficient,list) = raise TypeError("les coefficients doivent être sous la forme de liste")
+        if not isinstance(coefficient,list) : raise TypeError("les coefficients doivent être sous la forme de liste")
         p=-1
         liste=[]
         while coefficient[p]==0 :
@@ -91,6 +96,11 @@ class polynome():
                 liste = [0] * i + liste
                 multi += polynome(liste)
             return multi
+        elif isinstance(a,indicatrice) :
+            return(ind_poly(a,self))
+        elif isinstance(a,ind_poly) :
+            a.polynome = a.polynome * self
+            return(a)
         else:
             raise TypeError("Opération de multiplication non prise en charge.")
     def __rmul__(self, a):
@@ -108,3 +118,60 @@ class ind_poly():
         if isinstance(a,int) or isinstance(a,polynome) :
             self.polynome=self.polynome + a
             return self
+        elif isinstance(a,ind_poly) :
+            if self.indicatrice==a.indicatrice : 
+                self.polynome = self.polynome + a.polynome
+                return self
+            else : 
+                Somme =Sum_ind_poly([self,a])
+                return(Somme)
+        elif isinstance(a,Sum_ind_poly) :
+            check = True
+            for k in range (len(a.liste)) :
+                if a.ind[k]==self.indicatrice : 
+                    a.liste[k]= a.liste[k]+ self
+                    check = False
+            if check :
+                a.liste.append(self)
+                a.polynome.append(self.polynome)
+                a.ind.append(self.indicatrice)
+            return(a)
+        else : raise TypeError("Opération d'addition non prise en charge.")
+    def __radd__(self,a):
+        return self.__add__(a)
+    def ___mul__(self,a) :
+            if isinstance(a,int) or isinstance(a,polynome) :
+                self.polynome=self.polynome * a
+                return self
+            else : raise TypeError("Opération de multiplication non prise en charge.")
+    def __rmull__(self,a):
+        return self.__mul__(a)
+class Sum_ind_poly():
+    def __init__(self,List_ind_poly):
+        self.liste = List_ind_poly
+        self.polynome = [ l.polynome for l in List_ind_poly]
+        self.ind = [ l.indicatrice for l in List_ind_poly]
+    def __add__(self,a):
+        if isinstance(a,int) or isinstance(a,polynome) :
+            for k in self.polynome : k = k + a
+            return self
+        elif isinstance(a,ind_poly) : 
+            check = True
+            for k in range (len(self.liste)) :
+                if self.ind[k]==a.indicatrice : 
+                    self.liste[k]= self.liste[k]+ a
+                    check = False
+            if check :
+                self.liste.append(a)
+                self.polynome.append(a.polynome)
+                self.ind.append(a.indicatrice)
+            return(self)
+        elif isinstance(a,Sum_ind_poly) :
+            for k in a.liste :
+                self = self + k
+            return(self)
+        else : raise TypeError("Opération d'addition non prise en charge.")
+    def __radd__(self,a) :
+        return self.__add__(a)
+    def ___rmul__(self,a) :
+        raise TypeError("Opération de multiplication non prise en charge.")
