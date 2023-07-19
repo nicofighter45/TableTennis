@@ -5,7 +5,7 @@ class indicatrice() :
     def __init__(self, t1, t2):
         self.intervalle = (t1,t2)
     def __call__(self, point):
-        if self.intervalle[0] <= point <= self.intervalle[1] :
+        if self.intervalle[0] <= point < self.intervalle[1] :
             return(1)
         else : return(0)
     def __mul__(self,a):
@@ -209,12 +209,10 @@ def ind_degre(rang, degre):
     if degre == 0:
         return indicatrice(rang * intervalle, (rang + 1) * intervalle)
     else:
-        return (1 / (degre * intervalle)) * (
-            polynome([-rang - degre, 1]) * ind_degre(rang, degre - 1)
+        return (1 / ((degre) * intervalle)) * (
+            polynome([-rang , 1]) * ind_degre(rang, degre - 1)
             + polynome([1 + rang + degre, -1]) * ind_degre(rang + 1, degre - 1)
         )
-
-
 def interpolations(liste,degre) :
     fonction = Sum_ind_poly([])
     for rang in range (len(liste)-degre) :
@@ -222,12 +220,12 @@ def interpolations(liste,degre) :
         fonction = fonction + L
     print(fonction)
     return (fonction)
-liste = [ 1 for k in range (100)]
+liste = [ k for k in range (1000)]
 degre = 4
 fonction = interpolations(liste,degre)
 L = [fonction(k/100)  for k in range (10000)]
-print(L)
-t= [k*intervalle*10e-3 for k in range (len(L))]
+for k in range (10) : print(fonction(k))
+t= [ k*intervalle*10e-3 for k in range (len(L))]
 plt.plot(t,L)
 plt.legend()
 plt.xlabel('x')
