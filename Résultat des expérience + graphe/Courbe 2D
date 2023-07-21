@@ -3,14 +3,13 @@ import matplotlib.pyplot as plt
 import math as mt
 import matplotlib.gridspec as gridspec
 h,x=[],[]
-with open("/Users/antoine/TIPE/TableTennis/Résultat des expérience + graphe/Rebond table.txt", "r") as file:
+with open("Résultat des expérience + graphe/Rebond sur sol.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
         cut = line[:-2].split(";")
         h.append(float(cut[0]))
         x.append(float(cut[1]))
 Taille_pix, h, x = h[0]/x[0],h[1:],x[1:]
-print(Taille_pix)
 def max(x) :
     max = x[0]
     for l in x :
@@ -42,7 +41,7 @@ def rebilitation_de_liste_min(liste) :
 rebilitation_de_liste_min(x)
 convertisseur(x)
 convertisseur(h)
-t=[k for k in range(len(h))]
+t=[k*10e-3 for k in range(len(h))]
 
 fig = plt.figure(tight_layout=True)
 gs = gridspec.GridSpec(2, 1)
@@ -55,11 +54,9 @@ ax1.legend(["x"], loc="upper right")
 ax2.legend(["h"], loc="upper right")
 ax1.set_title('Position sur Uy ', loc="center")
 ax2.set_title('Position sur Uz ', loc="center")
-ax1.set_xlabel('Temps')
-ax1.set_ylabel('abscisse')
-ax2.set_xlabel('Temps')
-ax2.set_ylabel('Ordonnée')
+ax1.set_xlabel('Temps en s')
+ax1.set_ylabel('Abscisse en m')
+ax2.set_xlabel('Temps en s')
+ax2.set_ylabel('Ordonnée en m')
 plt.show()
 plt.clf()
-plt.plot(v,t)
-plt.show()

@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math as mt
 import matplotlib.gridspec as gridspec
-
+import numpy as np
 t,x,y,z = [],[],[],[]
-with open("...TableTennis/Visualisation/magnus accelerarion.txt", "r") as file:
+with open("/Users/antoine/TIPE/TableTennis/Visualisation/magnus acceleration.txt", "r") as file:
     lines = file.readlines()
     i = 0
     for line in lines:
@@ -42,6 +42,8 @@ ax1.plot(t,Uy,"w",t,Uym,"w",alpha=0.2)
 ax2.plot(t,z,"g-")
 ax2.plot(t,Uz,"w",t,Uzm,"w",alpha=0.2)
 ax1.legend(["y"], loc="upper right")
+ax1.set_title('Accélération sur Uy ', loc="center")
+ax2.set_title('Accélération sur Uz ', loc="center")
 ax2.legend(["z"], loc="upper right")
 ax1.fill_between(t,Uy ,Uym ,alpha=0.4)
 ax2.fill_between(t, Uz,Uzm ,alpha=0.4)
