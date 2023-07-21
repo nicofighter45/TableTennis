@@ -10,8 +10,6 @@ using namespace std;
 class Analyser {
 private:
 	Rect ROI;
-	Rect normalSearchRegion;
-	Rect initialSearchRegion;
 	Pos center;
 	Mat& actualMatrice;
 	Mat maskMatrice;
@@ -21,21 +19,14 @@ private:
 	Pos previous;
 	Pos getSearchPos(int straightDecal, int diagonalDecal);
 	Pos getPreSearchPos(int straightDecal, int diagonalDecal);
-
+	Pos getSearchPos();
+	void newMatrice(Mat& tActualMatrice);
+	void calculateCenter(Pos position);
+	void initialCalculation();
+	void findBall();
 public:
 	Analyser(Mat& tActualMatrice, 
-		Rect tNormalSearchRegion, 
-		Rect tinitialSearchRegion);
-	Pos getPreciseSearchPos();
-	Pos getRoughSearchPos();
-	void newMatrice(Mat& tActualMatrice);
-	void calculateCenter();
-	Pos getCenterPixel() const;
-	double getCenterX() const;
-	double getCenterY() const;
-	Mat& getActualMatrice() const;
-	Mat& getMaskMatrice();
-	Mat& getResultMatrice();
+		Rect tROI);
 };
 
 bool pixelIsInHSVRange(Mat& matrice, int i, int j);

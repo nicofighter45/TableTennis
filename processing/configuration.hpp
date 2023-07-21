@@ -47,6 +47,7 @@ const Rect testFileROI(0, 0, 1920, 1080 / 2);
 const float windowScalar = 0.7;
 const float imageScalar = 1;
 const int searchPixelSpacing = 10;
+const int searchPixelMaxSpacing = 200;
 
 extern HSVColor lower_color;
 extern HSVColor upper_color;

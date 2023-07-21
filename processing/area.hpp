@@ -15,25 +15,23 @@ protected:
 	const Pos centerPosition;
 	int difference;
 	virtual Pos getPreNextPosition();
-public:
-
-	Area(int tAreaIndex, Pos tCenterPosition);
-
 	virtual Pos getNextPosition();
-
+public:
+	Area(int tAreaIndex, Pos tCenterPosition);
 };
 
 class PairArea : public Area{
-public:
-	Pos getNextPosition();
 private:
 	Pos getPreNextPosition();
+public:
+	Pos getNextPosition();
 };
 class UnpairArea : public Area{
-public:
-	Pos getNextPosition();
 private:
 	Pos getPreNextPosition();
+public:
+	Pos getNextPosition();
+	UnpairArea(int tAreaIndex, Pos tCenterPosition);
 };
 
 

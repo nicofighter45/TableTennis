@@ -5,11 +5,11 @@
 using namespace cv;
 using namespace std;
 
-Analyser::Analyser(Mat& tActualMatrice, Rect tNormalSearchRegion, Rect tInitialSearchRegion)
-    : actualMatrice(tActualMatrice), normalSearchRegion(tNormalSearchRegion), initialSearchRegion(tInitialSearchRegion) {
+Analyser::Analyser(Mat& tActualMatrice, Rect tROI)
+    : actualMatrice(tActualMatrice), ROI(tROI) {
     isInitialSearch = true;
     actualIndex = 0;
-    calculateCenter();
+    findBall();
     previous = center;
     /*
     // convert to hsv image format
@@ -24,15 +24,49 @@ Analyser::Analyser(Mat& tActualMatrice, Rect tNormalSearchRegion, Rect tInitialS
     */
 }
 
-Pos Analyser::getRoughSearchPos() {
+void Analyser::newMatrice(Mat& tActualMatrice) {
+    actualMatrice = tActualMatrice;
+    findBall();
+}
+
+void Analyser::findBall() {
+    if (isInitialSearch) {
+        initialCalculation();
+    }
+    while (actualIndex != 8 * searchPixelMaxSpacing / searchPixelSpacing) {
+        Pos position = getSearchPos();
+        if (position.x == -1 || position.y == -1) {
+            continue;
+        }
+        if (pixelIsInHSVRange(actualMatrice, position)) {
+            calculateCenter(position);
+            return;
+        }
+    }
+    initialCalculation();
+}
+
+void Analyser::calculateCenter(Pos position) {
+    // multithreading
+}
+
+void Analyser::initialCalculation() {
+    for (int x = searchPixelSpacing; x += searchPixelSpacing; x < width - searchPixelSpacing) {
+        for (int y = searchPixelSpacing; y += searchPixelSpacing; y < height - searchPixelSpacing) {
+            Pos position = { x, y };
+            if (pixelIsInHSVRange(actualMatrice, position)) {
+                calculateCenter(position);
+                return;
+            }
+        }
+    }
+    // no ball found
+}
+
+Pos Analyser::getSearchPos() {
     int straightDecal = static_cast<int>((1 + actualIndex / 8) * searchPixelSpacing);
     int diagonalDecal = static_cast<int>(straightDecal * 0.7);
     Pos position = getSearchPos(straightDecal, diagonalDecal);
-    return position;
-}
-
-Pos Analyser::getPreciseSearchPos() {
-    Pos position = getSearchPos(1, 1);
     return position;
 }
 
@@ -62,7 +96,7 @@ Pos Analyser::getPreSearchPos(int straightDecal, int diagonalDecal) {
     case 0:
         return Pos{ center.x + straightDecal, center.y };
     case 1:
-        return Pos{ center.x + diagonalDecal, center.y + diagonalDecal };
+        return Pos{ center.x + diagonalDecal, center.y + diagonalDecal};
     case 2:
         return Pos{ center.x, center.y + straightDecal };
     case 3:
@@ -78,46 +112,9 @@ Pos Analyser::getPreSearchPos(int straightDecal, int diagonalDecal) {
     }
 }
 
-void Analyser::newMatrice(Mat& tActualMatrice) {
-    actualMatrice = tActualMatrice;
-    calculateCenter();
-}
 
-void Analyser::calculateCenter() {
-    if (isInitialSearch) {
-        ROI = initialSearchRegion;
-    }
-    else {
-        ROI = normalSearchRegion;
-    }
-}
-
-Pos Analyser::getCenterPixel() const {
-	return center;
-}
-
-double Analyser::getCenterX() const {
-	return center.x;
-}
-
-double Analyser::getCenterY() const {
-	return center.y;
-}
-
-Mat& Analyser::getActualMatrice() const {
-	return actualMatrice;
-}
-
-Mat& Analyser::getMaskMatrice() {
-	return ref(maskMatrice);
-}
-
-Mat& Analyser::getResultMatrice() {
-	return ref(resultMatrice);
-}
-
-bool pixelIsInHSVRange(Mat& matrice, int i, int j) {
-    HSVColor& color = RGBtoHSV(ref(matrice.at<Vec3b>(i, j)));
+bool pixelIsInHSVRange(Mat& matrice, Pos position) {
+    HSVColor& color = RGBtoHSV(ref(matrice.at<Vec3b>(position.x, position.y)));
     if (color.H > upper_color.H) {
         return false;
     }
