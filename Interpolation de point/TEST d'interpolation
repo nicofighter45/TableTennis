@@ -203,8 +203,8 @@ class Sum_ind_poly():
         s = f"{str(self.liste[0])}"
         for k in range (1,len(self.liste)) : s+=f"+ {str(self.liste[k])} "
         return s
-intervalle = 1
 # les fonctions
+intervalle = 1
 def ind_degre(rang, degre):
     if degre == 0:
         return indicatrice(rang * intervalle, (rang + 1) * intervalle)
@@ -229,12 +229,12 @@ def interpolation(liste,degre) :
         liste.append(L)
 
 
-liste = [ k for k in range (1000)]
+liste = [ k for k in range (100)]
 degre = 4
 fonction = approximation(liste,degre)
-L = [fonction(k/10)  for k in range (10000)]
+L = [fonction(k/100)  for k in range (10000)]
 for k in range (100) : print(fonction(k))
-t= [ k*intervalle for k in range (len(L))]
+t= [ k*intervalle/100 for k in range (len(L))]
 plt.plot(t,L)
 plt.legend()
 plt.xlabel('x')
