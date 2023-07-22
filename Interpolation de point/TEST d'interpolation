@@ -210,22 +210,31 @@ def ind_degre(rang, degre):
         return indicatrice(rang * intervalle, (rang + 1) * intervalle)
     else:
         return (1 / ((degre) * intervalle)) * (
-            polynome([-rang , 1]) * ind_degre(rang, degre - 1)
-            + polynome([1 + rang + degre, -1]) * ind_degre(rang + 1, degre - 1)
+            polynome([-rang * intervalle, 1]) * ind_degre(rang, degre - 1)
+            + polynome([(1 + rang + degre)* intervalle, -1]) * ind_degre(rang + 1, degre - 1)
         )
-def interpolations(liste,degre) :
+def approximation(liste,degre) :
     fonction = Sum_ind_poly([])
     for rang in range (len(liste)-degre) :
         L = ind_degre(rang,degre)*liste[rang]
         fonction = fonction + L
-    print(fonction)
     return (fonction)
+
+def interpolation(liste,degre) :
+    fonction = Sum_ind_poly([])
+    mat = matrice([[0 for k in range (len(liste))]*len(liste)])
+    liste =[]
+    for rang in range (len(liste)-degre) :
+        L = ind_degre(rang,degre)
+        liste.append(L)
+
+
 liste = [ k for k in range (1000)]
 degre = 4
-fonction = interpolations(liste,degre)
-L = [fonction(k/100)  for k in range (10000)]
-for k in range (10) : print(fonction(k))
-t= [ k*intervalle*10e-3 for k in range (len(L))]
+fonction = approximation(liste,degre)
+L = [fonction(k/10)  for k in range (10000)]
+for k in range (100) : print(fonction(k))
+t= [ k*intervalle for k in range (len(L))]
 plt.plot(t,L)
 plt.legend()
 plt.xlabel('x')
