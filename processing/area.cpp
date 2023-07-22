@@ -4,115 +4,91 @@
 using namespace cv;
 using namespace std;
 
-Area::Area(int tAreaIndex, Pos tCenterPosition) :
-	areaIndex(tAreaIndex), centerPosition(tCenterPosition) {
-	lineIndex = 1;
-	startIndex = 0;
-	positionIndex = 0;
-	difference = 0;
+Area::Area() : areaIndex(0), lineIndex(1), startIndex(-1),
+positionIndex(0), centerPosition(NULL_POS), difference(0) {
 }
 
-UnpairArea::UnpairArea(int tAreadIndex, Pos tCenterPosition) {
-	Area::Area(tAreadIndex, tCenterPosition);
-	startIndex = 1;
+Area::Area(int tAreaIndex, Pos tCenterPosition) : areaIndex(tAreaIndex), lineIndex(1), startIndex(-1),
+positionIndex(0), centerPosition(tCenterPosition), difference(0) {
+}
+
+UnpairArea::UnpairArea(int tAreadIndex, Pos tCenterPosition) : Area(tAreadIndex, tCenterPosition) {
+	startIndex = 0;
+}
+
+PairArea::PairArea(int tAreadIndex, Pos tCenterPosition) : Area(tAreadIndex, tCenterPosition) {
 }
 
 Pos PairArea::getNextPosition() {
-	if (positionIndex - difference >= lineIndex) {
+	if (positionIndex - difference > lineIndex) {
 		lineIndex++;
 		positionIndex = startIndex;
 	}
-	Pos position = Area::getNextPosition();
-	if (position.x == -1) {
-		return Pos{ -1, -1 };
-	}
+	positionIndex++;
+	Pos position = getPreNextPosition();
 	if (position.x > width) {
 		if (areaIndex == 3) {
 			difference++;
 			return getNextPosition();
 		}
-		// issue
+		return NULL_POS;
 	}
 	else if (position.x < 0) {
 		if (areaIndex == 1) {
 			difference++;
 			return getNextPosition();
 		}
-		// issue
+		return NULL_POS;
 	}
 	else if (position.y > height) {
 		if (areaIndex == 2) {
 			difference++;
 			return getNextPosition();
 		}
-		// issue
+		return NULL_POS;
 	}
 	else if (position.y < 0) {
 		if (areaIndex == 0) {
 			difference++;
 			return getNextPosition();
 		}
-		// issue
+		return NULL_POS;
 	}
+	return position;
 }
 Pos UnpairArea::getNextPosition() {
 	if (positionIndex - difference > lineIndex) {
 		lineIndex++;
 		positionIndex = startIndex;
 	}
-	Pos position = Area::getNextPosition();
-	if (position.x == -1) {
-		return Pos{ -1, -1 };
-	}
+	Pos position = getPreNextPosition();
 	if (position.x > width) {
 		if (areaIndex == 1) {
 			difference++;
 			return getNextPosition();
 		}
-		// issue
+		return NULL_POS;
 	}
 	else if (position.x < 0) {
 		if (areaIndex == 3) {
 			difference++;
 			return getNextPosition();
 		}
-		// issue
+		return NULL_POS;
 	}
 	else if (position.y > height) {
 		if (areaIndex == 0) {
 			difference++;
 			return getNextPosition();
 		}
-		// issue
+		return NULL_POS;
 	}
 	else if (position.y < 0) {
 		if (areaIndex == 2) {
 			difference++;
 			return getNextPosition();
 		}
-		// issue
-	}
-}
-
-Pos Area::getNextPosition() {
-	Pos position = getPreNextPosition();
-	switch(areaIndex) {
-	case 0:
-		if (position.x > width) {
-			return Pos{ -1, -1 };
-		}
-	case 1:
-		if (position.y < 0) {
-			return Pos{ -1, -1 };
-		}
-	case 2:
-		if (position.x < 0) {
-			return Pos{ -1, -1 };
-		}
-	case 3:
-		if (position.y > height) {
-			return Pos{ -1, -1 };
-		}
+		return NULL_POS;
 	}
 	return position;
 }
@@ -128,7 +104,8 @@ Pos PairArea::getPreNextPosition() {
 	case 3:
 		return Pos{ centerPosition.x + positionIndex, centerPosition.y - lineIndex };;
 	}
-	return ;
+	cerr << "PairArea index problem" << endl;
+	return NULL_POS;
 }
 
 Pos UnpairArea::getPreNextPosition() {
@@ -142,6 +119,7 @@ Pos UnpairArea::getPreNextPosition() {
 	case 3:
 		return Pos{ centerPosition.x - positionIndex, centerPosition.y - lineIndex };;
 	}
-	return ;
+	cerr << "UnpairArea index problem" << areaIndex << endl;
+	return NULL_POS;
 }
 

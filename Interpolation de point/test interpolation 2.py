@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 
+
 # Les classes
-class indicatrice():
+class Indicatrice:
     def __init__(self, t1, t2):
         self.intervalle = (t1, t2)
 
@@ -12,7 +13,7 @@ class indicatrice():
             return 0
 
     def __mul__(self, a):
-        if isinstance(a, polynome):
+        if isinstance(a, Polynome):
             return ind_poly(self, a)
         else:
             raise TypeError("Opération de multiplication non prise en charge.")
@@ -21,8 +22,11 @@ class indicatrice():
         return self.__mul__(a)
 
 
-class matrice():
-    def __init__(self, listedeliste):
+class Matrice:
+    def __init__(self, *lists):
+        listedeliste = []
+        for list in lists:
+            listedeliste.append(list)
         self.mat = listedeliste
         self.longueur = len(listedeliste[0])
         self.largeur = len(listedeliste)
@@ -40,12 +44,12 @@ class matrice():
 
     def __add__(self, B):
         if self.longueur == B.longueur and self.largeur == B.largeur:
-            return matrice([[self[i, j] + B[i, j] for j in range(self.longueur)] for i in range(self.largeur)])
+            return Matrice(*([self[i, j] + B[i, j] for j in range(self.longueur)] for i in range(self.largeur)))
         else:
             return False
 
     def __mul__(self, B):
-        if isinstance(B, matrice):
+        if isinstance(B, Matrice):
             n, m, l = self.largeur, self.longueur, B.longueur
             if m != B.largeur:
                 raise Exception("The number of column of M1 must be the same as the number of line of M2")
@@ -58,55 +62,53 @@ class matrice():
                         sum += self[i, k] * B[k, j]
                     line.append(sum)
                 M.append(line)
-            return matrice(M)
-        if isinstance(B, int):
+            return Matrice(*M)
+        if isinstance(B, int) or isinstance(B, float):
             for i in range(self.largeur):
                 for j in range(self.longueur):
                     self[i, j] = self[i, j] * B
             return self
+        raise Exception("B type isn't handle")
 
 
-class polynome():
-    def __init__(self, coefficient):
-        if not isinstance(coefficient, list):
-            raise TypeError("les coefficients doivent être sous la forme de liste")
+class Polynome:
+    def __init__(self, *coefficients):
         p = -1
-        liste = []
-        while len(coefficient) and coefficient[p] == 0:
+        while len(coefficients) and coefficients[p] == 0:
             p -= 1
         if p != -1:
-            self.coefficient = coefficient
+            self.coefficients = coefficients
         else:
-            self.coefficient = coefficient[:p+1]
-        self.degre = len(self.coefficient) - 1
-        if self.coefficient == []:
+            self.coefficients = coefficients[:p + 1]
+        self.degre = len(self.coefficients) - 1
+        if not self.coefficients:
             self.coefdomi = 0
         else:
-            self.coefdomi = coefficient[-1]
+            self.coefdomi = coefficients[-1]
 
     def coef(self, deg):
         if deg > self.degre:
             return 0
-        return self.coefficient[deg]
+        return self.coefficients[deg]
 
     def __call__(self, valeur):
         somme = 0
         for k in range(self.degre + 1):
-            somme += self.coefficient[k] * valeur**k
+            somme += self.coefficients[k] * valeur ** k
         return somme
 
     def __add__(self, a):
-        if isinstance(a, polynome):
+        if isinstance(a, Polynome):
             liste = []
             if a.degre <= self.degre:
-                for k in range(len(a.coefficient)):
-                    liste.append(a.coefficient[k] + self.coefficient[k])
+                for k in range(len(a.coefficients)):
+                    liste.append(a.coefficients[k] + self.coefficients[k])
             else:
-                for k in range(len(self.coefficient)):
-                    liste.append(a.coefficient[k] + self.coefficient[k])
-            return polynome(liste)
+                for k in range(len(self.coefficients)):
+                    liste.append(a.coefficients[k] + self.coefficients[k])
+            return Polynome(*liste)
         elif isinstance(a, float):
-            self.coefficient[0] += a
+            self.coefficients[0] += a
             return self
         else:
             raise TypeError("Opération d'addition non prise en charge.")
@@ -114,18 +116,15 @@ class polynome():
     def __radd__(self, a):
         return self.__add__(a)
 
-    def __mul__(self, a):
+    def __mul__(self, a): # todo implement faster algorithm for polynomial multiplication (seen in ocaml)
         if isinstance(a, float):
-            liste = [coef * a for coef in self.coefficient]
-            return polynome(liste)
-        elif isinstance(a, polynome):
-            multi = polynome([])
+            return Polynome(*(coef * a for coef in self.coefficients))
+        elif isinstance(a, Polynome):
+            multi = Polynome()
             for i in range(a.degre + 1):
-                liste = [coef * a.coef(i) for coef in self.coefficient]
-                liste = [0] * i + liste
-                multi += polynome(liste)
+                multi += Polynome(*(0 for _ in range(i)), *(coef * a.coef(i) for coef in self.coefficients)) # not sure
             return multi
-        elif isinstance(a, indicatrice):
+        elif isinstance(a, Indicatrice):
             return ind_poly(a, self)
         elif isinstance(a, ind_poly):
             a.polynome = a.polynome * self
@@ -141,10 +140,10 @@ class polynome():
         return self.__mul__(a)
 
     def der(self):
-        return polynome([k * self.coefficient[k] for k in range(1, self.degre + 1)])
+        return Polynome(*(k * self.coefficients[k] for k in range(1, self.degre + 1)))
 
 
-class ind_poly():
+class ind_poly:
     def __init__(self, indicatrice, polynome):
         self.indicatrice = indicatrice
         self.polynome = polynome
@@ -156,7 +155,7 @@ class ind_poly():
             return self.polynome(point)
 
     def __add__(self, a):
-        if isinstance(a, float) or isinstance(a, polynome):
+        if isinstance(a, float) or isinstance(a, Polynome):
             self.polynome = self.polynome + a
             return self
         elif isinstance(a, ind_poly):
@@ -184,7 +183,7 @@ class ind_poly():
         return self.__add__(a)
 
     def __mul__(self, a):
-        if isinstance(a, float) or isinstance(a, polynome):
+        if isinstance(a, float) or isinstance(a, Polynome):
             self.polynome = self.polynome * a
             return self
         else:
@@ -201,7 +200,7 @@ class Sum_ind_poly():
         self.ind = [l.indicatrice for l in List_ind_poly]
 
     def __add__(self, a):
-        if isinstance(a, float) or isinstance(a, polynome):
+        if isinstance(a, float) or isinstance(a, Polynome):
             for k in self.polynome:
                 k = k + a
             return self
@@ -218,7 +217,7 @@ class Sum_ind_poly():
             return self
         elif isinstance(a, Sum_ind_poly):
             for k in a.liste:
-                self = self + k
+                self += k
             return self
         else:
             raise TypeError("Opération d'addition non prise en charge.")
@@ -252,13 +251,15 @@ class Sum_ind_poly():
 
 intervalle = 1e-3
 
+
 # Les fonctions
 def ind_degre(rang, degre):
     if degre == 0:
-        return indicatrice(rang * intervalle, (rang + 1) * intervalle)
+        return Indicatrice(rang * intervalle, (rang + 1) * intervalle)
     else:
-        return 1 / (degre * intervalle) * (polynome([-rang - degre, 1]) * ind_degre(rang, degre - 1) +
-                                            polynome([1 + rang + degre, -1]) * ind_degre(rang + 1, degre - 1))
+        return 1 / (degre * intervalle) * (Polynome(-rang - degre, 1) * ind_degre(rang, degre - 1) +
+                                           Polynome(1 + rang + degre, -1) * ind_degre(rang + 1, degre - 1))
+
 
 def interpolations(liste, degre):
     fonction = Sum_ind_poly([])
@@ -266,6 +267,7 @@ def interpolations(liste, degre):
         if rang < len(liste):
             fonction = fonction + ind_degre(rang, degre) * liste[rang]
     return fonction
+
 
 liste = [(-1) ** k for k in range(1000)]
 degre = 3
