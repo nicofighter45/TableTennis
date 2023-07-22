@@ -20,16 +20,17 @@ private:
 	Pos getSearchPos(int straightDecal, int diagonalDecal);
 	Pos getPreSearchPos(int straightDecal, int diagonalDecal);
 	Pos getSearchPos();
-	void newMatrice(Mat& tActualMatrice);
-	void calculateCenter(Pos position);
-	void initialCalculation();
-	void findBall();
+	Pos calculateCenter(Pos position);
+	Pos initialCalculation();
 public:
-	Analyser(Mat& tActualMatrice, 
-		Rect tROI);
+	Pos findBall(Mat& tActualMatrice);
+	Mat& getMixedMatrice(float conversion);
+	Mat& getMaskMatrice();
+	Mat& getResultMatrice();
+	Analyser(Mat& tActualMatrice, Rect tROI);
 };
 
-bool pixelIsInHSVRange(Mat& matrice, int i, int j);
+bool pixelIsInHSVRange(Mat& matrice, Pos position);
 
 HSVColor& RGBtoHSV(Vec3b& vector);
 

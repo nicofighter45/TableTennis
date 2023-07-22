@@ -9,18 +9,23 @@
 using namespace cv;
 using namespace std;
 
-typedef struct Pos Pos;
-struct Pos {
+typedef struct Pos {
 	double x;
 	double y;
-};
-typedef struct Frame Frame;
-struct Frame {
+} Pos;
+const Pos NULL_POS = { -1, -1 };
+inline bool operator==(const Pos& pos1, const Pos& pos2) {
+	return pos1.x == pos2.x && pos1.y == pos2.y;
+}
+inline bool operator!=(const Pos& pos1, const Pos& pos2) {
+	return !(pos1 == pos2);
+}
+
+typedef struct Frame {
 	int number;
 	Mat matrice;
 };
-typedef struct HSVColor HSVColor;
-struct HSVColor {
+typedef struct HSVColor {
 	int H;
 	int S;
 	int V;

@@ -1,6 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include "analyse.hpp"
 #include "configuration.hpp"
+#include "area.hpp"
 
 using namespace cv;
 using namespace std;
@@ -9,58 +10,90 @@ Analyser::Analyser(Mat& tActualMatrice, Rect tROI)
     : actualMatrice(tActualMatrice), ROI(tROI) {
     isInitialSearch = true;
     actualIndex = 0;
-    findBall();
     previous = center;
-    /*
-    // convert to hsv image format
-	cvtColor(initialMatrice, HSVMatrice, COLOR_BGR2HSV);
-	// this matrice is a mask that is blank if pixel are in the range, black otherwise
-	inRange(HSVMatrice, getScalarFromHSVColor(lower_color), getScalarFromHSVColor(upper_color), maskMatrice);
-	// we fusion original image and mask to make only pixel in range appear
-	bitwise_and(initialMatrice, initialMatrice, resultMatrice, maskMatrice);
-	// calculate the center of the detected pixels
-	Moments m = moments(maskMatrice, true);
-	center =  Pos{ m.m10 / m.m00, m.m01 / m.m00 };
-    */
+    maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), cv::Scalar(0, 0, 0));
+    resultMatrice = Mat(actualMatrice.size(), actualMatrice.type(), cv::Scalar(0, 0, 0));
 }
 
-void Analyser::newMatrice(Mat& tActualMatrice) {
+Pos Analyser::findBall(Mat& tActualMatrice) {
     actualMatrice = tActualMatrice;
-    findBall();
-}
-
-void Analyser::findBall() {
     if (isInitialSearch) {
-        initialCalculation();
+        return calculateCenter(initialCalculation());
     }
     while (actualIndex != 8 * searchPixelMaxSpacing / searchPixelSpacing) {
         Pos position = getSearchPos();
-        if (position.x == -1 || position.y == -1) {
+        if (position == NULL_POS) {
             continue;
         }
         if (pixelIsInHSVRange(actualMatrice, position)) {
-            calculateCenter(position);
-            return;
+            isInitialSearch = false;
+            cout << "We find a pixel of the ball" << position.x << ";" << position.y << endl;
+            return calculateCenter(position);
         }
     }
-    initialCalculation();
+    if (!isInitialSearch) {
+        return calculateCenter(initialCalculation());
+    }
+    isInitialSearch = true;
+    cout << "We didn't find a ball: " << actualIndex << " " << searchPixelMaxSpacing << " " << searchPixelSpacing << endl;
+    return NULL_POS;
 }
 
-void Analyser::calculateCenter(Pos position) {
-    // multithreading
+Pos Analyser::calculateCenter(Pos position) {
+    vector<thread> threads;
+    int totalX = position.x;
+    int totalY = position.y;
+    int number_of_pixel_in_range = 1;
+    //TODO make it work when thread number is not 8
+    for (int i = 0; i < number_of_threads; i++) {
+        const int thread_number = i;
+        threads.emplace_back([&, thread_number]() {
+            Area* area = nullptr;
+            cout << "Launching thread " << thread_number << endl;
+            if (thread_number % 2 == 0) {
+                area = new PairArea(thread_number/2, position);
+            }
+            else {
+                return;
+                //area = new UnpairArea((thread_number+1)%8/2, position);
+            }
+            Pos position = area -> getNextPosition();
+            while (position != NULL_POS) {
+                cout << "Searching for pixel in " << position.x << ";" << position.y << " thread " << thread_number << endl;
+                if (pixelIsInHSVRange(actualMatrice, position)) {
+                    cout << "We find a pixel of the ball" << position.x << ";" << position.y << endl;
+                    number_of_pixel_in_range += 1;
+                    totalX += position.x;
+                    totalY += position.y;
+                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 255, 255);
+                    resultMatrice.at<Vec3b>(position.x, position.y) = actualMatrice.at<Vec3b>(position.x, position.y);
+                }
+                //TODO when the pixel isn't in range, not check the pixels behind it
+                position = area -> getNextPosition();
+            }
+            delete area;
+            return;
+        });
+    }
+    for (int i = 0; i < number_of_threads; i++) {
+        threads[i].join();
+    }
+    center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
+    return center;
 }
 
-void Analyser::initialCalculation() {
+Pos Analyser::initialCalculation() {
     for (int x = searchPixelSpacing; x += searchPixelSpacing; x < width - searchPixelSpacing) {
         for (int y = searchPixelSpacing; y += searchPixelSpacing; y < height - searchPixelSpacing) {
             Pos position = { x, y };
             if (pixelIsInHSVRange(actualMatrice, position)) {
-                calculateCenter(position);
-                return;
+                cout << "We find a pixel of the ball" << position.x << ";" << position.y << endl;
+                return calculateCenter(position);
             }
         }
     }
-    // no ball found
+    cerr << "No ball found" << endl;
+    return NULL_POS;
 }
 
 Pos Analyser::getSearchPos() {
@@ -75,16 +108,16 @@ Pos Analyser::getSearchPos(int straightDecal, int diagonalDecal) {
     if (position.x > width) {
         if (position.y > height) {
             if (previous.y == position.y) {
-                return Pos{ -1, -1 };
+                return NULL_POS;
             }
         }
         if (previous.x == position.x) {
-            return Pos{ -1, -1 };
+            return NULL_POS;
         }
     }
     else if (position.y > height) {
         if (previous.y == position.y) {
-            return Pos{ -1, -1 };
+            return NULL_POS;
         }
     }
     actualIndex++;
@@ -110,6 +143,24 @@ Pos Analyser::getPreSearchPos(int straightDecal, int diagonalDecal) {
     case 7:
         return Pos{ center.x + diagonalDecal, center.y - diagonalDecal };
     }
+}
+
+Mat& Analyser::getMaskMatrice() {
+    return ref(maskMatrice);
+}
+
+Mat& Analyser::getResultMatrice() {
+    return ref(resultMatrice);
+}
+
+Mat& Analyser::getMixedMatrice(float conversion) {
+    Mat mixedMatrice = resultMatrice.clone();
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            mixedMatrice.at<Vec3b>(x, y) = actualMatrice.at<Vec3b>(x, y) * conversion;
+        }
+    }
+    return ref(mixedMatrice);
 }
 
 

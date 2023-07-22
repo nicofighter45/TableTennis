@@ -18,6 +18,7 @@ void cutter();
 void processVideoSingleThreaded(VideoCapture capture, String name);
 void printCircleCenter(Mat& mat, const int x, const int y);
 void singlethreading();
+String getFile();
 
 
 void initTracking();

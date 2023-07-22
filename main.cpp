@@ -4,6 +4,6 @@
 int main()
 {
     initTracking();
-    run();
+    setupTracking();
     return 0;
 }
