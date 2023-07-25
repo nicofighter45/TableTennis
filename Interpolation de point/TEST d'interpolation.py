@@ -213,12 +213,13 @@ def ind_degre(rang, degre):
             polynome([-rang * intervalle, 1]) * ind_degre(rang, degre - 1)
             + polynome([(1 + rang + degre)* intervalle, -1]) * ind_degre(rang + 1, degre - 1)
         )
-def approximation(liste,degre) :
+def approximation(liste, degre):
     fonction = Sum_ind_poly([])
-    for rang in range (len(liste)-degre) :
-        L = ind_degre(rang,degre)*liste[rang]
+    for rang in range(len(liste) - degre):
+        L = ind_degre(rang, degre) * liste[rang]
         fonction = fonction + L
-    return (fonction)
+    return fonction
+
 
 def interpolation(liste,degre) :
     fonction = Sum_ind_poly([])
@@ -229,15 +230,33 @@ def interpolation(liste,degre) :
         liste.append(L)
 
 
-liste = [ k for k in range (100)]
-degre = 4
-fonction = approximation(liste,degre)
-L = [fonction(k/100)  for k in range (10000)]
-for k in range (100) : print(fonction(k))
-t= [ k*intervalle/100 for k in range (len(L))]
-plt.plot(t,L)
+import matplotlib.pyplot as plt
+
+# Les points d'interpolation 
+y_interpolation = [rd.uniform(-1,1) for k in range(10)]
+
+# Convertir les points d'interpolation en listes de coordonnées x et y
+x_interpolation = [ k for k in range (len(y_interpolation))]
+
+# Degré d'interpolation B-spline
+degre = 3
+
+# Effectuer l'interpolation B-spline
+fonction_interpolation = approximation(y_interpolation, degre)
+
+# Calculer les valeurs interpolées pour l'affichage
+L = [fonction_interpolation(k/100) for k in range(1000)]
+
+# Afficher les points d'interpolation
+plt.scatter(x_interpolation, y_interpolation, color='red', label='Points d\'interpolation')
+
+# Afficher la courbe interpolée
+t = [k * intervalle * 0.01 for k in range(len(L))]
+plt.plot(t, L, label='Interpolation B-spline')
+
 plt.legend()
 plt.xlabel('x')
 plt.ylabel('y')
-plt.title(f'Interpolation de degré {degre}')
+plt.title(f'Interpolation B-spline de degré {degre}')
 plt.show()
+
