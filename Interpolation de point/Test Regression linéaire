@@ -47,15 +47,6 @@ class polynome():
                 liste = [0] * i + [coef * a.coefficient[i] for coef in self.coefficient]
                 multi = multi + polynome(liste)
             return multi
-        elif isinstance(a,indicatrice) :
-            return(ind_poly(a,self))
-        elif isinstance(a,ind_poly) :
-            a.polynome = a.polynome * self
-            return(a)
-        elif isinstance(a,Sum_ind_poly) :
-            for k in a.liste : 
-                k = self*k
-            return(a)
         else:
             raise TypeError("Opération de multiplication non prise en charge.")
     def __rmul__(self, a):
