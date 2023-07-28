@@ -55,16 +55,18 @@ class matrice() :
     def __rmul__(self,B):
         return self.__mul__(B)
     def coefligne(self,alpha,ligne) :
-        for k in range (self.largeur) : 
+        for k in range (self.longueur) : 
             if  1>=self[ligne,k]*alpha > 0.99 : self[ligne,k] = 1
             elif 0.01>abs(self[ligne,k]*alpha) >= 0 : self[ligne,k] = 0
             else : self[ligne,k]*=alpha 
         return self
     def liligne(self,ligne1,ligne2,alpha) :
-        for k in range (self.largeur) : self[ligne1,k]-= alpha*self[ligne2,k]
+        for k in range (self.longueur) : self[ligne1,k]-= alpha*self[ligne2,k]
         return self
-    def échange(self,ligne1,ligne2) :
-        for k in range (self.largeur) : self[ligne1,k],self[ligne2,k] = self[ligne2,k],self[ligne1,k]
+    def echange(self,ligne1,ligne2) :
+        M=self.donnee
+        for k in range (self.longueur) : M[ligne1][k],M[ligne2][k] = M[ligne2][k],M[ligne1][k]
+        return(matrice(M))
 class polynome():
     def __init__(self, coefficient) :
         self.coefficient = coefficient
@@ -214,21 +216,19 @@ class Sum_ind_poly():
         for k in range (1,len(self.liste)) : s+=f"+ {str(self.liste[k])} "
         return s
 # les fonctions
-intervalle = 1
-def ind_degre(rang, degre):
+def ind_degre(rang, degre,intervalle):
     if degre == 0:
         return indicatrice(rang * intervalle, (rang + 1) * intervalle)
     else:
-        return (1/(degre*intervalle)*
-            (polynome([-rang * intervalle, 1]) * ind_degre(rang, degre - 1)
-            + polynome([(1 + rang + degre)* intervalle, -1]) * ind_degre(rang + 1, degre - 1))
+        return (
+            (polynome([-rang * intervalle, 1]) * ind_degre(rang, degre - 1,intervalle)
+            + polynome([(1 + rang + degre)* intervalle, -1]) * ind_degre(rang + 1, degre - 1,intervalle))
         )
 def approximation(liste, degre):
     fonction = Sum_ind_poly([])
-
     for rang in range(len(liste)):
         L = ind_degre(rang+degre+2, degre) * liste[rang]
-        fonction = fonction + L
+        fonction = fonction + L*(1/fact(degre)*intervalle**degre)
     return fonction
 
 def inverse(self):
@@ -264,26 +264,27 @@ def inverse(self):
 def fact (n):
     if n==1 : return 1
     else : return fact(n-1)*n
-def interpolation(liste,degre) :
+def interpolation(liste,degre,intervalle) :
     fonction = Sum_ind_poly([])
-    mat1 = matrice([[0]]+[[k]for k in liste]+[[0]])
+    mat1 = matrice( [[(liste[1]-liste[0])/intervalle]] + [[k] for k in liste] + [[(liste[len(liste)-1]-liste[len(liste)-2])/intervalle]])
     mat2 = matrice([[0 for k in range (len(liste)+2)]for k in range(len(liste)+2)])
     liste1 =[]
     m=len(liste)
-    for rang in range (m+2) :
-        L = ind_degre(rang,degre)
+    for rang in range (m+degre) :
+        L = ind_degre(rang,degre,intervalle)
         liste1.append(L)
     for k in range (m) :
-        for i in range (m+2) : mat2[k+1,i] = liste1[i]((k+3)*intervalle)
+        for i in range (m+2) : mat2[k+1,i] = liste1[i]((k+degre)*intervalle**degre)
     liste1der = [der(l) for l in liste1]
     for j in range (m+2) : 
-        mat2[0,j] = liste1der[j](5*intervalle)
-        mat2[-1,j] = liste1der[j](m*intervalle)
-    inverse1 = résolution(mat2,mat1)
-    point_de_controle = inverse1*mat1
-    for k in range (0,m+2): fonction = fonction + liste1[k]*point_de_controle[k,0]
+        mat2[0,j] = liste1der[j]((degre+2)*intervalle)
+        mat2[-1,j] = liste1der[j]((m+3)*intervalle)
+    print(mat2)
+    point_de_controle = résolution(mat2,mat1)
+    for k in  range(degre) : fonction = fonction + liste1[k]
+    for k in range (m): 
+        fonction = fonction + liste1[k+degre]*point_de_controle[k,0]*(1/(fact(degre)*intervalle))
     return fonction
-
 
 def der(self) :
         if type(self) == ind_poly : return ind_poly(self.indicatrice,der(self.polynome))
@@ -291,30 +292,47 @@ def der(self) :
         elif type(self) == Sum_ind_poly : return Sum_ind_poly([der(k) for k in self.liste])
         else : raise Exception("Pas dérivable")
 
-# Les points d'interpolation 
-y_interpolation = [ rd.uniform(k,k+1)  for k in range(10,41)]
+def résolution(matrice1, coordonée) :
+    if matrice1.longueur != coordonée.largeur : raise TypeError("Matrice et coordonée doivent être de même longueur")
+    # triangulons la matrice
+    for k in range (matrice1.longueur) :
+        for j in range (k,matrice1.longueur) :
+            if matrice1[j,k] != 0 : 
+                matrice1.echange(k,j)
+                coordonée.echange(k,j)
+        pivot_inv = 1/matrice1[k,k]
+        matrice1.coefligne(pivot_inv, k)
+        coordonée.coefligne(pivot_inv, k)
+        for i in range (k+1,matrice1.longueur) :
+            matrice1.liligne(i,k,matrice1[i,k])
+            coordonée.liligne(i,k,matrice1[i,k])
+    lesresultats = matrice([[0] for k in range (coordonée.largeur)])
+    for m in range (coordonée.largeur) :
+        resultat = coordonée[coordonée.largeur-m-1,0]
+        for l in range (coordonée.largeur-m,coordonée.largeur) :
+            resultat -= lesresultats[coordonée.largeur-m-1,0]*matrice1[coordonée.largeur-m-1,coordonée.largeur-l-1]
+        resultat = resultat/matrice1[coordonée.largeur-m-1,coordonée.largeur-m-1]
+        lesresultats[coordonée.largeur-m-1,0] = resultat
+    return(lesresultats)
+    # c'est fait
+def plot(intervalle,y_interpolation,degre) :
+    x_interpolation = [ k for k in range (len(y_interpolation))]
+    # Effectuer l'interpolation B-spline
+    
+    fonction_interpolation = interpolation(y_interpolation, degre,intervalle)
 
-# Convertir les points d'interpolation en listes de coordonnées x et y
-x_interpolation = [ k for k in range (len(y_interpolation))]
-
-# Degré d'interpolation B-spline
-degre = 3
-
-# Effectuer l'interpolation B-spline
-fonction_interpolation = approximation(y_interpolation, degre)
-
-# Calculer les valeurs interpolées pour l'affichage
-L = [fonction_interpolation((3+k/100)*intervalle) for k in range(4100)]
-
-# Afficher les points d'interpolation
-plt.scatter(x_interpolation, y_interpolation, color='red', label='Points d\'interpolation')
-
-# Afficher la courbe interpolée
-t = [k * intervalle * 0.01 for k in range(len(L))]
-plt.plot(t, L, label='Interpolation B-spline')
-
-plt.legend()
-plt.xlabel('x')
-plt.ylabel('y')
-plt.title(f'Interpolation B-spline de degré {degre}')
-plt.show()
+    # Calculer les valeurs interpolées pour l'affichage
+    L = [fonction_interpolation((5+k/100)*intervalle) for k in range(len(y_interpolation)*100)]
+    for k in range (len(y_interpolation)) : print(fonction_interpolation((5+k)*intervalle))
+    # Afficher les points d'interpolation
+    plt.scatter(x_interpolation, y_interpolation, color='red', label='Points d\'interpolation')
+    # Afficher la courbe interpolée
+    t = [k * intervalle * 0.01 for k in range(len(L))]
+    plt.plot(t, L, label='Interpolation B-spline')
+    plt.legend()
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title(f'Interpolation B-spline de degré {degre}')
+    plt.show()
+L= [rd.uniform(k,k+1) for k in range (10,41)]
+plot(1,L,3)
