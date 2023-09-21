@@ -6,6 +6,7 @@
 #include "tracking.hpp"
 #include "prompt.hpp"
 #include "analyse.hpp"
+#include "area.hpp"
 
 using namespace std;
 using namespace cv;
@@ -21,8 +22,52 @@ void initTracking() {
 	watchedPos = { 0, 0 };
 
 	// default orange range, the best one we figured out for now
-	lower_color = HSVColor{ 0, 65, 65 };
-	upper_color = HSVColor{ 20, 255, 255 };
+	lower_color = HSVColor{ 10, 70, 70};
+	upper_color = HSVColor{ 40, 255, 255 };
+}
+
+void test2() {
+	Vec3b colors[] = { Vec3b(255, 255, 255) , Vec3b(255, 0, 0) , Vec3b(0, 255, 0) ,
+		Vec3b(0, 0, 255) , Vec3b(0, 255, 255), Vec3b(255, 255, 0), Vec3b(255, 0, 255), Vec3b(120, 120, 0) };
+	for (Vec3b color : colors) {
+		cout << "R: " << color[0] << "G: " << color[1] << "B: " << color[2] << " " << RGBtoHSV(color) << endl << endl;
+	}
+	cout << lower_color;
+}
+
+void test() {
+	vector<Area*> areas;
+	Pos center({ 5, 50 });
+	for (int k = 0; k < 4; k++) {
+		areas.push_back(new PairArea(k, center));
+		areas.push_back(new UnpairArea(k, center));
+	}
+	Vec3b colors[] = { Vec3b(255, 255, 255) , Vec3b(255, 0, 0) , Vec3b(0, 255, 0) , 
+		Vec3b(0, 0, 255) , Vec3b(0, 255, 255), Vec3b(255, 255, 0), Vec3b(255, 0, 255), Vec3b(120, 120, 0)};
+	width = 100;
+	height = 100;
+	Mat mat(1100, 1100, CV_8UC3, Scalar(0, 0, 0));
+	
+	for (int i = 0; i < 100; i++) {
+		int j = 0;
+		for (Area*area : areas) {
+			Pos pos = area -> getNextPosition();
+			if (pos == NULL_POS) {
+				cout << "null pos : " << j << "   " << *area << endl;
+			}
+			else {
+				for (int x = pos.x * 10; x < pos.x * 10 + 10; x++) {
+					for (int y = pos.y * 10; y < pos.y * 10 + 10; y++) {
+						mat.at<Vec3b>(x, y) = colors[j];
+					}
+				}
+			}
+			j++;
+		}
+		imshow("mat", mat);
+		waitKey(5);
+	}
+	waitKey(-1);
 }
 
 void setupTracking() {
@@ -45,21 +90,28 @@ void setupTracking() {
 	total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
 
 	// prepare the window to show frames
-	initialisePrompts();
+	// initialisePrompts();
 
 	const float conversion = static_cast<float>(watchedOpacity) / 100;
 
 	Mat readed_frame;
 	capture.read(readed_frame);
+	capture.read(readed_frame);
 	// TODO let the user choose ROI
-	Analyser analyser(ref(readed_frame), regions_of_interest[0]);
 	cout << "Starting tracking" << endl;
+	cout << lower_color << "  " << upper_color << endl;
+	width = 1000;
+	height = 300;
 	do {
-		Pos center = analyser.findBall(readed_frame);
+		readed_frame = readed_frame(Rect(0, 150, 1000, 300));
+		imshow("test2", readed_frame);
+		Analyser analyser(ref(readed_frame), regions_of_interest[0]);
+		Pos center = analyser.findBall(ref(readed_frame));
 		cout << "the center is " << center.x << ";" << center.y << endl;
-		matForIniti = analyser.getMixedMatrice(conversion);
-		imshow("bou", matForIniti);
-	} while (capture.read(readed_frame) /* && showWindow() */ );
+		imshow("mixedMatrice", analyser.getMixedMatrice(conversion));
+		imshow("maskMatrice", analyser.getMaskMatrice());
+		waitKey(-1);
+	} while (capture.read(readed_frame) /*&& showWindow()*/);
 
 }
 

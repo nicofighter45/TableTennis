@@ -11,30 +11,33 @@ protected:
 	const int areaIndex;
 	int lineIndex;
 	int startIndex;
+	int stopIndex;
 	int positionIndex;
 	const Pos centerPosition;
-	int difference;
-	virtual Pos getPreNextPosition() = 0;
 public:
+	ostream& print(ostream& os) const;
+	virtual Pos getPreNextPosition() = 0;
 	Area();
 	Area(int tAreaIndex, Pos tCenterPosition);
 	virtual Pos getNextPosition() = 0;
+	void nextRaw();
 };
 
 class PairArea : public Area{
 private:
-	Pos getPreNextPosition();
 public:
+	Pos getPreNextPosition();
 	Pos getNextPosition();
 	PairArea(int tAreaIndex, Pos tCenterPosition);
 };
 class UnpairArea : public Area{
 private:
-	Pos getPreNextPosition();
 public:
+	Pos getPreNextPosition();
 	Pos getNextPosition();
 	UnpairArea(int tAreaIndex, Pos tCenterPosition);
 };
 
+ostream& operator<<(std::ostream& os, const Area& obj);
 
 #endif
