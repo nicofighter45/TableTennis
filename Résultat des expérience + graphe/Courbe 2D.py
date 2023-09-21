@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math as mt
 import matplotlib.gridspec as gridspec
+import data_reception as dt
+import processing as p
+import speed as sp
 h,x=[],[]
 with open("Résultat des expérience + graphe/Rebond sur sol.txt", "r") as file:
     lines = file.readlines()
