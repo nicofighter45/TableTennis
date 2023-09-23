@@ -17,7 +17,7 @@ def pente(h):
         for j in range (k,len(v)):
             if j!= k : pente.append((v[k]-v[j])/(10e-3*(k-j)))
         return(moyenne(pente))
-
+    
 rebilitation_de_liste(h)
 h=premièrevaleurhaute(h)
 h=descente(h)[:-1]

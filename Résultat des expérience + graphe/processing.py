@@ -8,6 +8,10 @@ def min(x) :
     for l in x :
         if min > l : min =l
     return(min)
+def rebilitation_de_liste_min(liste) :
+    mini =min(liste)
+    for k in range(len(liste)) :
+        liste[k]=abs(mini-liste[k])
 def rebilitation_de_liste(liste) :
     maxi =max(liste)
     for k in range(len(liste)) :
@@ -31,3 +35,7 @@ def moyenne(liste) :
     for k in liste :
         somme+=k
     return(somme/len(liste))
+def rebilitation_de_liste_max(liste) :
+    maxi =max(liste)
+    for k in range(len(liste)) :
+        liste[k]=abs(maxi-liste[k])

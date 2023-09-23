@@ -1,47 +1,8 @@
 import math as mt
-h,x=[],[]
-with open("//Users/antoine/TIPE/TableTennis/Résultat des expérience + graphe/Rebond sur sol.txt", "r") as file:
-    lines = file.readlines()
-    for line in lines:
-        cut = line[:-2].split(";")
-        h.append(float(cut[0]))
-        x.append(float(cut[1]))
-def max(x) :
-    max = x[0]
-    for l in x :
-        if max < l : max =l
-    return(max)
-def min(x) :
-    min = x[0]
-    for l in x :
-        if min > l : min =l
-    return(min)
-def rebilitation_de_liste(liste) :
-    maxi =max(liste)
-    for k in range(len(liste)) :
-        liste[k]=abs(maxi-liste[k])
-def maximum(liste) :
-    liste2=premièrevaleurhaute(liste)
-    max=[liste2[0]]
-    p=-1
-    k=0
-    while k < len(liste2) :
-        if p == -1 :
-            while k+1< len(liste2) and liste2[k]>=liste2[k+1] :
-                k+=1
-            p = 1
-        if p == 1 :
-            while k+1 < len(liste2) and liste2[k]<=liste2[k+1] :
-                k+=1
-            if k+1 <len(liste2) : max.append(liste2[k])
-            p = -1
-            k+=1
-    return(max)
-def moyenne(liste) :
-    somme=0
-    for k in liste :
-        somme+=k
-    return(somme/len(liste))
+from data_reception import *
+from processing import *
+from speed import *
+Taille_pix, h,x = data("TableTennis/Résultat des expérience + graphe/Rebond sur sol.txt")
 def coefficient_de_rebond(liste) :
     max = maximum(liste)
     coefficient = []
@@ -49,12 +10,6 @@ def coefficient_de_rebond(liste) :
         coefficient.append(mt.sqrt(max [k+1]/max[k]))
     print(coefficient)
     return(moyenne(coefficient))
-def premièrevaleurhaute(liste) :
-    p=0
-    for k in range(40): 
-        if liste[k]<=liste[k+1]:
-            p=k
-    return(liste[p+1:])
 h,x=h[1:],x[1:]
 rebilitation_de_liste(x)
 rebilitation_de_liste(h)

@@ -2,59 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math as mt
 import matplotlib.gridspec as gridspec
-import data_reception as dt
-import processing as p
-import speed as sp
-h,x=[],[]
-with open("/Users/antoine/TIPE/TableTennis/Résultat des expérience + graphe/Courbe du robot.txt", "r") as file:
-    lines = file.readlines()
-    for line in lines:
-        cut = line[:-2].split(";")
-        x.append(float(cut[0]))
-        h.append(float(cut[1]))
-Taille_pix, h, x = x[0]/h[0],h[1:],x[1:]
-print(Taille_pix)
-print(x)
-def max(x) :
-    max = x[0]
-    for l in x :
-        if max < l : max =l
-    return(max)
-def min(x) :
-    min = x[0]
-    for l in x :
-        if min > l : min =l
-    return(min)
-    maxi =max(liste)
-    for k in range(len(liste)) :
-        liste[k]=abs(maxi-liste[k])
-def convertisseur(liste):
-    for k in range (len(liste)):
-        liste[k] = liste[k]*Taille_pix
-def rebilitation_de_liste(liste) :
-    maxi =max(liste)
-    for k in range(len(liste)) :
-        liste[k]=abs(maxi-liste[k])
-def vitesse(position) :
-    vitesse=[]
-    p=1
-    for k in range (len(position)-1) :
-        if abs(position[k+1]-position[k])< 10e-5 : p+=1
-        else : vitesse.append((position[k+1]-position[k])/(10e-3*p))
-    return(vitesse)
+from data_reception import *
+from processing import *
+from speed import *
+Taille_pix, x,h = data("TableTennis/Résultat des expérience + graphe/Courbe du robot.txt")
 rebilitation_de_liste(h)
-def rebilitation_de_liste_min(liste) :
-    mini =min(liste)
-    for k in range(len(liste)) :
-        liste[k]=abs(mini-liste[k])
-rebilitation_de_liste_min(x)
-convertisseur(h)
-convertisseur(x)
+convertisseur(h,Taille_pix)
+convertisseur(x,Taille_pix)
 
 t=[k*10e-3 for k in range(len(h))]
 fig = plt.figure(tight_layout=True)
 gs = gridspec.GridSpec(1, 1)
-
 ax2 = fig.add_subplot(gs[0, 0])
 ax2.set_title('Courbe du rebond : f(y) = z ', loc="center")
 ax2.plot(x,h,"b-")
