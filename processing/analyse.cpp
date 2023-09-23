@@ -11,15 +11,17 @@ Analyser::Analyser(Mat& tActualMatrice, Rect tROI)
     isInitialSearch = true;
     actualIndex = 0;
     previous = center;
-    maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), cv::Scalar(0, 0, 0));
-    resultMatrice = Mat(actualMatrice.size(), actualMatrice.type(), cv::Scalar(0, 0, 0));
+    maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
+    resultMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
 }
 
 Pos Analyser::findBall(Mat& tActualMatrice) {
     actualMatrice = tActualMatrice;
     if (isInitialSearch) {
-        return calculateCenter(initialCalculation());
+        cout << "initial search" << endl;
+        return initialCalculation();
     }
+    cout << "not initial search" << endl;
     while (actualIndex != 8 * searchPixelMaxSpacing / searchPixelSpacing) {
         Pos position = getSearchPos();
         if (position == NULL_POS) {
@@ -27,12 +29,11 @@ Pos Analyser::findBall(Mat& tActualMatrice) {
         }
         if (pixelIsInHSVRange(actualMatrice, position)) {
             isInitialSearch = false;
-            cout << "We find a pixel of the ball" << position.x << ";" << position.y << endl;
             return calculateCenter(position);
         }
     }
     if (!isInitialSearch) {
-        return calculateCenter(initialCalculation());
+        return initialCalculation();
     }
     isInitialSearch = true;
     cout << "We didn't find a ball: " << actualIndex << " " << searchPixelMaxSpacing << " " << searchPixelSpacing << endl;
@@ -40,6 +41,9 @@ Pos Analyser::findBall(Mat& tActualMatrice) {
 }
 
 Pos Analyser::calculateCenter(Pos position) {
+    cout << "calculating center" << endl;
+    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 0, 0);
+    resultMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 0, 0);
     vector<thread> threads;
     int totalX = position.x;
     int totalY = position.y;
@@ -47,47 +51,57 @@ Pos Analyser::calculateCenter(Pos position) {
     //TODO make it work when thread number is not 8
     for (int i = 0; i < number_of_threads; i++) {
         const int thread_number = i;
-        threads.emplace_back([&, thread_number]() {
+        //threads.emplace_back([&, thread_number]() {
             Area* area = nullptr;
-            cout << "Launching thread " << thread_number << endl;
             if (thread_number % 2 == 0) {
                 area = new PairArea(thread_number/2, position);
             }
             else {
-                return;
-                //area = new UnpairArea((thread_number+1)%8/2, position);
+                area = new UnpairArea((thread_number+1)%8/2, position);
             }
             Pos position = area -> getNextPosition();
             while (position != NULL_POS) {
-                cout << "Searching for pixel in " << position.x << ";" << position.y << " thread " << thread_number << endl;
+                cout << "Searching pos " << position << endl;
                 if (pixelIsInHSVRange(actualMatrice, position)) {
-                    cout << "We find a pixel of the ball" << position.x << ";" << position.y << endl;
                     number_of_pixel_in_range += 1;
                     totalX += position.x;
                     totalY += position.y;
                     maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 255, 255);
                     resultMatrice.at<Vec3b>(position.x, position.y) = actualMatrice.at<Vec3b>(position.x, position.y);
+                    imshow("mat", maskMatrice);
+                    waitKey(1000);
                 }
-                //TODO when the pixel isn't in range, not check the pixels behind it
+                else {
+                    area->nextRaw();
+                }
                 position = area -> getNextPosition();
             }
             delete area;
-            return;
-        });
+            //return;
+        //});
     }
     for (int i = 0; i < number_of_threads; i++) {
         threads[i].join();
     }
-    center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
-    return center;
+    Pos center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
+    maskMatrice.at<Vec3b>(center.x, center.y) = Vec3b(0, 255, 0);
+    resultMatrice.at<Vec3b>(center.x, center.y) = Vec3b(0, 255, 0);
+    cout << "Caluclate Center is terminate : " << center << endl;
+    return center;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 }
 
 Pos Analyser::initialCalculation() {
-    for (int x = searchPixelSpacing; x += searchPixelSpacing; x < width - searchPixelSpacing) {
-        for (int y = searchPixelSpacing; y += searchPixelSpacing; y < height - searchPixelSpacing) {
+    Mat mat(300, 1000, CV_8UC3, Scalar(0, 0, 0));
+    waitKey(1000);
+    for (int x = searchPixelSpacing - 1; x < width - searchPixelSpacing;  x += searchPixelSpacing) {
+        for (int y = searchPixelSpacing -1; y < height - searchPixelSpacing; y += searchPixelSpacing) {
             Pos position = { x, y };
+            cout << position << endl;
             if (pixelIsInHSVRange(actualMatrice, position)) {
-                cout << "We find a pixel of the ball" << position.x << ";" << position.y << endl;
+                cout << "We find a ball point" << endl;
+                mat.at<Vec3b>(y, x) = Vec3b(255, 255, 0);
+                imshow("test", mat);
+                waitKey(-1);
                 return calculateCenter(position);
             }
         }
@@ -99,8 +113,7 @@ Pos Analyser::initialCalculation() {
 Pos Analyser::getSearchPos() {
     int straightDecal = static_cast<int>((1 + actualIndex / 8) * searchPixelSpacing);
     int diagonalDecal = static_cast<int>(straightDecal * 0.7);
-    Pos position = getSearchPos(straightDecal, diagonalDecal);
-    return position;
+    return getSearchPos(straightDecal, diagonalDecal);
 }
 
 Pos Analyser::getSearchPos(int straightDecal, int diagonalDecal) {
@@ -154,18 +167,20 @@ Mat& Analyser::getResultMatrice() {
 }
 
 Mat& Analyser::getMixedMatrice(float conversion) {
+   /*
     Mat mixedMatrice = resultMatrice.clone();
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
+    for (int x = 0; x < height; x++) {
+        for (int y = 0; y < width; y++) {
             mixedMatrice.at<Vec3b>(x, y) = actualMatrice.at<Vec3b>(x, y) * conversion;
         }
     }
-    return ref(mixedMatrice);
+    */
+    return actualMatrice;
 }
 
 
 bool pixelIsInHSVRange(Mat& matrice, Pos position) {
-    HSVColor& color = RGBtoHSV(ref(matrice.at<Vec3b>(position.x, position.y)));
+    HSVColor& color = RGBtoHSV(ref(matrice.at<Vec3b>(position.y, position.x)));
     if (color.H > upper_color.H) {
         return false;
     }
@@ -175,13 +190,13 @@ bool pixelIsInHSVRange(Mat& matrice, Pos position) {
     if (color.S > upper_color.S) {
         return false;
     }
-    if (color.S > upper_color.S) {
+    if (color.S < lower_color.S) {
         return false;
     }
     if (color.V > upper_color.V) {
         return false;
     }
-    if (color.V > upper_color.V) {
+    if (color.V < lower_color.V) {
         return false;
     }
     return true;
@@ -194,26 +209,34 @@ HSVColor& RGBtoHSV(Vec3b& vector) {
     double b_normalized = vector[2] / 255.0;
 
     double cmax = std::max({ r_normalized, g_normalized, b_normalized });
+    color.V = static_cast<int>(cmax * 255);
+
     double cmin = std::min({ r_normalized, g_normalized, b_normalized });
     double delta = cmax - cmin;
 
-    color.V = static_cast<int>(cmax * 255);
-
     if (delta != 0) {
         if (cmax == r_normalized) {
-            color.H = static_cast<int>(60 * ((g_normalized - b_normalized) / delta) + 360) % 360;
+            color.H = static_cast<int>(60 * (g_normalized - b_normalized) / delta) %360;
+            if (color.H < 0) {
+                color.H += 360;
+            }
         }
         else if (cmax == g_normalized) {
-            color.H = static_cast<int>(60 * ((b_normalized - r_normalized) / delta) + 120);
+            color.H = static_cast<int>(60 * (((b_normalized - r_normalized) / delta) + 2));
         }
         else if (cmax == b_normalized) {
-            color.H = static_cast<int>(60 * ((r_normalized - g_normalized) / delta) + 240);
+            color.H = static_cast<int>(60 * (((r_normalized - g_normalized) / delta) + 4));
+        }
+        else {
+            cerr << "Calcul of HSV failed" << endl;
         }
     }
 
     if (cmax != 0) {
         color.S = static_cast<int>((delta / cmax) * 255);
     }
+
+    cout << color << " " << vector << endl;
 
     return ref(color);
 }

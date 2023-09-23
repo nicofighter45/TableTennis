@@ -26,6 +26,8 @@ void setupTracking();
 void trackSinglethreading();
 void tackMultithreading();
 void analyseResults();
+void test();
+void test2();
 
 
 #endif

@@ -20,6 +20,10 @@ inline bool operator==(const Pos& pos1, const Pos& pos2) {
 inline bool operator!=(const Pos& pos1, const Pos& pos2) {
 	return !(pos1 == pos2);
 }
+inline ostream& operator<<(ostream& os, const Pos& pos) {
+	os << "x: " << pos.x << "  y: " << pos.y;
+	return os;
+}
 
 typedef struct Frame {
 	int number;
@@ -30,6 +34,10 @@ typedef struct HSVColor {
 	int S;
 	int V;
 };
+inline ostream& operator<<(ostream& os, const HSVColor& color) {
+	os << "h: " << color.H << "  s: " << color.S << "  v: " << color.V;
+	return os;
+}
 
 const Rect regions_of_interest[] = {
 	Rect(0, 0, 1920, 1080 / 2),
