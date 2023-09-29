@@ -22,8 +22,8 @@ void initTracking() {
 	watchedPos = { 0, 0 };
 
 	// default orange range, the best one we figured out for now
-	lower_color = HSVColor{ 10, 70, 70};
-	upper_color = HSVColor{ 40, 255, 255 };
+	lower_color = HSVColor{ 8, 70, 70};
+	upper_color = HSVColor{ 25, 255, 255 };
 }
 
 void test2() {
@@ -37,35 +37,44 @@ void test2() {
 
 void test() {
 	vector<Area*> areas;
-	Pos center({ 5, 50 });
-	for (int k = 0; k < 4; k++) {
+	Pos center({ 5, 5 });
+	for (int k = 0; k < 1; k++) {
 		areas.push_back(new PairArea(k, center));
-		areas.push_back(new UnpairArea(k, center));
+		//areas.push_back(new UnpairArea(k, center));
 	}
 	Vec3b colors[] = { Vec3b(255, 255, 255) , Vec3b(255, 0, 0) , Vec3b(0, 255, 0) , 
 		Vec3b(0, 0, 255) , Vec3b(0, 255, 255), Vec3b(255, 255, 0), Vec3b(255, 0, 255), Vec3b(120, 120, 0)};
-	width = 100;
-	height = 100;
+	width = 20;
+	height = 20;
 	Mat mat(1100, 1100, CV_8UC3, Scalar(0, 0, 0));
+	for (int x = center.x * 10; x < center.x * 10 + 10; x++) {
+		for (int y = center.y * 10; y < center.y * 10 + 10; y++) {
+			mat.at<Vec3b>(x, y) = colors[1];
+		}
+	}
+	imshow("mat", mat);
+	waitKey(-1);
 	
 	for (int i = 0; i < 100; i++) {
 		int j = 0;
 		for (Area*area : areas) {
 			Pos pos = area -> getNextPosition();
-			if (pos == NULL_POS) {
-				cout << "null pos : " << j << "   " << *area << endl;
+			if (pos.x + pos.y > 14) {
+				area->nextRaw();
 			}
-			else {
+			else if (pos != NULL_POS) {
 				for (int x = pos.x * 10; x < pos.x * 10 + 10; x++) {
 					for (int y = pos.y * 10; y < pos.y * 10 + 10; y++) {
 						mat.at<Vec3b>(x, y) = colors[j];
 					}
 				}
 			}
+			cout << j << ") " <<  pos << " --> " << *area << endl;	
 			j++;
+			imshow("mat", mat);
+			waitKey(100);
 		}
-		imshow("mat", mat);
-		waitKey(5);
+		waitKey(-1);
 	}
 	waitKey(-1);
 }
@@ -100,14 +109,14 @@ void setupTracking() {
 	// TODO let the user choose ROI
 	cout << "Starting tracking" << endl;
 	cout << lower_color << "  " << upper_color << endl;
-	width = 1000;
-	height = 300;
+	width = 50;
+	height = 30;
+	initPos = { 0, 190 };
 	do {
-		readed_frame = readed_frame(Rect(0, 150, 1000, 300));
-		imshow("test2", readed_frame);
+		readed_frame = readed_frame(Rect(initPos.x, initPos.y, width, height));
+		imshow("original", readed_frame);
 		Analyser analyser(ref(readed_frame), regions_of_interest[0]);
-		Pos center = analyser.findBall(ref(readed_frame));
-		cout << "the center is " << center.x << ";" << center.y << endl;
+		Pos center = analyser.findBall(readed_frame);
 		imshow("mixedMatrice", analyser.getMixedMatrice(conversion));
 		imshow("maskMatrice", analyser.getMaskMatrice());
 		waitKey(-1);

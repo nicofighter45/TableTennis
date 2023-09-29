@@ -4,7 +4,7 @@
 using namespace cv;
 using namespace std;
 
-Area::Area() : areaIndex(0), lineIndex(0), startIndex(0), stopIndex(0),
+Area::Area() : areaIndex(0), lineIndex(0), startIndex(0), stopIndex(-1),
 positionIndex(0), centerPosition(NULL_POS) {
 }
 
@@ -20,10 +20,10 @@ PairArea::PairArea(int tAreadIndex, Pos tCenterPosition) : Area(tAreadIndex, tCe
 }
 
 Pos PairArea::getNextPosition() {
-	if ((stopIndex != 0 && stopIndex >= lineIndex) || startIndex > lineIndex) {
+	if ((stopIndex != -1 && stopIndex >= lineIndex) || startIndex > lineIndex) {
 		return NULL_POS;
 	}
-	if ((stopIndex != 0 && positionIndex >= stopIndex) || positionIndex > lineIndex) {
+	if ((stopIndex != -1 && positionIndex >= stopIndex) || positionIndex >= lineIndex -1) {
 		lineIndex++;
 		positionIndex = startIndex;
 	}
@@ -31,30 +31,30 @@ Pos PairArea::getNextPosition() {
 		positionIndex++;
 	}
 	Pos position = getPreNextPosition();
-	if (position.x > width) {
+	if (position.x >= height) {
 		if (areaIndex == 2) {
-			stopIndex++;
+			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
 	else if (position.x < 0) {
 		if (areaIndex == 0) {
-			stopIndex++;
+			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
-	else if (position.y > height) {
+	else if (position.y >= width) {
 		if (areaIndex == 3) {
-			stopIndex++;
+			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
 	else if (position.y < 0) {
 		if (areaIndex == 1) {
-			stopIndex++;
+			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
@@ -62,10 +62,10 @@ Pos PairArea::getNextPosition() {
 	return position;
 }
 Pos UnpairArea::getNextPosition() {
-	if ((stopIndex != 0 && stopIndex >= lineIndex + 1) || startIndex > lineIndex + 1) {
+	if ((stopIndex != -1 && stopIndex >= lineIndex + 1) || startIndex > lineIndex + 1) {
 		return NULL_POS;
 	}
-	if ((stopIndex != 0 && positionIndex >= stopIndex) || positionIndex > lineIndex + 1) {
+	if ((stopIndex != -1 && positionIndex >= stopIndex) || positionIndex >= lineIndex) {
 		lineIndex++;
 		positionIndex = startIndex;
 	}
@@ -73,30 +73,30 @@ Pos UnpairArea::getNextPosition() {
 		positionIndex++;
 	}
 	Pos position = getPreNextPosition();
-	if (position.x > width) {
+	if (position.x >= height) {
 		if (areaIndex == 3) {
-			stopIndex++;
+			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
 	else if (position.x < 0) {
 		if (areaIndex == 1) {
-			stopIndex++;
+			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
-	else if (position.y > height) {
+	else if (position.y >= width) {
 		if (areaIndex == 0) {
-			stopIndex++;
+			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
 	else if (position.y < 0) {
 		if (areaIndex == 2) {
-			stopIndex++;
+			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;

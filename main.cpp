@@ -1,6 +1,6 @@
 #include "processing/tracking.hpp"
 #include "loader.hpp"
-//#pragma comment(linker, "/STACK:1000000")
+#pragma comment(linker, "/STACK:4000000")
 
 int main()
 {

@@ -42,8 +42,8 @@ Pos Analyser::findBall(Mat& tActualMatrice) {
 
 Pos Analyser::calculateCenter(Pos position) {
     cout << "calculating center" << endl;
-    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 0, 0);
-    resultMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 0, 0);
+    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(0, 255, 0);
+    resultMatrice.at<Vec3b>(position.x, position.y) = Vec3b(0, 255, 0);
     vector<thread> threads;
     int totalX = position.x;
     int totalY = position.y;
@@ -57,7 +57,7 @@ Pos Analyser::calculateCenter(Pos position) {
                 area = new PairArea(thread_number/2, position);
             }
             else {
-                area = new UnpairArea((thread_number+1)%8/2, position);
+                area = new UnpairArea((thread_number-1)/2, position);
             }
             Pos position = area -> getNextPosition();
             while (position != NULL_POS) {
@@ -66,47 +66,47 @@ Pos Analyser::calculateCenter(Pos position) {
                     number_of_pixel_in_range += 1;
                     totalX += position.x;
                     totalY += position.y;
-                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 255, 255);
-                    resultMatrice.at<Vec3b>(position.x, position.y) = actualMatrice.at<Vec3b>(position.x, position.y);
-                    imshow("mat", maskMatrice);
-                    waitKey(1000);
+                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(0, 0, 255);
+                    imshow("maskMatrice", maskMatrice);
+                    waitKey(10);
                 }
                 else {
+                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 0, 0);
+                    imshow("maskMatrice", maskMatrice);
+                    waitKey(10);
                     area->nextRaw();
                 }
                 position = area -> getNextPosition();
             }
+            cout << "delete area" << endl; //todo area 0 working, other not at all !
             delete area;
             //return;
         //});
     }
+    /*
     for (int i = 0; i < number_of_threads; i++) {
         threads[i].join();
-    }
+    }*/
+    cout << "ending" << endl;
     Pos center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
     maskMatrice.at<Vec3b>(center.x, center.y) = Vec3b(0, 255, 0);
     resultMatrice.at<Vec3b>(center.x, center.y) = Vec3b(0, 255, 0);
-    cout << "Caluclate Center is terminate : " << center << endl;
+    cout << "Calculate Center is terminate : " << center << endl;
     return center;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 }
 
 Pos Analyser::initialCalculation() {
-    Mat mat(300, 1000, CV_8UC3, Scalar(0, 0, 0));
-    waitKey(1000);
-    for (int x = searchPixelSpacing - 1; x < width - searchPixelSpacing;  x += searchPixelSpacing) {
-        for (int y = searchPixelSpacing -1; y < height - searchPixelSpacing; y += searchPixelSpacing) {
-            Pos position = { x, y };
-            cout << position << endl;
+    Mat mat(height, width, CV_8UC3, Scalar(0, 0, 0));
+    for (int x = searchPixelSpacing - 1; x < height - searchPixelSpacing;  x += searchPixelSpacing) {
+        for (int y = searchPixelSpacing - 1; y < width - searchPixelSpacing; y += searchPixelSpacing) {
+            Pos position = { x, y};
             if (pixelIsInHSVRange(actualMatrice, position)) {
-                cout << "We find a ball point" << endl;
-                mat.at<Vec3b>(y, x) = Vec3b(255, 255, 0);
-                imshow("test", mat);
-                waitKey(-1);
                 return calculateCenter(position);
             }
         }
     }
     cerr << "No ball found" << endl;
+    waitKey(-1);
     return NULL_POS;
 }
 
@@ -118,18 +118,18 @@ Pos Analyser::getSearchPos() {
 
 Pos Analyser::getSearchPos(int straightDecal, int diagonalDecal) {
     Pos position = getPreSearchPos(straightDecal, diagonalDecal);
-    if (position.x > width) {
-        if (position.y > height) {
-            if (previous.y == position.y) {
+    if (position.y > width) {
+        if (position.x > height) {
+            if (previous.x == position.x) {
                 return NULL_POS;
             }
         }
-        if (previous.x == position.x) {
+        if (previous.y == position.y) {
             return NULL_POS;
         }
     }
-    else if (position.y > height) {
-        if (previous.y == position.y) {
+    else if (position.x > height) {
+        if (previous.x == position.x) {
             return NULL_POS;
         }
     }
@@ -180,7 +180,7 @@ Mat& Analyser::getMixedMatrice(float conversion) {
 
 
 bool pixelIsInHSVRange(Mat& matrice, Pos position) {
-    HSVColor& color = RGBtoHSV(ref(matrice.at<Vec3b>(position.y, position.x)));
+    HSVColor color = RGBtoHSV(ref(matrice.at<Vec3b>(position.x, position.y)));
     if (color.H > upper_color.H) {
         return false;
     }
@@ -202,11 +202,11 @@ bool pixelIsInHSVRange(Mat& matrice, Pos position) {
     return true;
 }
 
-HSVColor& RGBtoHSV(Vec3b& vector) {
+HSVColor RGBtoHSV(Vec3b& vector) {
     HSVColor color = { 0, 0, 0 };
-    double r_normalized = vector[0] / 255.0;
+    double r_normalized = vector[2] / 255.0;
     double g_normalized = vector[1] / 255.0;
-    double b_normalized = vector[2] / 255.0;
+    double b_normalized = vector[0] / 255.0;
 
     double cmax = std::max({ r_normalized, g_normalized, b_normalized });
     color.V = static_cast<int>(cmax * 255);
@@ -235,8 +235,5 @@ HSVColor& RGBtoHSV(Vec3b& vector) {
     if (cmax != 0) {
         color.S = static_cast<int>((delta / cmax) * 255);
     }
-
-    cout << color << " " << vector << endl;
-
-    return ref(color);
+    return color;
 }

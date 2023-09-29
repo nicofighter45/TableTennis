@@ -13,6 +13,7 @@ int total_frames;
 int fps;
 int width;
 int height;
+Pos initPos;
 int actualWatchedFrame;
 int watchedOpacity;
 float watchedZoom;
