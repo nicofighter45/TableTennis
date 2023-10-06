@@ -68,6 +68,7 @@ extern int total_frames;
 extern int fps;
 extern int width;
 extern int height;
+extern Pos initPos;
 extern int actualWatchedFrame;
 extern int watchedOpacity;
 extern float watchedZoom;

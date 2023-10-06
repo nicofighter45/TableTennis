@@ -31,7 +31,6 @@ public:
 };
 
 bool pixelIsInHSVRange(Mat& matrice, Pos position);
-
-HSVColor& RGBtoHSV(Vec3b& vector);
+HSVColor RGBtoHSV(Vec3b& vector);
 
 #endif
