@@ -3,17 +3,19 @@ def moyenne(liste) :
     somme = 0
     for k in liste : somme+=k
     return(somme/len(liste))
-def ecart_type(liste) :
-    moyen = moyenne(liste)
-    somme = 0
-    for k in liste : somme = (k-moyen)**2
-    return (mt.sqrt(somme/(len(liste)-1)))
 
 def variance(liste):
     moy= moyenne(liste)
     somme=0
     for k in liste :somme+=(k-moy)**2
     return(somme/len(liste))
+
+def ecart_type(liste) :
+    moyen = moyenne(liste)
+    somme = 0
+    for k in liste : somme += (k-moyen)**2
+    return (mt.sqrt(somme/(len(liste)-1)))
+
 
 def incertitude_type_A (liste):
     return(ecart_type(liste)/mt.sqrt(len(liste)))

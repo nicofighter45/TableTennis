@@ -42,9 +42,8 @@ plt.ylabel("yvalues")
 plt.scatter(xvalues, yvalues, color='red')
 plt.errorbar(xvalues, yvalues, xerr = incertitude_x, yerr = incertitude_y,
   fmt = 'none', capsize = 3, ecolor = 'red')
-  
+print(a[0],a[1])
 #tracé des droites "extrêmes" avec les incertitudes-types de $a$ et $b$
 plt.plot(xfonction, (a[0]-a[1])*xfonction+(b[0]+b[1]), color='blue')
 plt.plot(xfonction, (a[0]+a[1])*xfonction+(b[0]-b[1]), color='orange')
-
 plt.show()
