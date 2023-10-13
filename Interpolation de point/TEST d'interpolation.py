@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import random as rd
 from abstract import *
-
+intervalle =1
 # les fonctions
 def ind_degre(rang, degre,intervalle):
     if degre == 0:

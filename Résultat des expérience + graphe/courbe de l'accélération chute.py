@@ -31,3 +31,4 @@ ax1.set_xlabel('Temps')
 ax1.set_ylabel('Ay')
 plt.show()
 plt.clf()
+
