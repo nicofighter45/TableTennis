@@ -9,7 +9,7 @@ using namespace std;
 using namespace cv;
 
 void initialisePrompts();
-bool showWindow();
+bool showWindow(Mat& originalMatrice);
 void createTrackbar(string name, int max_value, int& variable);
 void mouseCallback(int event, int x, int y, int flags, void* userdata);
 void setNewWatchedPos(int x, int y);

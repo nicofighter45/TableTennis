@@ -7,6 +7,7 @@
 #include "prompt.hpp"
 #include "analyse.hpp"
 #include "area.hpp"
+#include <chrono>
 
 using namespace std;
 using namespace cv;
@@ -37,10 +38,10 @@ void test2() {
 
 void test() {
 	vector<Area*> areas;
-	Pos center({ 5, 5 });
-	for (int k = 0; k < 1; k++) {
+	Pos center({ 10, 10 });
+	for (int k = 0; k < 4; k++) {
 		areas.push_back(new PairArea(k, center));
-		//areas.push_back(new UnpairArea(k, center));
+		areas.push_back(new UnpairArea(k, center));
 	}
 	Vec3b colors[] = { Vec3b(255, 255, 255) , Vec3b(255, 0, 0) , Vec3b(0, 255, 0) , 
 		Vec3b(0, 0, 255) , Vec3b(0, 255, 255), Vec3b(255, 255, 0), Vec3b(255, 0, 255), Vec3b(120, 120, 0)};
@@ -55,11 +56,11 @@ void test() {
 	imshow("mat", mat);
 	waitKey(-1);
 	
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 400; i++) {
 		int j = 0;
 		for (Area*area : areas) {
 			Pos pos = area -> getNextPosition();
-			if (pos.x + pos.y > 14) {
+			if (pos.x + pos.y > 20) {
 				area->nextRaw();
 			}
 			else if (pos != NULL_POS) {
@@ -80,15 +81,22 @@ void test() {
 }
 
 void setupTracking() {
-	// this method is used to find the most optimized range
 
 	// the capture of the video (testFilePath is the path to a video that is small enough for the setup)
+	/*
 	cout << "OpenCV version: " << getVersionString() << endl;
-	VideoCapture capture(getFile());
+	string filePath = getFile();
+	if (filePath == "") {
+		return;
+	}
+	cout << "FilePath: " << filePath << endl;
+	VideoCapture capture(filePath);*/
+
+	VideoCapture capture("C:\\Users\\fagot\\ShadowDrive\\tipe\\test1.MP4");
 
 	// error if video can't be open
 	if (!capture.isOpened()) {
-		cerr << "Failed to open test video" << endl;
+		cerr << "Failed to open video" << endl;
 		return;
 	}
 
@@ -99,28 +107,42 @@ void setupTracking() {
 	total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
 
 	// prepare the window to show frames
-	// initialisePrompts();
-
-	const float conversion = static_cast<float>(watchedOpacity) / 100;
+	initialisePrompts();
 
 	Mat readed_frame;
 	capture.read(readed_frame);
-	capture.read(readed_frame);
 	// TODO let the user choose ROI
 	cout << "Starting tracking" << endl;
-	cout << lower_color << "  " << upper_color << endl;
-	width = 50;
-	height = 30;
-	initPos = { 0, 190 };
-	do {
-		readed_frame = readed_frame(Rect(initPos.x, initPos.y, width, height));
-		imshow("original", readed_frame);
+	Mat currentMixedMatrice;
+	while (true) {
+		float conversion = static_cast<float>(watchedOpacity) / 100;
+		auto start = chrono::high_resolution_clock::now();
 		Analyser analyser(ref(readed_frame), regions_of_interest[0]);
 		Pos center = analyser.findBall(readed_frame);
-		imshow("mixedMatrice", analyser.getMixedMatrice(conversion));
-		imshow("maskMatrice", analyser.getMaskMatrice());
-		waitKey(-1);
-	} while (capture.read(readed_frame) /*&& showWindow()*/);
+		currentMixedMatrice = analyser.getMixedMatrice(conversion);
+		auto finish = std::chrono::high_resolution_clock::now();
+		cout << "finish analyse center: " << center << " in " << chrono::duration_cast<chrono::milliseconds>(finish - start).count() << "ms" << endl;
+		if (!showWindow(ref(currentMixedMatrice))) {
+			break;
+		}
+		if (currentLoadedFrame == actualWatchedFrame) {
+			continue;
+		}
+		if (currentLoadedFrame == actualWatchedFrame + 1) {
+			capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
+			currentLoadedFrame--;
+		}
+		else if (currentLoadedFrame == actualWatchedFrame - 1) {
+			currentLoadedFrame++;
+		}
+		else {
+			capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
+			currentLoadedFrame = actualWatchedFrame;
+		}
+		if (!capture.read(readed_frame)) {
+			break;
+		}
+	}
 
 }
 
@@ -139,12 +161,10 @@ String getFile() {
 
 	if (GetOpenFileNameW(&ofn)) {
 		// The user selected an MP4 file. Convert the wide character string to UTF-8 and return as a string.
-		std::wstring wideFileName(fileName);
-		return std::string(wideFileName.begin(), wideFileName.end());
+		wstring wideFileName(fileName);
+		return string(wideFileName.begin(), wideFileName.end());
 	}
-	else {
-		// The user canceled the dialog or an error occurred.
+	// The user canceled the dialog or an error occurred.
 		// You can handle this case accordingly (e.g., return an empty string).
-		return "";
-	}
+	return "";
 }

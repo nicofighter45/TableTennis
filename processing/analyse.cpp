@@ -12,16 +12,13 @@ Analyser::Analyser(Mat& tActualMatrice, Rect tROI)
     actualIndex = 0;
     previous = center;
     maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
-    resultMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
 }
 
 Pos Analyser::findBall(Mat& tActualMatrice) {
     actualMatrice = tActualMatrice;
     if (isInitialSearch) {
-        cout << "initial search" << endl;
         return initialCalculation();
     }
-    cout << "not initial search" << endl;
     while (actualIndex != 8 * searchPixelMaxSpacing / searchPixelSpacing) {
         Pos position = getSearchPos();
         if (position == NULL_POS) {
@@ -36,14 +33,11 @@ Pos Analyser::findBall(Mat& tActualMatrice) {
         return initialCalculation();
     }
     isInitialSearch = true;
-    cout << "We didn't find a ball: " << actualIndex << " " << searchPixelMaxSpacing << " " << searchPixelSpacing << endl;
     return NULL_POS;
 }
 
 Pos Analyser::calculateCenter(Pos position) {
-    cout << "calculating center" << endl;
     maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(0, 255, 0);
-    resultMatrice.at<Vec3b>(position.x, position.y) = Vec3b(0, 255, 0);
     vector<thread> threads;
     int totalX = position.x;
     int totalY = position.y;
@@ -51,7 +45,7 @@ Pos Analyser::calculateCenter(Pos position) {
     //TODO make it work when thread number is not 8
     for (int i = 0; i < number_of_threads; i++) {
         const int thread_number = i;
-        //threads.emplace_back([&, thread_number]() {
+        threads.emplace_back([&, thread_number]() {
             Area* area = nullptr;
             if (thread_number % 2 == 0) {
                 area = new PairArea(thread_number/2, position);
@@ -61,37 +55,26 @@ Pos Analyser::calculateCenter(Pos position) {
             }
             Pos position = area -> getNextPosition();
             while (position != NULL_POS) {
-                cout << "Searching pos " << position << endl;
                 if (pixelIsInHSVRange(actualMatrice, position)) {
                     number_of_pixel_in_range += 1;
                     totalX += position.x;
                     totalY += position.y;
-                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(0, 0, 255);
-                    imshow("maskMatrice", maskMatrice);
-                    waitKey(10);
+                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 255, 255);
                 }
                 else {
                     maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 0, 0);
-                    imshow("maskMatrice", maskMatrice);
-                    waitKey(10);
-                    area->nextRaw();
+                    area -> nextRaw();
                 }
                 position = area -> getNextPosition();
             }
-            cout << "delete area" << endl; //todo area 0 working, other not at all !
             delete area;
-            //return;
-        //});
+        });
     }
-    /*
     for (int i = 0; i < number_of_threads; i++) {
         threads[i].join();
-    }*/
-    cout << "ending" << endl;
-    Pos center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
-    maskMatrice.at<Vec3b>(center.x, center.y) = Vec3b(0, 255, 0);
-    resultMatrice.at<Vec3b>(center.x, center.y) = Vec3b(0, 255, 0);
-    cout << "Calculate Center is terminate : " << center << endl;
+    }
+    center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
+    addCubeToImage(ref(maskMatrice), center, 2, Vec3b(0, 0, 255));
     return center;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 }
 
@@ -162,20 +145,31 @@ Mat& Analyser::getMaskMatrice() {
     return ref(maskMatrice);
 }
 
-Mat& Analyser::getResultMatrice() {
-    return ref(resultMatrice);
-}
-
-Mat& Analyser::getMixedMatrice(float conversion) {
-   /*
-    Mat mixedMatrice = resultMatrice.clone();
+Mat Analyser::getMixedMatrice(float conversion) {
+    Mat mixedMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
     for (int x = 0; x < height; x++) {
         for (int y = 0; y < width; y++) {
-            mixedMatrice.at<Vec3b>(x, y) = actualMatrice.at<Vec3b>(x, y) * conversion;
+            Vec3b originalPixel = actualMatrice.at<Vec3b>(x, y);
+            Vec3b maskPixel = maskMatrice.at<Vec3b>(x, y);
+            Vec3b black(0, 0, 0);
+            if (maskPixel == black) {
+                mixedMatrice.at<Vec3b>(x, y) = reducePixelStrength(ref(originalPixel), conversion);
+            }
+            else {
+                mixedMatrice.at<Vec3b>(x, y) = actualMatrice.at<Vec3b>(x, y);
+            }
         }
     }
-    */
-    return actualMatrice;
+    if (center != NULL_POS) {
+        addCubeToImage(ref(mixedMatrice), center, 2, Vec3b(0, 0, 255));
+    }
+    return mixedMatrice;
+}
+
+Vec3b reducePixelStrength(Vec3b& originalPixel, float conversion) {
+    return Vec3b(static_cast<int>(originalPixel[0] * conversion), 
+        static_cast<int>(originalPixel[1] * conversion),
+        static_cast<int>(originalPixel[2] * conversion));
 }
 
 
@@ -236,4 +230,18 @@ HSVColor RGBtoHSV(Vec3b& vector) {
         color.S = static_cast<int>((delta / cmax) * 255);
     }
     return color;
+}
+
+void addCubeToImage(Mat& matrice, Pos position, int size, Vec3b color) {
+    for (int x = 0; x < 2*size; x++) {
+        if (position.x - size + x < 0 || position.x - size + x >= height) {
+            continue;
+        }
+        for (int y = 0; y < 2 * size; y++) {
+            if (position.y - size + y < 0 || position.y - size + y >= width) {
+                continue;
+            }
+            matrice.at<Vec3b>(x + static_cast<int>(position.x) - size, y + static_cast<int>(position.y) - size) = color;
+        }
+    }
 }

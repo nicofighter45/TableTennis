@@ -13,7 +13,6 @@ private:
 	Pos center;
 	Mat& actualMatrice;
 	Mat maskMatrice;
-	Mat resultMatrice;
 	bool isInitialSearch;
 	int actualIndex;
 	Pos previous;
@@ -24,13 +23,14 @@ private:
 	Pos initialCalculation();
 public:
 	Pos findBall(Mat& tActualMatrice);
-	Mat& getMixedMatrice(float conversion);
+	Mat getMixedMatrice(float conversion);
 	Mat& getMaskMatrice();
-	Mat& getResultMatrice();
 	Analyser(Mat& tActualMatrice, Rect tROI);
 };
 
 bool pixelIsInHSVRange(Mat& matrice, Pos position);
+Vec3b reducePixelStrength(Vec3b& originalPixel, float conversion);
 HSVColor RGBtoHSV(Vec3b& vector);
+void addCubeToImage(Mat& matrice, Pos position, int size, Vec3b color);
 
 #endif

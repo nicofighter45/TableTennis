@@ -29,8 +29,6 @@ condition_variable cvariable;
 int currentLoadedFrame;
 atomic<bool> shouldLoadFrames;
 
-Mat matForIniti;
-
 Scalar getScalarFromHSVColor(HSVColor color) {
 	return Scalar(color.H, color.S, color.V);
 }

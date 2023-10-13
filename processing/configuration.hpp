@@ -59,8 +59,9 @@ const String testFilePath = "C:\\Users\\fagot\\ShadowDrive\\tipe\\test1.MP4";
 const Rect testFileROI(0, 0, 1920, 1080 / 2);
 const float windowScalar = 0.7;
 const float imageScalar = 1;
-const int searchPixelSpacing = 10;
+const int searchPixelSpacing = 15;
 const int searchPixelMaxSpacing = 200;
+const int maxSearchAreaSize = 40;
 
 extern HSVColor lower_color;
 extern HSVColor upper_color;
@@ -83,8 +84,6 @@ extern mutex mtx;
 extern condition_variable cvariable;
 extern int currentLoadedFrame;
 extern atomic<bool> shouldLoadFrames;
-
-extern Mat matForIniti;
 
 Scalar getScalarFromHSVColor(HSVColor color);
 

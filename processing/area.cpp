@@ -20,7 +20,7 @@ PairArea::PairArea(int tAreadIndex, Pos tCenterPosition) : Area(tAreadIndex, tCe
 }
 
 Pos PairArea::getNextPosition() {
-	if ((stopIndex != -1 && stopIndex >= lineIndex) || startIndex > lineIndex) {
+	if (lineIndex >= maxSearchAreaSize || (stopIndex != -1 && (stopIndex >= lineIndex || startIndex == stopIndex)) || startIndex > lineIndex) {
 		return NULL_POS;
 	}
 	if ((stopIndex != -1 && positionIndex >= stopIndex) || positionIndex >= lineIndex -1) {
@@ -62,7 +62,7 @@ Pos PairArea::getNextPosition() {
 	return position;
 }
 Pos UnpairArea::getNextPosition() {
-	if ((stopIndex != -1 && stopIndex >= lineIndex + 1) || startIndex > lineIndex + 1) {
+	if (lineIndex >= maxSearchAreaSize || (stopIndex != -1 && (stopIndex >= lineIndex + 1 || startIndex == stopIndex)) || startIndex > lineIndex + 1) {
 		return NULL_POS;
 	}
 	if ((stopIndex != -1 && positionIndex >= stopIndex) || positionIndex >= lineIndex) {

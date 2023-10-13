@@ -7,6 +7,7 @@ using namespace std;
 using namespace cv;
 
 void initialisePrompts() {
+	shouldBreak = false;
 	namedWindow(windowName, WINDOW_NORMAL);
 	namedWindow(configurationWindowName, WINDOW_NORMAL);
 	resizeWindow(windowName, Size(width * windowScalar, height * windowScalar));
@@ -29,7 +30,7 @@ void createTrackbar(string name, int max_value, int& variable) {
 	setTrackbarPos(name, configurationWindowName, variable);
 }
 
-bool showWindow() {
+bool showWindow(Mat& originalMatrice) {
 	Size imageSize(width * imageScalar * windowScalar, height * imageScalar * windowScalar);
 	Size windowSize(width * windowScalar, height * windowScalar);
 	Point imagePosition(0, 0);
@@ -37,11 +38,9 @@ bool showWindow() {
 	int mouseData[2] = { 0, 0 };
 	setMouseCallback(windowName, mouseCallback, mouseData);
 
-	thread keyboardThread;
+	while (shouldBreak) {
 
-	while (not shouldBreak) {
-
-		Mat matrice = matForIniti(Rect(watchedPos.x, watchedPos.y, width / watchedZoom, height / watchedZoom));
+		Mat matrice = originalMatrice(Rect(watchedPos.x, watchedPos.y, width / watchedZoom, height / watchedZoom));
 
 		resize(matrice, matrice, imageSize);
 
@@ -89,42 +88,9 @@ bool showWindow() {
 			break;
 		}
 		else if (key == 27) { //espace
-			shouldBreak = false;
 			return false;
 		}
-		else if (key == 'i') {
-			cout << "Give your values, here are actual ones" << endl
-				<< lower_color.H << " " << lower_color.S << " " << lower_color.V << " "
-				<< upper_color.H << " " << upper_color.S << " " << upper_color.V << endl;
-			string input;
-			getline(cin, input);
-			vector<string> inputs;
-			string current("");
-			for (unsigned int i = 0; i < input.length(); i++)
-			{
-				char c = input[i];
-				if (c == ' ')
-				{
-					inputs.push_back(current);
-					current = "";
-				}
-				else
-				{
-					current += c;
-				}
-			}
-			inputs.push_back(current);
-			lower_color = HSVColor{ stoi(inputs[0]), stoi(inputs[1]), stoi(inputs[2]) };
-			upper_color = HSVColor{ stoi(inputs[3]), stoi(inputs[4]), stoi(inputs[5]) };
-			cout << "Give your values, here are actual ones" << endl
-				<< lower_color.H << " " << lower_color.S << " " << lower_color.V << " "
-				<< upper_color.H << " " << upper_color.S << " " << upper_color.V << endl;
-			break;
-		}
-
 	}
-	cout << "processing ..." << endl;
-	shouldBreak = false;
 	return true;
 }
 
