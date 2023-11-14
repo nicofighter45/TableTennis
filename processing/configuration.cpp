@@ -19,6 +19,8 @@ int watchedOpacity;
 float watchedZoom;
 Pos watchedPos;
 bool shouldBreak;
+bool autoState;
+Pos reloadFromCamera;
 
 vector<vector<Frame>> frames;
 vector<vector<Pos>> positionsResults;

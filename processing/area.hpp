@@ -14,6 +14,7 @@ protected:
 	int stopIndex;
 	int positionIndex;
 	const Pos centerPosition;
+	int morePixel;
 public:
 	ostream& print(ostream& os) const;
 	virtual Pos getPreNextPosition() = 0;

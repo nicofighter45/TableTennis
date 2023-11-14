@@ -14,26 +14,28 @@ Analyser::Analyser(Mat& tActualMatrice, Rect tROI)
     maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
 }
 
-Pos Analyser::findBall(Mat& tActualMatrice) {
-    actualMatrice = tActualMatrice;
+Pos Analyser::findBall() {
+    actualIndex = 0;
+    maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
+    if(reloadFromCamera != NULL_POS){
+        return calculateCenter(reloadFromCamera);
+    }
     if (isInitialSearch) {
         return initialCalculation();
     }
+    center.x = static_cast<int>(center.x);
+    center.y = static_cast<int>(center.y);
     while (actualIndex != 8 * searchPixelMaxSpacing / searchPixelSpacing) {
         Pos position = getSearchPos();
         if (position == NULL_POS) {
-            continue;
+            break;
         }
         if (pixelIsInHSVRange(actualMatrice, position)) {
             isInitialSearch = false;
             return calculateCenter(position);
         }
     }
-    if (!isInitialSearch) {
-        return initialCalculation();
-    }
-    isInitialSearch = true;
-    return NULL_POS;
+    return initialCalculation();
 }
 
 Pos Analyser::calculateCenter(Pos position) {
@@ -59,10 +61,12 @@ Pos Analyser::calculateCenter(Pos position) {
                     number_of_pixel_in_range += 1;
                     totalX += position.x;
                     totalY += position.y;
-                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 255, 255);
+                    Vec3b colors[] = { Vec3b(0, 120, 120) , Vec3b(255, 0, 0) , Vec3b(0, 255, 0) ,
+                    Vec3b(0, 0, 255) , Vec3b(0, 255, 255), Vec3b(255, 255, 0), Vec3b(255, 0, 255), Vec3b(120, 120, 0) };
+                    maskMatrice.at<Vec3b>(position.x, position.y) = colors[thread_number];
                 }
                 else {
-                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 0, 0);
+                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 255, 255);
                     area -> nextRaw();
                 }
                 position = area -> getNextPosition();
@@ -74,17 +78,24 @@ Pos Analyser::calculateCenter(Pos position) {
         threads[i].join();
     }
     center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
-    addCubeToImage(ref(maskMatrice), center, 2, Vec3b(0, 0, 255));
+    if (center != NULL_POS) {
+        isInitialSearch = false;
+        addCubeToImage(ref(maskMatrice), center, 1, Vec3b(0, 0, 255));
+    }
     return center;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 }
 
 Pos Analyser::initialCalculation() {
+    Pos first = NULL_POS;
     Mat mat(height, width, CV_8UC3, Scalar(0, 0, 0));
     for (int x = searchPixelSpacing - 1; x < height - searchPixelSpacing;  x += searchPixelSpacing) {
         for (int y = searchPixelSpacing - 1; y < width - searchPixelSpacing; y += searchPixelSpacing) {
             Pos position = { x, y};
-            if (pixelIsInHSVRange(actualMatrice, position)) {
+            if (first != NULL_POS) {
                 return calculateCenter(position);
+            }
+            if (pixelIsInHSVRange(actualMatrice, position)) {
+                first = position;
             }
         }
     }
@@ -94,13 +105,16 @@ Pos Analyser::initialCalculation() {
 }
 
 Pos Analyser::getSearchPos() {
-    int straightDecal = static_cast<int>((1 + actualIndex / 8) * searchPixelSpacing);
+    int straightDecal = static_cast<int>(searchPixelSpacing);
     int diagonalDecal = static_cast<int>(straightDecal * 0.7);
     return getSearchPos(straightDecal, diagonalDecal);
 }
 
 Pos Analyser::getSearchPos(int straightDecal, int diagonalDecal) {
     Pos position = getPreSearchPos(straightDecal, diagonalDecal);
+    if (position.x < 0 || position.y < 0) {
+        return NULL_POS;
+    }
     if (position.y > width) {
         if (position.x > height) {
             if (previous.x == position.x) {
@@ -146,30 +160,33 @@ Mat& Analyser::getMaskMatrice() {
 }
 
 Mat Analyser::getMixedMatrice(float conversion) {
-    Mat mixedMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
+    Mat mixedMatrice = actualMatrice.clone();
     for (int x = 0; x < height; x++) {
         for (int y = 0; y < width; y++) {
-            Vec3b originalPixel = actualMatrice.at<Vec3b>(x, y);
+            Vec3b& mixedPixel = mixedMatrice.at<Vec3b>(x, y);
             Vec3b maskPixel = maskMatrice.at<Vec3b>(x, y);
-            Vec3b black(0, 0, 0);
-            if (maskPixel == black) {
-                mixedMatrice.at<Vec3b>(x, y) = reducePixelStrength(ref(originalPixel), conversion);
-            }
-            else {
-                mixedMatrice.at<Vec3b>(x, y) = actualMatrice.at<Vec3b>(x, y);
+            if (maskPixel != Vec3b(0, 0,0 )) {
+                mixedPixel = mixPixels(mixedPixel, maskPixel, conversion);
+                
             }
         }
     }
     if (center != NULL_POS) {
-        addCubeToImage(ref(mixedMatrice), center, 2, Vec3b(0, 0, 255));
+        addCubeToImage(mixedMatrice, center, 1, Vec3b(0, 0, 255));
     }
     return mixedMatrice;
 }
 
-Vec3b reducePixelStrength(Vec3b& originalPixel, float conversion) {
+Vec3b reducePixelStrength(const Vec3b& originalPixel, float conversion) {
     return Vec3b(static_cast<int>(originalPixel[0] * conversion), 
         static_cast<int>(originalPixel[1] * conversion),
         static_cast<int>(originalPixel[2] * conversion));
+}
+
+Vec3b mixPixels(const Vec3b& pixel1, const Vec3b& pixel2, float conversion) {
+    return Vec3b(static_cast<int>(pixel1[0] * conversion + pixel2[0] * (1-conversion)),
+        static_cast<int>(pixel1[1] * conversion + pixel2[1] * (1-conversion)),
+        static_cast<int>(pixel1[2] * conversion + pixel2[2] * (1-conversion)));
 }
 
 
@@ -233,15 +250,18 @@ HSVColor RGBtoHSV(Vec3b& vector) {
 }
 
 void addCubeToImage(Mat& matrice, Pos position, int size, Vec3b color) {
-    for (int x = 0; x < 2*size; x++) {
-        if (position.x - size + x < 0 || position.x - size + x >= height) {
-            continue;
-        }
-        for (int y = 0; y < 2 * size; y++) {
-            if (position.y - size + y < 0 || position.y - size + y >= width) {
-                continue;
-            }
-            matrice.at<Vec3b>(x + static_cast<int>(position.x) - size, y + static_cast<int>(position.y) - size) = color;
+    int startX = std::max(0, static_cast<int>(position.x) - size);
+    int startY = std::max(0, static_cast<int>(position.y) - size);
+    int endX = std::min(height, static_cast<int>(position.x) + size);
+    int endY = std::min(width, static_cast<int>(position.y) + size);
+
+    for (int x = startX; x < endX; x++) {
+        for (int y = startY; y < endY; y++) {
+            matrice.at<Vec3b>(x, y) = color;
         }
     }
+}
+
+void Analyser::setIsInitialSearch(bool state) {
+    isInitialSearch = state;
 }

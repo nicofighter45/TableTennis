@@ -21,10 +21,12 @@ void initTracking() {
 	shouldLoadFrames = false;
 	shouldBreak = false;
 	watchedPos = { 0, 0 };
+	autoState = true;
+	reloadFromCamera = NULL_POS;
 
 	// default orange range, the best one we figured out for now
-	lower_color = HSVColor{ 8, 70, 70};
-	upper_color = HSVColor{ 25, 255, 255 };
+	lower_color = HSVColor{ 5, 50, 50};
+	upper_color = HSVColor{ 45, 240, 240 };
 }
 
 void test2() {
@@ -60,7 +62,7 @@ void test() {
 		int j = 0;
 		for (Area*area : areas) {
 			Pos pos = area -> getNextPosition();
-			if (pos.x + pos.y > 20) {
+			if (pos.y > 12) {
 				area->nextRaw();
 			}
 			else if (pos != NULL_POS) {
@@ -73,7 +75,7 @@ void test() {
 			cout << j << ") " <<  pos << " --> " << *area << endl;	
 			j++;
 			imshow("mat", mat);
-			waitKey(100);
+			waitKey(10);
 		}
 		waitKey(-1);
 	}
@@ -83,19 +85,27 @@ void test() {
 void setupTracking() {
 
 	// the capture of the video (testFilePath is the path to a video that is small enough for the setup)
-	/*
+	
 	cout << "OpenCV version: " << getVersionString() << endl;
 	string filePath = getFile();
 	if (filePath == "") {
 		return;
 	}
 	cout << "FilePath: " << filePath << endl;
-	VideoCapture capture(filePath);*/
 
-	VideoCapture capture("C:\\Users\\fagot\\ShadowDrive\\tipe\\test1.MP4");
+
+
+	streambuf* stream_buffer_cout = std::cout.rdbuf();
+
+	// Redirect cout to a file
+	ofstream out("output.txt");
+	cout.rdbuf(out.rdbuf());
+
+	VideoCapture capture(filePath);
 
 	// error if video can't be open
 	if (!capture.isOpened()) {
+		cout.rdbuf(stream_buffer_cout);
 		cerr << "Failed to open video" << endl;
 		return;
 	}
@@ -109,26 +119,45 @@ void setupTracking() {
 	// prepare the window to show frames
 	initialisePrompts();
 
+	// Restore the original buffer for cout
+	cout.rdbuf(stream_buffer_cout);
+
 	Mat readed_frame;
 	capture.read(readed_frame);
 	// TODO let the user choose ROI
-	cout << "Starting tracking" << endl;
-	Mat currentMixedMatrice;
+	bool shouldCalculate = true;
+	float conversion = static_cast<float>(watchedOpacity) / 100;
+	Analyser analyser(ref(readed_frame), regions_of_interest[0]); // roi needs to work
+	Pos center = NULL_POS;
 	while (true) {
-		float conversion = static_cast<float>(watchedOpacity) / 100;
-		auto start = chrono::high_resolution_clock::now();
-		Analyser analyser(ref(readed_frame), regions_of_interest[0]);
-		Pos center = analyser.findBall(readed_frame);
-		currentMixedMatrice = analyser.getMixedMatrice(conversion);
-		auto finish = std::chrono::high_resolution_clock::now();
-		cout << "finish analyse center: " << center << " in " << chrono::duration_cast<chrono::milliseconds>(finish - start).count() << "ms" << endl;
-		if (!showWindow(ref(currentMixedMatrice))) {
+		if (shouldCalculate) {
+			auto start = chrono::high_resolution_clock::now();
+			cout << "test" << endl;
+			reloadFromCamera = analyser.findBall(); //problem here with null_pos
+			cout << center << endl;
+			center = analyser.findBall();
+			reloadFromCamera = NULL_POS;
+			auto finish = chrono::high_resolution_clock::now();
+			cout << "Frame " << capture.get(CAP_PROP_POS_FRAMES)  << " center " << center << " in " 
+				<< chrono::duration_cast<chrono::milliseconds>(finish - start).count() << "ms" << endl;
+		}
+		
+		if (!showWindow(inverse(center), analyser.getMixedMatrice(conversion))) {
 			break;
 		}
 		if (currentLoadedFrame == actualWatchedFrame) {
+			if (watchedOpacity != conversion * 100) {
+				conversion = static_cast<float>(watchedOpacity) / 100;
+				shouldCalculate = false;
+				
+			}else{
+				shouldCalculate = true;
+			}
 			continue;
 		}
+		shouldCalculate = true;
 		if (currentLoadedFrame == actualWatchedFrame + 1) {
+			analyser.setIsInitialSearch(true);
 			capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
 			currentLoadedFrame--;
 		}

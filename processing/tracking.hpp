@@ -16,16 +16,12 @@ void processFrame(const int i, const int j);
 Frame getFrame(const int i, const int j);
 void cutter();
 void processVideoSingleThreaded(VideoCapture capture, String name);
-void printCircleCenter(Mat& mat, const int x, const int y);
 void singlethreading();
 String getFile();
 
 
 void initTracking();
 void setupTracking();
-void trackSinglethreading();
-void tackMultithreading();
-void analyseResults();
 void test();
 void test2();
 

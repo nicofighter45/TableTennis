@@ -7,7 +7,7 @@ using namespace std;
 using namespace cv;
 
 void initialisePrompts() {
-	shouldBreak = false;
+	shouldBreak = true;
 	namedWindow(windowName, WINDOW_NORMAL);
 	namedWindow(configurationWindowName, WINDOW_NORMAL);
 	resizeWindow(windowName, Size(width * windowScalar, height * windowScalar));
@@ -25,20 +25,51 @@ void createTrackbar(string name, int max_value, int& variable) {
 	createTrackbar(name, configurationWindowName, NULL, max_value, [](int value, void* userdata) {
 		int& variable = *static_cast<int*>(userdata);
 		variable = value;
-		shouldBreak = true;
 		}, &variable);
 	setTrackbarPos(name, configurationWindowName, variable);
 }
 
-bool showWindow(Mat& originalMatrice) {
+bool showWindow(Pos center, Mat originalMatrice) {
 	Size imageSize(width * imageScalar * windowScalar, height * imageScalar * windowScalar);
 	Size windowSize(width * windowScalar, height * windowScalar);
 	Point imagePosition(0, 0);
 
 	int mouseData[2] = { 0, 0 };
+
+	streambuf* stream_buffer_cout = std::cout.rdbuf();
+	ofstream out("output.txt");
+	cout.rdbuf(out.rdbuf());
 	setMouseCallback(windowName, mouseCallback, mouseData);
 
-	while (shouldBreak) {
+	if (autoState) {
+		if (center != NULL_POS) {
+			watchedZoom = 16;
+			if (center.x + width / (2*watchedZoom) >= width) {
+				watchedPos.x = width - width / watchedZoom - 1;
+			}
+			else if (center.x >= width / (2*watchedZoom)) {
+				watchedPos.x = center.x - width / (2*watchedZoom);
+			}
+			else {
+				watchedPos.x = 0;
+			}
+			if (center.y + height/ (2*watchedZoom) >= height) {
+				watchedPos.y = height - height / watchedZoom - 1;
+			} else if (center.y >= height / (2*watchedZoom)) {
+				watchedPos.y = center.y - height / (2 * watchedZoom);
+			}
+			else{
+				watchedPos.y = 0;
+			}
+		}
+		else {
+			watchedPos == Pos{ 0, 0 };
+			watchedZoom = 1;
+			cout << "bou" << endl;
+		}
+		
+	}
+	while (shouldBreak) {	
 
 		Mat matrice = originalMatrice(Rect(watchedPos.x, watchedPos.y, width / watchedZoom, height / watchedZoom));
 
@@ -66,7 +97,7 @@ bool showWindow(Mat& originalMatrice) {
 				break;
 			}
 		}
-		else if (key == 2490368) {  //up_arrow_key
+		else if (key == 2621440) {  //down_arrow_key
 			if (watchedOpacity < 75) {
 				watchedOpacity += 25;
 			}
@@ -76,7 +107,7 @@ bool showWindow(Mat& originalMatrice) {
 			setTrackbarPos("Opacity", configurationWindowName, watchedOpacity);
 			break;
 		}
-		else if (key == 2621440) {  //down_arrow_key
+		else if (key == 2490368) {  //up_arrow_key
 			if (watchedOpacity > 25) {
 				watchedOpacity -= 25;
 
@@ -87,16 +118,44 @@ bool showWindow(Mat& originalMatrice) {
 			setTrackbarPos("Opacity", configurationWindowName, watchedOpacity);
 			break;
 		}
-		else if (key == 27) { //espace
-			return false;
+		else if (key == 32) { //espace
+			autoState = not autoState;
+			break;
 		}
+		else if (key == 101) { //e
+			// export txt file;
+		}
+		else if (key == 99){ // c
+			reloadFromCamera = inverse(center);
+			break;
+		}
+		else if (key == 114){ // r
+			break;
+		}
+		else if (key != -1) {
+			cout << "Unbing key, number: " << key << endl;
+		}
+		if (autoState) {
+			this_thread::sleep_for(chrono::milliseconds(40));
+			if (actualWatchedFrame < total_frames - 1) {
+				actualWatchedFrame += 1;
+				setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
+				break;
+			}
+			break;
+		}			
 	}
+
+	cout.rdbuf(stream_buffer_cout);
+	
 	return true;
 }
 
 
 
 void mouseCallback(int event, int x, int y, int flags, void* userdata) {
+	int window_width = getWindowImageRect(windowName).width;
+	int window_height = getWindowImageRect(windowName).height;
 	if (event == EVENT_LBUTTONUP) {
 		*(int*)userdata = 0;
 		*((int*)userdata + 1) = 0;
@@ -104,16 +163,18 @@ void mouseCallback(int event, int x, int y, int flags, void* userdata) {
 	else if (event == EVENT_LBUTTONDBLCLK) {
 		if (watchedZoom < 16) {
 			watchedZoom *= 2;
-			setNewWatchedPos(x / 2, y / 2);
+			setNewWatchedPos(x*(1-1/watchedZoom), y*(1 - 1 / watchedZoom), window_width, window_height);
 		}
 	}
 	else if (event == EVENT_RBUTTONDOWN) {
 		if (watchedZoom > 1) {
-			watchedZoom = 1;
-			watchedPos = Pos{ 0, 0 };
+			watchedZoom /= 2;
+			setNewWatchedPos(x*(1-1/watchedZoom), y*(1-1/watchedZoom), window_width, window_height);
 		}
 	}
 	else if (flags == EVENT_FLAG_LBUTTON && event == EVENT_MOUSEMOVE) {
+		watchedPos.x = static_cast<int>(watchedPos.x * window_width / width);
+		watchedPos.y = static_cast<int>(watchedPos.y * window_height / height);
 		if (*(int*)userdata == 0) {
 			*(int*)userdata = x;
 		}
@@ -124,24 +185,32 @@ void mouseCallback(int event, int x, int y, int flags, void* userdata) {
 		int dy = y - *((int*)userdata + 1);
 		*(int*)userdata = x;
 		*((int*)userdata + 1) = y;
-		setNewWatchedPos(watchedPos.x + dx, watchedPos.y + dy);
+		setNewWatchedPos(watchedPos.x + dx, watchedPos.y + dy, window_width, window_height);
 	}
 }
 
 
-void setNewWatchedPos(int x, int y) {
-	if (x > 0 and x + width / watchedZoom < width) {
+void setNewWatchedPos(int x, int y, int window_width, int window_height) {
+	if (x < 0) {
+		watchedPos.x = 0;
+	}
+	else if (x + window_width / watchedZoom >= window_width) {
+		watchedPos.x = window_width - window_width / watchedZoom;
+	}
+	else {
 		watchedPos.x = x;
 	}
-	else {
-		watchedPos.x = width - width / watchedZoom;
+	if (y < 0) {
+		watchedPos.y = 0;
 	}
-	if (y > 0 and y + height / watchedZoom < height) {
+	else if (y + window_height / watchedZoom >= window_height) {
+		watchedPos.y = window_height - window_height / watchedZoom;
+	}
+	else {
 		watchedPos.y = y;
 	}
-	else {
-		watchedPos.y = height - height / watchedZoom;
-	}
+	watchedPos.x = static_cast<int>(watchedPos.x * width / window_width);
+	watchedPos.y = static_cast<int>(watchedPos.y * height / window_height);
 }
 
 void printCircle(Mat& mat, Pos center) {

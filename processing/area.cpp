@@ -5,11 +5,11 @@ using namespace cv;
 using namespace std;
 
 Area::Area() : areaIndex(0), lineIndex(0), startIndex(0), stopIndex(-1),
-positionIndex(0), centerPosition(NULL_POS) {
+positionIndex(0), centerPosition(NULL_POS), morePixel(20) {
 }
 
 Area::Area(int tAreaIndex, Pos tCenterPosition) : areaIndex(tAreaIndex), lineIndex(0), startIndex(0),
-positionIndex(0), centerPosition(tCenterPosition), stopIndex(-1) {
+positionIndex(0), centerPosition(tCenterPosition), stopIndex(-1), morePixel(20) {
 }
 
 UnpairArea::UnpairArea(int tAreadIndex, Pos tCenterPosition) : Area(tAreadIndex, tCenterPosition) {
@@ -20,8 +20,14 @@ PairArea::PairArea(int tAreadIndex, Pos tCenterPosition) : Area(tAreadIndex, tCe
 }
 
 Pos PairArea::getNextPosition() {
-	if (lineIndex >= maxSearchAreaSize || (stopIndex != -1 && (stopIndex >= lineIndex || startIndex == stopIndex)) || startIndex > lineIndex) {
+	if (lineIndex >= maxSearchAreaSize) {
 		return NULL_POS;
+	}
+	if ((stopIndex != -1 && (stopIndex >= lineIndex || startIndex == stopIndex)) || startIndex > lineIndex) {
+		if (morePixel == 0) {
+			return NULL_POS;
+		}
+		morePixel -= 1;
 	}
 	if ((stopIndex != -1 && positionIndex >= stopIndex) || positionIndex >= lineIndex -1) {
 		lineIndex++;
@@ -62,8 +68,14 @@ Pos PairArea::getNextPosition() {
 	return position;
 }
 Pos UnpairArea::getNextPosition() {
-	if (lineIndex >= maxSearchAreaSize || (stopIndex != -1 && (stopIndex >= lineIndex + 1 || startIndex == stopIndex)) || startIndex > lineIndex + 1) {
+	if (lineIndex >= maxSearchAreaSize) {
 		return NULL_POS;
+	}
+	if ((stopIndex != -1 && (stopIndex >= lineIndex + 1 || startIndex == stopIndex)) || startIndex > lineIndex + 1) {
+		if (morePixel == 0) {
+			return NULL_POS;
+		}
+		morePixel -= 1;
 	}
 	if ((stopIndex != -1 && positionIndex >= stopIndex) || positionIndex >= lineIndex) {
 		lineIndex++;

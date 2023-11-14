@@ -22,14 +22,16 @@ private:
 	Pos calculateCenter(Pos position);
 	Pos initialCalculation();
 public:
-	Pos findBall(Mat& tActualMatrice);
+	void setIsInitialSearch(bool state);
+	Pos findBall();
 	Mat getMixedMatrice(float conversion);
 	Mat& getMaskMatrice();
 	Analyser(Mat& tActualMatrice, Rect tROI);
 };
 
 bool pixelIsInHSVRange(Mat& matrice, Pos position);
-Vec3b reducePixelStrength(Vec3b& originalPixel, float conversion);
+Vec3b reducePixelStrength(const Vec3b& originalPixel, float conversion);
+Vec3b mixPixels(const Vec3b& pixel1, const Vec3b& pixel2, float conversion);
 HSVColor RGBtoHSV(Vec3b& vector);
 void addCubeToImage(Mat& matrice, Pos position, int size, Vec3b color);
 

@@ -14,6 +14,9 @@ typedef struct Pos {
 	double y;
 } Pos;
 const Pos NULL_POS = { -1, -1 };
+inline Pos inverse(const Pos& pos) {
+	return Pos{ pos.y, pos.x};
+}
 inline bool operator==(const Pos& pos1, const Pos& pos2) {
 	return pos1.x == pos2.x && pos1.y == pos2.y;
 }
@@ -24,6 +27,27 @@ inline ostream& operator<<(ostream& os, const Pos& pos) {
 	os << "x: " << pos.x << "  y: " << pos.y;
 	return os;
 }
+inline Pos operator+(const Pos& pos1, const Pos& pos2) {
+	return Pos{ pos1.x + pos2.x, pos1.y + pos2.y };
+}
+
+inline Pos operator+=(const Pos& pos1, const int add) {
+	return Pos{ pos1.x + add, pos1.y + add };
+}
+inline Pos operator-(const Pos& pos1, const Pos& pos2) {
+	return Pos{ pos1.x - pos2.x, pos1.y - pos2.y };
+}
+
+inline Pos operator-=(const Pos& pos1, const int add) {
+	return Pos{ pos1.x - add, pos1.y - add };
+}
+inline bool operator<=(const Pos& pos1, const Pos& pos2) {
+	return (pos1.x <= pos2.x) && (pos1.y <= pos2.y);
+}
+inline bool operator>=(const Pos& pos1, const Pos& pos2) {
+	return (pos1.x >= pos2.x) && (pos1.y >= pos2.y);
+}
+
 
 typedef struct Frame {
 	int number;
@@ -61,7 +85,7 @@ const float windowScalar = 0.7;
 const float imageScalar = 1;
 const int searchPixelSpacing = 15;
 const int searchPixelMaxSpacing = 200;
-const int maxSearchAreaSize = 40;
+const int maxSearchAreaSize = 100;
 
 extern HSVColor lower_color;
 extern HSVColor upper_color;
@@ -75,6 +99,8 @@ extern int watchedOpacity;
 extern float watchedZoom;
 extern Pos watchedPos;
 extern bool shouldBreak;
+extern bool autoState;
+extern Pos reloadFromCamera;
 
 extern vector<vector<Frame>> frames;
 extern vector<vector<Pos>> positionsResults;
