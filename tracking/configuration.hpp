@@ -63,17 +63,6 @@ inline ostream& operator<<(ostream& os, const HSVColor& color) {
 	return os;
 }
 
-const Rect regions_of_interest[] = {
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 1080 / 2, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2),
-	Rect(0, 0, 1920, 1080 / 2)
-};
 const int number_frames_to_read_ahead = 100;
 const string path = "C:\\Users\\fagot\\ShadowDrive\\tipe\\*.MP4";
 const int number_of_threads = thread::hardware_concurrency();
@@ -81,7 +70,7 @@ const String windowName = "Window";
 const String configurationWindowName = "Configuration";
 const String testFilePath = "C:\\Users\\fagot\\ShadowDrive\\tipe\\test1.MP4";
 const Rect testFileROI(0, 0, 1920, 1080 / 2);
-const float windowScalar = 0.7;
+const float windowScalar = 0.5;
 const float imageScalar = 1;
 const int searchPixelSpacing = 15;
 const int searchPixelMaxSpacing = 200;
@@ -101,6 +90,8 @@ extern Pos watchedPos;
 extern bool shouldBreak;
 extern bool autoState;
 extern Pos reloadFromCamera;
+extern bool roiSetup;
+extern Rect roi;
 
 extern vector<vector<Frame>> frames;
 extern vector<vector<Pos>> positionsResults;

@@ -6,8 +6,8 @@
 using namespace cv;
 using namespace std;
 
-Analyser::Analyser(Mat& tActualMatrice, Rect tROI)
-    : actualMatrice(tActualMatrice), ROI(tROI) {
+Analyser::Analyser(Mat& tActualMatrice)
+    : actualMatrice(tActualMatrice) {
     isInitialSearch = true;
     actualIndex = 0;
     previous = center;
@@ -18,6 +18,8 @@ Pos Analyser::findBall() {
     actualIndex = 0;
     maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
     if(reloadFromCamera != NULL_POS){
+        reloadFromCamera.x = static_cast<int>(reloadFromCamera.x);
+        reloadFromCamera.y = static_cast<int>(reloadFromCamera.y);
         return calculateCenter(reloadFromCamera);
     }
     if (isInitialSearch) {
@@ -44,7 +46,6 @@ Pos Analyser::calculateCenter(Pos position) {
     int totalX = position.x;
     int totalY = position.y;
     int number_of_pixel_in_range = 1;
-    //TODO make it work when thread number is not 8
     for (int i = 0; i < number_of_threads; i++) {
         const int thread_number = i;
         threads.emplace_back([&, thread_number]() {
@@ -77,6 +78,10 @@ Pos Analyser::calculateCenter(Pos position) {
     for (int i = 0; i < number_of_threads; i++) {
         threads[i].join();
     }
+    if (number_of_pixel_in_range < 100) {
+        cerr << "Minimal pixels found" << endl;
+        return NULL_POS;
+    }
     center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
     if (center != NULL_POS) {
         isInitialSearch = false;
@@ -88,8 +93,8 @@ Pos Analyser::calculateCenter(Pos position) {
 Pos Analyser::initialCalculation() {
     Pos first = NULL_POS;
     Mat mat(height, width, CV_8UC3, Scalar(0, 0, 0));
-    for (int x = searchPixelSpacing - 1; x < height - searchPixelSpacing;  x += searchPixelSpacing) {
-        for (int y = searchPixelSpacing - 1; y < width - searchPixelSpacing; y += searchPixelSpacing) {
+    for (int x = searchPixelSpacing - 1 + roi.y; x < roi.y + roi.height - searchPixelSpacing;  x += searchPixelSpacing) {
+        for (int y = searchPixelSpacing - 1 + roi.x; y < roi.x + roi.width - searchPixelSpacing; y += searchPixelSpacing) {
             Pos position = { x, y};
             if (first != NULL_POS) {
                 return calculateCenter(position);
@@ -100,7 +105,6 @@ Pos Analyser::initialCalculation() {
         }
     }
     cerr << "No ball found" << endl;
-    waitKey(-1);
     return NULL_POS;
 }
 
@@ -112,23 +116,8 @@ Pos Analyser::getSearchPos() {
 
 Pos Analyser::getSearchPos(int straightDecal, int diagonalDecal) {
     Pos position = getPreSearchPos(straightDecal, diagonalDecal);
-    if (position.x < 0 || position.y < 0) {
+    if (position.x < roi.y || position.y < roi.x || position.y >= roi.x + roi.width || position.x >= roi.y + roi.height) {
         return NULL_POS;
-    }
-    if (position.y > width) {
-        if (position.x > height) {
-            if (previous.x == position.x) {
-                return NULL_POS;
-            }
-        }
-        if (previous.y == position.y) {
-            return NULL_POS;
-        }
-    }
-    else if (position.x > height) {
-        if (previous.x == position.x) {
-            return NULL_POS;
-        }
     }
     actualIndex++;
     return position;
@@ -172,7 +161,7 @@ Mat Analyser::getMixedMatrice(float conversion) {
         }
     }
     if (center != NULL_POS) {
-        addCubeToImage(mixedMatrice, center, 1, Vec3b(0, 0, 255));
+        addCubeToImage(mixedMatrice, center, 1, Vec3b(255, 255, 255));
     }
     return mixedMatrice;
 }

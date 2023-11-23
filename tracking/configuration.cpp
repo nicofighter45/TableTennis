@@ -21,6 +21,8 @@ Pos watchedPos;
 bool shouldBreak;
 bool autoState;
 Pos reloadFromCamera;
+bool roiSetup;
+Rect roi;
 
 vector<vector<Frame>> frames;
 vector<vector<Pos>> positionsResults;

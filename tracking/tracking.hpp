@@ -22,8 +22,6 @@ String getFile();
 
 void initTracking();
 void setupTracking();
-void test();
-void test2();
 
 
 #endif

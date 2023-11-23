@@ -37,28 +37,28 @@ Pos PairArea::getNextPosition() {
 		positionIndex++;
 	}
 	Pos position = getPreNextPosition();
-	if (position.x >= height) {
+	if (position.x >= roi.y + roi.height) {
 		if (areaIndex == 2) {
 			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
-	else if (position.x < 0) {
+	else if (position.x < roi.y) {
 		if (areaIndex == 0) {
 			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
-	else if (position.y >= width) {
+	else if (position.y >= roi.x + roi.width) {
 		if (areaIndex == 3) {
 			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
-	else if (position.y < 0) {
+	else if (position.y < roi.x) {
 		if (areaIndex == 1) {
 			stopIndex = positionIndex;
 			return getNextPosition();
@@ -85,28 +85,28 @@ Pos UnpairArea::getNextPosition() {
 		positionIndex++;
 	}
 	Pos position = getPreNextPosition();
-	if (position.x >= height) {
+	if (position.x >= roi.y + roi.height) {
 		if (areaIndex == 3) {
 			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
-	else if (position.x < 0) {
+	else if (position.x < roi.y) {
 		if (areaIndex == 1) {
 			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
-	else if (position.y >= width) {
+	else if (position.y >= roi.x + roi.width) {
 		if (areaIndex == 0) {
 			stopIndex = positionIndex;
 			return getNextPosition();
 		}
 		return NULL_POS;
 	}
-	else if (position.y < 0) {
+	else if (position.y < roi.x) {
 		if (areaIndex == 2) {
 			stopIndex = positionIndex;
 			return getNextPosition();

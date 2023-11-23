@@ -9,7 +9,6 @@ using namespace std;
 
 class Analyser {
 private:
-	Rect ROI;
 	Pos center;
 	Mat& actualMatrice;
 	Mat maskMatrice;
@@ -26,7 +25,7 @@ public:
 	Pos findBall();
 	Mat getMixedMatrice(float conversion);
 	Mat& getMaskMatrice();
-	Analyser(Mat& tActualMatrice, Rect tROI);
+	Analyser(Mat& tActualMatrice);
 };
 
 bool pixelIsInHSVRange(Mat& matrice, Pos position);

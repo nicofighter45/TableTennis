@@ -1,308 +1,222 @@
-#pragma once
-
-#include "opencv2/opencv.hpp"
-#include <vector>
-#include <string>
+#include <opencv2/opencv.hpp>
 #include <fstream>
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include "../processing/configuration.hpp"
+#include <vector>
+#include <Windows.h>
+#include <chrono>
+#include <filesystem>
+
+#include "configuration.hpp"
+#include "tracking.hpp"
+#include "prompt.hpp"
+#include "analyse.hpp"
+#include "area.hpp"
 
 using namespace std;
 using namespace cv;
 
-void processVideo(const string& filename, const int video_number);
-void processFrame(const int i, const int j);
-Frame getFrame(const int i, const int j);
-void printCenter(Mat& mat, const int x, const int y);
-
-int current_frame_number;
-
-void multithreading() {
-	for (int k = 0; k < filenames.size(); k++) {
-		cout << "Processing video: " << filenames[k] << endl;
-		processVideo(ref(filenames[k]), k);
-		cout << "End of processing: " << filenames[k] << endl;
-		for (int i = 0; i < total_frames; i++) {
-			orderedPositions.push_back(positionsResults[i % number_of_threads][i / number_of_threads]);
-		}
-		for (const Pos& position : orderedPositions) {
-			cout << position.x << ";" << position.y << ";" << endl;
-		}
-		ofstream file;
-		file.open("C:/Users/fagot/OneDrive/Documents/MPSI/TableTennis/processing/output/" + to_string(k) + "-tracked.txt");
-		if (file.is_open()) {
-			for (const Pos& position : orderedPositions) {
-				file << position.x << ";" << position.y << ";" << endl;
-			}
-			file.close();
-		}
-		frames.clear();
-		positionsResults.clear();
-		orderedPositions.clear();
-		current_frame_number = { 0 };
-	}
-}
-
-void loadFrames(VideoCapture& capture, const int video_number) {
-	int next_frame_number = current_frame_number + number_frames_to_read_ahead;
-	if (next_frame_number >= total_frames) {
-		next_frame_number = total_frames;
-	}
-
-	for (int i = current_frame_number; i < next_frame_number; ++i) {
-		Mat frame;
-		if (!capture.read(frame)) {
-			cout << "------------------Failed to read frame------------------" << i << endl;
-			continue;
-		}
-		cout << "adding frame: " << i << endl;
-		Frame value = { i, frame(regions_of_interest[video_number]) };
-		frames[i % number_of_threads].push_back(value);
-	}
-
-	current_frame_number = next_frame_number;
+void initTracking() {
+	// initializer, set default values for all variables that are in configuration.cpp
+	currentLoadedFrame = 0;
+	actualWatchedFrame = 0;
+	watchedOpacity = 25; // from 0 to 100
+	watchedZoom = 1; // from 1 to 16
 	shouldLoadFrames = false;
+	shouldBreak = false;
+	watchedPos = { 0, 0 };
+	autoState = true;
+	reloadFromCamera = NULL_POS;
+	roiSetup = true;
+
+	// default orange range, the best one we figured out for now
+	lower_color = HSVColor{ 5, 50, 50};
+	upper_color = HSVColor{ 45, 240, 240 };
 }
 
-void processVideo(const string& filename, const int video_number) {
-	VideoCapture capture(filename);
+
+void setupTracking() {
+
+	cout << "Library: OpenCV version: " << getVersionString() << endl;
+
+
+	// the capture of the video
+	string filePath = getFile();
+	if (filePath == "") {
+		return;
+	}
+	cout << "FilePath: " << filePath << endl;
+
+	streambuf* stream_buffer_cout = std::cout.rdbuf();
+
+	// Redirect cout to a file
+	ofstream out("output.txt");
+	cout.rdbuf(out.rdbuf());
+
+	VideoCapture capture(filePath);
+
+	// error if video can't be open
 	if (!capture.isOpened()) {
-		cerr << "Failed to open this video: " << filename << endl;
+		cout.rdbuf(stream_buffer_cout);
+		cerr << "Failed to open video" << endl;
 	}
 
+	// Restore the original buffer for cout
+	cout.rdbuf(stream_buffer_cout);
+
+	// getting all video settings into proper variables
 	fps = capture.get(CAP_PROP_FPS);
 	width = capture.get(CAP_PROP_FRAME_WIDTH);
 	height = capture.get(CAP_PROP_FRAME_HEIGHT);
 	total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
+	roi = Rect{ 0, 0, width, height };
 
-	cout << fps << " " << width << " " << height << " " << total_frames << " " << number_of_threads << endl;
+	cout << "FPS: " << fps << endl << "width: " << width << endl << "height: " << height << endl << "total frames: " << total_frames << endl;
 
-	for (int i = 0; i < number_of_threads; i++) {
-		vector<Pos> ini1;
-		positionsResults.push_back(ini1);
-		vector<Frame> ini2;
-		frames.push_back(ini2);
-	}
+	// prepare the window to show frames
+	cout.rdbuf(out.rdbuf());
+	initialisePrompts();
+	cout.rdbuf(stream_buffer_cout);
 
-	loadFrames(ref(capture), video_number);
+	Mat readed_frame;
+	capture.read(readed_frame);
+	chooseROI(readed_frame);
 
-	vector<thread> threads;
+	cout << "ROI: " << roi << endl;
 
-	for (int i = 0; i < number_of_threads; i++) {
-		const int thread_number = i;
-		const int limite = total_frames % number_of_threads;
-		threads.emplace_back([&, thread_number]() {
-			int quotient(total_frames / number_of_threads);
-			if (thread_number < limite) {
-				quotient += 1;
+	bool shouldCalculate = true;
+	float conversion = static_cast<float>(watchedOpacity) / 100;
+	Analyser analyser(ref(readed_frame));
+	Pos center = NULL_POS;
+	map < int, Pos > positionsResults;
+
+	while (true) {
+		int ms = 0;
+		if (shouldCalculate) {
+			auto start = chrono::high_resolution_clock::now();
+			reloadFromCamera = analyser.findBall();
+			if (reloadFromCamera != NULL_POS) {
+				center = analyser.findBall();
+				reloadFromCamera = NULL_POS;
+				auto finish = chrono::high_resolution_clock::now();
+				ms = chrono::duration_cast<chrono::milliseconds>(finish - start).count();
+				cout << "Frame " << capture.get(CAP_PROP_POS_FRAMES) - 1 << " center " << center << " in "
+					<< ms << "ms" << endl;
 			}
-			cout << "Thread " << thread_number << " started processing" << endl;
-			for (int j = 0; j < quotient; ++j) {
-				processFrame(thread_number, j);
+			else {
+				center = NULL_POS;
+				auto finish = chrono::high_resolution_clock::now();
+				ms = chrono::duration_cast<chrono::milliseconds>(finish - start).count();
+				cout << "Frame " << capture.get(CAP_PROP_POS_FRAMES) - 1 << " no center in " << ms << "ms" << endl;
 			}
-			return;
-			});
-	}
-	while (current_frame_number < total_frames) {
-		unique_lock<mutex> lock(mtx);
-		cvariable.wait(lock, [] { return shouldLoadFrames == true; });
-		loadFrames(ref(capture), video_number);
-		cvariable.notify_all();
-	}
-	for (int i = 0; i < number_of_threads; i++) {
-		cout << "thread joining: " << i << endl;
-		threads[i].join();
-	}
-}
+			positionsResults[currentLoadedFrame] = center;
 
-void processFrame(const int i, const int j) {
-	Frame value = getFrame(i, j);
-	const int frame_number = value.number;
-	const Mat& frame = value.matrice;
-	cout << "Processing frame: " << frame_number << endl;
-
-	Mat hsv_frame;
-	cvtColor(frame, hsv_frame, COLOR_BGR2HSV);
-
-	Mat mask;
-	inRange(hsv_frame, getScalarFromHSVColor(lower_color), 
-		getScalarFromHSVColor(upper_color), mask);
-
-	int num_non_black_pixels = countNonZero(mask);
-	if (num_non_black_pixels == 0) {
-		Pos null = { -1, -1 };
-		positionsResults[i].push_back(null);
-		return;
-	}
-
-	Moments m = moments(mask, true);
-	Point center(m.m10 / m.m00, m.m01 / m.m00);
-
-	Pos pos = { center.x, center.y };
-	positionsResults[i].push_back(pos);
-
-	Mat empty_mat;
-	frames[i][j].matrice.deallocate();
-	frames[i][j].matrice = empty_mat;
-
-}
-
-Frame getFrame(const int i, const int j) {
-	if (j < frames[i].size()) {
-		return frames[i][j];
-	}
-
-	cout << "calling mutex: " << j * number_of_threads + i << endl;
-	unique_lock<mutex> lock(mtx);
-	shouldLoadFrames = true;
-	cvariable.notify_one();
-	while (j >= frames[i].size()) {
-		cvariable.wait(lock);
-	}
-	return frames[i][j];
-}
-
-
-
-
-
-void cutter() {
-	// Open the input video
-	VideoCapture input_cap("C:/Users/fagot/ShadowDrive/tipe/MVI_0013.MP4");
-	if (!input_cap.isOpened()) {
-		std::cerr << "Error: Could not open input video\n";
-		return;
-	}
-
-	// Get input video properties
-	double fps = input_cap.get(CAP_PROP_FPS);
-	int width = input_cap.get(CAP_PROP_FRAME_WIDTH);
-	int height = input_cap.get(CAP_PROP_FRAME_HEIGHT);
-	int total_frames = input_cap.get(CAP_PROP_FRAME_COUNT);
-
-	// Define output video properties
-	int start_frame = 2 * fps + 0;
-	int end_frame = 15 * fps + 0;
-	int output_width = width;
-	int output_height = height;
-	std::string output_filename = "C:/Users/fagot/ShadowDrive/tipe/output/rebond_sol.MP4";
-
-	// Open the output video
-	VideoWriter output_cap(output_filename, VideoWriter::fourcc('X', '2', '6', '4'), fps, Size(output_width, output_height));
-	if (!output_cap.isOpened()) {
-		std::cerr << "Error: Could not open output video\n";
-		return;
-	}
-
-	// Set the input video position to the start frame
-	input_cap.set(CAP_PROP_POS_FRAMES, start_frame);
-
-	// Read and write the frames from start frame to end frame
-	for (int i = start_frame; i <= end_frame; i++) {
-		Mat frame;
-		input_cap >> frame;
-		output_cap.write(frame);
-	}
-
-	// Release the input and output videos
-	input_cap.release();
-	output_cap.release();
-
-}
-
-
-void processVideoSingleThreaded(VideoCapture capture, String name) {
-	// Define the output video file properties
-	/*
-	int fourcc = VideoWriter::fourcc('m', 'p', '4', 'v'); // MP4 codec
-	double fps = capture.get(CAP_PROP_FPS);
-	Size frame_size(capture.get(cv::CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
-	string output_name = name;
-	output_name.erase(output_name.size() - 4);
-	output_name += "-tracked.MP4";
-	*/
-	//VideoWriter writer(output_name, fourcc, fps, frame_size);
-
-	//Rect region_of_interest(1200, 500, 700, 200);
-	Rect region_of_interest(100, 750, 1810, 300);
-
-	vector<Pos> positions;
-
-	Mat total_frame;
-	int i(1);
-	while (capture.read(total_frame)) {
-		Mat frame = total_frame(region_of_interest);
-		Mat hsv;
-		cvtColor(frame, hsv, COLOR_BGR2HSV);
-		Mat mask;
-		inRange(hsv, getScalarFromHSVColor(lower_color), getScalarFromHSVColor(upper_color), mask);
-		Mat result;
-		bitwise_and(frame, frame, result, mask);
-		Moments m = moments(mask, true);
-		Point center(m.m10 / m.m00, m.m01 / m.m00);
-		if (center.x >= 0 and center.y >= 0) {
-			printCenter(ref(result), center.x, center.y);
-			Pos pos = { center.x, center.y };
-			positions.push_back(pos);
 		}
-		Mat blanck(20, 1810, CV_8UC3, Scalar(255, 255, 255));
-		Mat mat;
-		vconcat(frame, blanck, mat);
-		vconcat(mat, result, mat);
-		putText(mat, "Video original", {70, 50}, FONT_HERSHEY_SIMPLEX, 1.5, Scalar(255, 255, 255), 4, LINE_AA);
-		putText(mat, "Video detecte", {70, 600}, FONT_HERSHEY_SIMPLEX, 1.5, Scalar(255, 255, 255), 4, LINE_AA);
-		imshow("Mask", mat);
-		cout << "Image " << i << " proccessed" << endl;
-		imwrite("C:/Users/fagot/OneDrive/Documents/MPSI/TableTennis/processing/output/third/image-" + to_string(i) + ".png", mat);
-		waitKey(1);
-		i++;
+
+		if (center == NULL_POS) {
+			showWindow(NULL_POS, readed_frame, ms);
+		}
+		else {
+			showWindow(inverse(center), analyser.getMixedMatrice(conversion), ms);
+		}
+		if (roiSetup) {
+			chooseROI(analyser.getMixedMatrice(conversion));
+			cout << "ROI: " << roi << endl;
+			center = NULL_POS;
+		}
+		if (currentLoadedFrame == actualWatchedFrame) {
+			if (watchedOpacity != conversion * 100) {
+				conversion = static_cast<float>(watchedOpacity) / 100;
+				shouldCalculate = false;
+
+			}
+			else {
+				shouldCalculate = true;
+			}
+			continue;
+		}
+		shouldCalculate = true;
+		if (currentLoadedFrame == actualWatchedFrame + 1) {
+			analyser.setIsInitialSearch(true);
+			capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
+			currentLoadedFrame--;
+		}
+		else if (currentLoadedFrame == actualWatchedFrame - 1) {
+			currentLoadedFrame++;
+		}
+		else {
+			capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
+			currentLoadedFrame = actualWatchedFrame;
+		}
+		if (!capture.read(readed_frame)) {
+			cout << "End Video calculation" << endl;
+			shutDownPrompt();
+			break;
+		}
+	}
+
+	string name;
+
+	cout << "name of file: ";
+	cin >> name;
+	cout << endl;
+
+	string directoryPath = "C:/Users/fagot/Code/TableTennis/processing/output/" + name + "/";
+
+	if (!filesystem::exists(directoryPath)) {
+		if (filesystem::create_directories(directoryPath)) {
+			cerr << "Failed to create the directory" << endl;
+		}
 	}
 
 	ofstream file;
-	file.open("C:/Users/fagot/OneDrive/Documents/MPSI/TableTennis/processing/output/" + to_string(i) + "-tracked.txt");
-	if (file.is_open()) {
-		for (const Pos& position : positions) {
-			file << position.x << ";" << position.y << ";" << endl;
-		}
-		file.close();
+	file.open("C:/Users/fagot/Code/TableTennis/processing/output/" + name + "/tracked-0.txt");
+	if (!file.is_open()) {
+		cerr << "Cannot save tracking data" << endl;
 	}
-}
-
-
-void printCenter(Mat& mat, const int x, const int y) {
-	mat.at<Vec3b>(y, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y, x - 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x - 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y - 1, x + 1) = Vec3b(0, 0, 255);
-	mat.at<Vec3b>(y + 1, x - 1) = Vec3b(0, 0, 255);
-}
-
-
-void singlethreading() {
-	for (const auto& filename : filenames) {
-		VideoCapture capture(filename);
-		if (!capture.isOpened()) {
-			cerr << "Failed to open this video: " << filename << endl;
+	int file_k = 0;
+	bool first = true;
+	for (int i = 0; i <= total_frames; i++) {
+		if (positionsResults[i] == NULL_POS || positionsResults[i] == Pos{ 0, 0 }) {
+			if (first) {
+				continue;
+			}
+			file_k++;
+			file.close();
+			file.open("C:/Users/fagot/Code/TableTennis/processing/output/" + name + "/tracked-" + to_string(file_k) + ".txt");
+			if (!file.is_open()) {
+				cerr << "Cannot save tracking data" << endl;
+			}
+			first = true;
 			continue;
 		}
-		processVideoSingleThreaded(capture, filename);
-		cout << filename << " was processed" << endl;
-		break;
+		first = false;
+		file << positionsResults[i].x << ";" << positionsResults[i].y << ";" << endl;
 	}
+	file.close();
+	if (first) {
+		filesystem::remove("C:/Users/fagot/Code/TableTennis/processing/output/" + name + "/tracked-" + to_string(file_k) + ".txt");
+	}
+
 }
 
-int main() {
-	lower_color = HSVColor{ 15, 130, 130};
-	upper_color = HSVColor{ 28, 255, 255 };
-	//glob("C:/Users/fagot/ShadowDrive/tipe/output/*.MP4", filenames, false);
-	filenames.push_back("C:/Users/fagot/ShadowDrive/tipe/output/rebond_sol.MP4");
-	//filenames.push_back("C:/Users/fagot/ShadowDrive/tipe/test1.MP4");
-	singlethreading();
-	return 0;
+String getFile() {
+
+	// https://learn.microsoft.com/fr-fr/windows/win32/dlgbox/using-common-dialog-boxes?redirectedfrom=MSDN#open_file
+
+	wchar_t fileName[MAX_PATH] = { 0 };
+	OPENFILENAMEW ofn = { 0 };
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL; // The parent window handle (or NULL if you don't have one).
+	ofn.lpstrFilter = L"MP4 Files (*.mp4)\0*.mp4\0"; // Filter for MP4 files only.
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST; // Flags for dialog behavior.
+
+	if (GetOpenFileNameW(&ofn)) {
+		// The user selected an MP4 file. Convert the wide character string to UTF-8 and return as a string.
+		wstring wideFileName(fileName);
+		return string(wideFileName.begin(), wideFileName.end());
+	}
+	// The user canceled the dialog or an error occurred.
+		// You can handle this case accordingly (e.g., return an empty string).
+	return "";
 }
