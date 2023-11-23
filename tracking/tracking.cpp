@@ -29,7 +29,7 @@ void initTracking() {
 
 	// default orange range, the best one we figured out for now
 	lower_color = HSVColor{ 5, 50, 50};
-	upper_color = HSVColor{ 45, 240, 240 };
+	upper_color = HSVColor{ 45, 250, 250 };
 }
 
 
@@ -69,7 +69,8 @@ void setupTracking() {
 	total_frames = static_cast<int>(capture.get(CAP_PROP_FRAME_COUNT));
 	roi = Rect{ 0, 0, width, height };
 
-	cout << "FPS: " << fps << endl << "width: " << width << endl << "height: " << height << endl << "total frames: " << total_frames << endl;
+	cout << "FPS: " << fps << endl << "width: " << width << endl << 
+		"height: " << height << endl << "total frames: " << total_frames << endl;
 
 	// prepare the window to show frames
 	cout.rdbuf(out.rdbuf());
@@ -159,7 +160,7 @@ void setupTracking() {
 	cin >> name;
 	cout << endl;
 
-	string directoryPath = "C:/Users/fagot/Code/TableTennis/processing/output/" + name + "/";
+	string directoryPath = "C:/Users/fagot/Code/TableTennis/output/" + name + "/";
 
 	if (!filesystem::exists(directoryPath)) {
 		if (filesystem::create_directories(directoryPath)) {
@@ -168,7 +169,7 @@ void setupTracking() {
 	}
 
 	ofstream file;
-	file.open("C:/Users/fagot/Code/TableTennis/processing/output/" + name + "/tracked-0.txt");
+	file.open("C:/Users/fagot/Code/TableTennis/output/" + name + "/tracked-0.txt");
 	if (!file.is_open()) {
 		cerr << "Cannot save tracking data" << endl;
 	}
@@ -181,7 +182,7 @@ void setupTracking() {
 			}
 			file_k++;
 			file.close();
-			file.open("C:/Users/fagot/Code/TableTennis/processing/output/" + name + "/tracked-" + to_string(file_k) + ".txt");
+			file.open("C:/Users/fagot/Code/TableTennis/output/" + name + "/tracked-" + to_string(file_k) + ".txt");
 			if (!file.is_open()) {
 				cerr << "Cannot save tracking data" << endl;
 			}
@@ -193,7 +194,7 @@ void setupTracking() {
 	}
 	file.close();
 	if (first) {
-		filesystem::remove("C:/Users/fagot/Code/TableTennis/processing/output/" + name + "/tracked-" + to_string(file_k) + ".txt");
+		filesystem::remove("C:/Users/fagot/Code/TableTennis/output/" + name + "/tracked-" + to_string(file_k) + ".txt");
 	}
 
 }

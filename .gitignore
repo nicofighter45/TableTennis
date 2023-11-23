@@ -1,5 +1,4 @@
 .vscode/
-output/
 *.exe
 .vs/
 *.sln
