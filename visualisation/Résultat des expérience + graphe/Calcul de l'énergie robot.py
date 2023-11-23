@@ -32,7 +32,7 @@ def courbe2(h):
     h=premièrevaleurhaute(h)
     convertisseur(h)
     t=[k*10e-3 for k in range(len(h))]
-    cinetique = np.array(energie_cinétique(h)[:-1])
+    cinetique = np.array(energie_cinétique1(h)[:-1])
     plt.plot(t[1:-1],cinetique,label ="Énergie cinétique de la vitesse selon Uy")
     plt.title("Évolution de l'énergie au cours du temps")
     plt.ylabel( "Énergie en Joule")

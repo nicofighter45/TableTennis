@@ -4,7 +4,7 @@ from data_reception import *
 from processing import *
 from speed import *
 
-Taille_pix, h,x = data("TableTennis/Résultat des expérience + graphe/Rebond sur raquette.txt")
+Taille_pix, h,x = data("TableTennis/Visualisation/Résultat des expérience + graphe/Rebond table.txt")
 def courbe(h):
     rebilitation_de_liste(h)
     h=premièrevaleurhaute(h)
