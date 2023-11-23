@@ -42,10 +42,6 @@ void chooseROI(Mat readed_frame) {
 
 	int mouseData[2] = { 0, 0 };
 
-	streambuf* stream_buffer_cout = cout.rdbuf();
-	ofstream out("output.txt");
-	cout.rdbuf(out.rdbuf());
-
 	setMouseCallback(windowName, roiMouseCallback, mouseData);
 
 	while (true) {
@@ -71,7 +67,6 @@ void chooseROI(Mat readed_frame) {
 		}
 	}
 
-	cout.rdbuf(stream_buffer_cout);
 	roiSetup = false;
 }
 
@@ -115,10 +110,6 @@ void roiMouseCallback(int event, int x, int y, int flags, void* userdata) {
 }
 
 void showWindow(Pos center, Mat originalMatrice, int ms) {
-
-	streambuf* stream_buffer_cout = std::cout.rdbuf();
-	ofstream out("output.txt");
-	cout.rdbuf(out.rdbuf());
 
 	Size imageSize(width * imageScalar * windowScalar, height * imageScalar * windowScalar);
 	Size windowSize(width * windowScalar, height * windowScalar);
@@ -221,22 +212,14 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 			break;
 		}
 		if (autoState) {
-			if (ms > 40) {
-				ms =  40;
-			}
-			if (center != NULL_POS) {
-				this_thread::sleep_for(chrono::milliseconds(100-ms));
-			}
-			else {
-				this_thread::sleep_for(chrono::milliseconds(40-ms));
+			if (center != NULL_POS && ms <= timeSpacing) {
+				this_thread::sleep_for(chrono::milliseconds(timeSpacing -ms));
 			}
 			actualWatchedFrame += 1;
 			setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
 			break;
 		}			
 	}
-
-	cout.rdbuf(stream_buffer_cout);
 	
 }
 
@@ -303,7 +286,7 @@ void setNewWatchedPos(int x, int y, int window_width, int window_height) {
 }
 
 void printCircle(Mat& mat, Pos center) {
-	circle(mat, Point(static_cast<int>(center.x), static_cast<int>(center.y)), 50, Scalar(0, 0, 255), 4, LINE_AA, false);
+	circle(mat, Point(static_cast<int>(center.x), static_cast<int>(center.y)), 50, white, 4, LINE_AA, false);
 }
 
 void printRectangle(Mat& mat, Pos top_left_corner, Size size) {
@@ -311,5 +294,5 @@ void printRectangle(Mat& mat, Pos top_left_corner, Size size) {
 }
 
 void printRectangle(Mat& mat, Rect region) {
-	rectangle(mat, region, Scalar(0, 0, 0), 4, LINE_AA);
+	rectangle(mat, region, black, 4, LINE_AA);
 }

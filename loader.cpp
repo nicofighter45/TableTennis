@@ -6,8 +6,6 @@
 #include "simulations/friction.h"
 #include "simulations/magnus.h"
 #include "simulations/gravity.h"
-#include "tools/python_link.hpp"
-#include "tools/export.hpp"
 #include "loader.hpp"
 
 using namespace std;
@@ -81,15 +79,15 @@ void run()
     }
     else if (simulationType == "2")
     {
-        print2DGraph(runFrictionSimulation(initialPosition, initialSpeed), "friction");
+        //print2DGraph(runFrictionSimulation(initialPosition, initialSpeed), "friction");
     }
     else if (simulationType == "3")
     {
         auto vectors = runMagnusSimulation(initialPosition, initialSpeed);
 
-        print2DGraph(get<0>(vectors), "magnus position");
-        print2DGraph(get<1>(vectors), "magnus speed");
-        print2DGraph(get<2>(vectors), "magnus acceleration");
+        //print2DGraph(get<0>(vectors), "magnus position");
+        //print2DGraph(get<1>(vectors), "magnus speed");
+        //print2DGraph(get<2>(vectors), "magnus acceleration");
     }
     else
     {

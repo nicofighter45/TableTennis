@@ -1,8 +1,8 @@
 #include <opencv2/opencv.hpp>
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
+#include <fstream>
+
 #include "configuration.hpp"
+#include "../tools/abstract_structs.hpp"
 
 using namespace cv;
 using namespace std;
@@ -13,8 +13,8 @@ int total_frames;
 int fps;
 int width;
 int height;
-Pos initPos;
 int actualWatchedFrame;
+int currentLoadedFrame;
 int watchedOpacity;
 float watchedZoom;
 Pos watchedPos;
@@ -23,15 +23,6 @@ bool autoState;
 Pos reloadFromCamera;
 bool roiSetup;
 Rect roi;
-
-vector<vector<Frame>> frames;
-vector<vector<Pos>> positionsResults;
-vector<Pos> orderedPositions;
-vector<string> filenames;
-mutex mtx;
-condition_variable cvariable;
-int currentLoadedFrame;
-atomic<bool> shouldLoadFrames;
 
 Scalar getScalarFromHSVColor(HSVColor color) {
 	return Scalar(color.H, color.S, color.V);

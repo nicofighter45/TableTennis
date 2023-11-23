@@ -7,8 +7,4 @@
 *.user
 *.pdb
 x64/
-CppProperties.json
-.DS_Store
-CMakeLists.txt
-cmake-build-debug/
 .idea/

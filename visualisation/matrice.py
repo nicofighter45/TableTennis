@@ -8,7 +8,7 @@ def multiply(M1: [[]], M2: [[]]) -> [[]]:
         for j in range(l):
             sum = 0
             for k in range(m):
-                sum += M1[i][k]*M2[k][j]
+                sum += M1[i][k] * M2[k][j]
             line.append(sum)
         M.append(line)
     return M

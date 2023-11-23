@@ -5,11 +5,11 @@ using namespace cv;
 using namespace std;
 
 Area::Area() : areaIndex(0), lineIndex(0), startIndex(0), stopIndex(-1),
-positionIndex(0), centerPosition(NULL_POS), morePixel(20) {
+positionIndex(0), centerPosition(NULL_POS), morePixel(morePixelStart) {
 }
 
 Area::Area(int tAreaIndex, Pos tCenterPosition) : areaIndex(tAreaIndex), lineIndex(0), startIndex(0),
-positionIndex(0), centerPosition(tCenterPosition), stopIndex(-1), morePixel(20) {
+positionIndex(0), centerPosition(tCenterPosition), stopIndex(-1), morePixel(morePixelStart) {
 }
 
 UnpairArea::UnpairArea(int tAreadIndex, Pos tCenterPosition) : Area(tAreadIndex, tCenterPosition) {

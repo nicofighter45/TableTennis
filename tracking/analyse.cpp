@@ -41,7 +41,6 @@ Pos Analyser::findBall() {
 }
 
 Pos Analyser::calculateCenter(Pos position) {
-    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(0, 255, 0);
     vector<thread> threads;
     int totalX = position.x;
     int totalY = position.y;
@@ -62,12 +61,10 @@ Pos Analyser::calculateCenter(Pos position) {
                     number_of_pixel_in_range += 1;
                     totalX += position.x;
                     totalY += position.y;
-                    Vec3b colors[] = { Vec3b(0, 120, 120) , Vec3b(255, 0, 0) , Vec3b(0, 255, 0) ,
-                    Vec3b(0, 0, 255) , Vec3b(0, 255, 255), Vec3b(255, 255, 0), Vec3b(255, 0, 255), Vec3b(120, 120, 0) };
                     maskMatrice.at<Vec3b>(position.x, position.y) = colors[thread_number];
                 }
                 else {
-                    maskMatrice.at<Vec3b>(position.x, position.y) = Vec3b(255, 255, 255);
+                    maskMatrice.at<Vec3b>(position.x, position.y) = white;
                     area -> nextRaw();
                 }
                 position = area -> getNextPosition();
@@ -78,21 +75,20 @@ Pos Analyser::calculateCenter(Pos position) {
     for (int i = 0; i < number_of_threads; i++) {
         threads[i].join();
     }
-    if (number_of_pixel_in_range < 100) {
-        cerr << "Minimal pixels found" << endl;
+    if (number_of_pixel_in_range < minimumPixelNeeded) {
         return NULL_POS;
     }
     center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
     if (center != NULL_POS) {
         isInitialSearch = false;
-        addCubeToImage(ref(maskMatrice), center, 1, Vec3b(0, 0, 255));
+        addCubeToImage(ref(maskMatrice), center, 1, white);
     }
     return center;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 }
 
 Pos Analyser::initialCalculation() {
     Pos first = NULL_POS;
-    Mat mat(height, width, CV_8UC3, Scalar(0, 0, 0));
+    Mat mat(height, width, CV_8UC3, white);
     for (int x = searchPixelSpacing - 1 + roi.y; x < roi.y + roi.height - searchPixelSpacing;  x += searchPixelSpacing) {
         for (int y = searchPixelSpacing - 1 + roi.x; y < roi.x + roi.width - searchPixelSpacing; y += searchPixelSpacing) {
             Pos position = { x, y};
@@ -104,7 +100,6 @@ Pos Analyser::initialCalculation() {
             }
         }
     }
-    cerr << "No ball found" << endl;
     return NULL_POS;
 }
 
@@ -159,9 +154,6 @@ Mat Analyser::getMixedMatrice(float conversion) {
                 
             }
         }
-    }
-    if (center != NULL_POS) {
-        addCubeToImage(mixedMatrice, center, 1, Vec3b(255, 255, 255));
     }
     return mixedMatrice;
 }
