@@ -13,7 +13,7 @@ def ind_degre(rang, degre,intervalle):
         )
 def approximation(liste, degre):
     fonction = Sum_ind_poly([])
-    intervalle = 1
+    intervalle = 10e-3
     for rang in range(len(liste)):
         L = ind_degre(rang+degre+2, degre,intervalle) * liste[rang]
         fonction = fonction + L*(1/fact(degre)*intervalle**degre)
@@ -105,7 +105,7 @@ def résolution(matrice1, coordonée) :
     return(lesresultats)
     # c'est fait
 def plot_interpolation_et_point(y_interpolation,degre) :
-    intervalle = 10e-3
+    intervalle = 1
     x_interpolation = [ k*intervalle for k in range (len(y_interpolation))]
     # Effectuer l'interpolation B-spline
     
@@ -155,7 +155,7 @@ def plot_vitesse_et_point(y_interpolation,degre) :
     fonction_interpolation = interpolation(y_interpolation, degre)
     fonction_interpolation =der(fonction_interpolation)
     # Calculer les valeurs interpolées pour l'affichage
-    L = [fonction_interpolation((2*degre+k/100)*intervalle) for k in range(len(y_interpolation)*100)]
+    L = [fonction_interpolation((2*degre+k/100)*intervalle) for k in range((len(y_interpolation)-degre*2)*100)]
     # Afficher les points d'interpolation
     plt.scatter(x_interpolation, v_point, color='red', label='Points d\'interpolation')
     # Afficher la courbe interpolée
@@ -168,15 +168,15 @@ def plot_vitesse_et_point(y_interpolation,degre) :
     plt.show()
 
 def plot_vitesse_et_point(y_interpolation,degre) :
-    intervalle = 1
+    intervalle = 10e-3
     x_interpolation = [ k*intervalle for k in range (len(y_interpolation)-1)]
-    v_point = [(y_interpolation[k+1]-y_interpolation[k])/10e-3 for k in range (len(y_interpolation)-1)]
+    v_point = [(y_interpolation[k+1]-y_interpolation[k])/intervalle for k in range (len(y_interpolation)-1)]
     # Effectuer l'interpolation B-spline
     
-    fonction_interpolation = approximation(y_interpolation, degre)
+    fonction_interpolation = interpolation(y_interpolation, degre)
     fonction_interpolation = der(fonction_interpolation)
     # Calculer les valeurs interpolées pour l'affichage
-    L = [fonction_interpolation((3*degre+k/100)*intervalle) for k in range((len(y_interpolation)-4)*100)]
+    L = [fonction_interpolation((3*degre+k/100)*intervalle) for k in range((len(y_interpolation)-degre*2)*100)]
     # Afficher les points d'interpolation
     plt.scatter(x_interpolation, v_point, color='red', label='Points d\'interpolation')
     # Afficher la courbe interpolée
@@ -187,4 +187,3 @@ def plot_vitesse_et_point(y_interpolation,degre) :
     plt.ylabel('y')
     plt.title(f'Interpolation B-spline de degré {degre}')
     plt.show()
-plot_vitesse_et_point(liste,3)

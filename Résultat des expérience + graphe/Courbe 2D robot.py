@@ -5,7 +5,7 @@ import matplotlib.gridspec as gridspec
 from data_reception import *
 from processing import *
 from speed import *
-Taille_pix, x,h = data("TableTennis/Résultat des expérience + graphe/Courbe du robot.txt")
+Taille_pix, h,x = data("TableTennis/Résultat des expérience + graphe/test1-tracked.txt")
 rebilitation_de_liste(h)
 convertisseur(h,Taille_pix)
 convertisseur(x,Taille_pix)
@@ -18,6 +18,5 @@ ax2.set_title('Courbe du rebond : f(y) = z ', loc="center")
 ax2.plot(x,h,"b-")
 ax2.set_xlabel('Abscisse en m')
 ax2.set_ylabel('Hauteur en m')
-ax2.set_ylim(-0.1,0.4)
 plt.show()
 plt.clf()

@@ -10,21 +10,19 @@ Taille_pix, h,x = data("TableTennis/Résultat des expérience + graphe/Rebond ta
 def courbe(h):
     rebilitation_de_liste(h)
     h=premièrevaleurhaute(h)
-    convertisseur(h,Taille_pix)
-    interpolation_de_h = it.interpolation(h,3)
+    convertisseur(h,Taille_pix/100)
+    interpolation_de_h = it.approximation(h,4)
     vitesse = it.der(interpolation_de_h)
     t=[k*10e-3 for k in range(100*(len(h)-4))]
     h = [interpolation_de_h(2*3+k) for k in t ]
     v = [vitesse(2*3+k) for k in t ]
-    print(len(v),len(h))
     cinetique = energie_cinétique2(v)
     potentiel = energie_potentielle(h)
     potentiel = np.array(potentiel)
     cinetique = np.array(cinetique)
-    print(len(cinetique),len(potentiel))
+    print(v)
     Mecanique= potentiel + cinetique
     t = np.array(t)
-    print(potentiel)
     plt.plot(t,potentiel,label ="Énergie potentiel")
     plt.plot(t,cinetique,label ="Énergie cinétique")
     plt.plot(t,Mecanique,label="Énergie mécanique")
@@ -34,4 +32,5 @@ def courbe(h):
     plt.legend()
     plt.show()
     plt.clf()
+it.plot_vitesse_et_point(h,3)
 courbe(h)
