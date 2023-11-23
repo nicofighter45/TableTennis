@@ -8,17 +8,13 @@ import speed as sp
 from data_reception import *
 from processing import *
 from speed import *
-
+import sys
+sys.path.insert(0, 'TableTennis/Interpolation_de_point')
+import Test_Regression_linéaire as li
 Taille_pix, h,x = data("TableTennis/Résultat des expérience + graphe/Courbe du robot.txt")
-def pente(h):
-    v=vitesse(h)
-    pente=[]
-    for k in range (len(v)) :
-        for j in range (k,len(v)):
-            if j!= k : pente.append((v[k]-v[j])/(10e-3*(k-j)))
-        return(moyenne(pente))
-    
 rebilitation_de_liste(h)
 h=premièrevaleurhaute(h)
 h=descente(h)[:-1]
-print(pente(h))
+v=vitesse(h)
+print(monte(v))
+li.curv_trace(monte(v),[t*10e-3 for t in range(len(monte(v)))],0,0,"dzcgze","dzhdzh","hezh")

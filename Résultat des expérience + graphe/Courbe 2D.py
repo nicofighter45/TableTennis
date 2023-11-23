@@ -3,7 +3,7 @@ import matplotlib.gridspec as gridspec
 from data_reception import *
 from processing import *
 from speed import *
-Taille_pix, h,x = data("TableTennis/Résultat des expérience + graphe/Rebond sur sol.txt")
+Taille_pix, h,x = data("TableTennis/Résultat des expérience + graphe/Rebond table.txt")
 rebilitation_de_liste_max(h)
 rebilitation_de_liste_min(x)
 convertisseur(x,Taille_pix)

@@ -27,7 +27,12 @@ def premièrevaleurhaute(liste) :
     return(liste[p+1:])
 def descente(liste) :
     p=0
-    while liste[p]>=liste[p+1] :
+    while p+1 < len(liste) and liste[p]>=liste[p+1] :
+        p+=1
+    return(liste[:p+1])
+def monte(liste) :
+    p=0
+    while p+1 < len(liste) and liste[p]<=liste[p+1] :
         p+=1
     return(liste[:p+1])
 def moyenne(liste) :

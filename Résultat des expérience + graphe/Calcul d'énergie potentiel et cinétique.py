@@ -11,7 +11,7 @@ def courbe(h):
     convertisseur(h,Taille_pix)
     t=[k*10e-3 for k in range(len(h))]
     potentiel = np.array(energie_potentielle(h))
-    cinetique = np.array([0]+energie_cinétique(h))
+    cinetique = np.array([0]+energie_cinétique1(h))
     Mecanique= potentiel +cinetique
     plt.plot(t,potentiel,label ="Énergie potentiel")
     plt.plot(t,cinetique,label ="Énergie cinétique")

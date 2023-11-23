@@ -17,8 +17,14 @@ def energie_potentielle(position) :
     for k in position :
         liste.append(m*g*k)
     return(liste)
-def energie_cinétique(position) :
+def energie_cinétique1(position) :
     liste = []
-    for k in vitesse(position) :
+    v = vitesse(position)
+    for k in v :
         liste.append(1/2*m*k**2)
     return(liste)
+def energie_cinétique2(position):
+        liste = []
+        for k in position :
+            liste.append(1/2*m*k**2)
+        return(liste)
