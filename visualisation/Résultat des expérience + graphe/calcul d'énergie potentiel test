@@ -31,6 +31,4 @@ def courbe(h):
     plt.legend()
     plt.show()
     plt.clf()
-it.plot_vitesse_et_point1(h,3)
-it.plot_vitesse_et_point2(h,3)
 courbe(h)
