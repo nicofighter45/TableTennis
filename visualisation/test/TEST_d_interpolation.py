@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from abstract import *
+from visualisation.tools.abstract import *
 
 intervalle = 1
 

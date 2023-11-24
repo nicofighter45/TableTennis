@@ -1,10 +1,10 @@
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 
-from data_reception import *
-from processing import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
 
-Taille_pix, h, x = data("TableTennis/Résultat des expérience + graphe/test1-tracked.txt")
+Taille_pix, h, x = data("TableTennis/calcul/test1-tracked.txt")
 rebilitation_de_liste(h)
 convertisseur(h, Taille_pix)
 convertisseur(x, Taille_pix)

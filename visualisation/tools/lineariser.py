@@ -1,5 +1,5 @@
 h, x = [], []
-with open("Résultat des expérience + graphe/Rebond sur sol.txt", "r") as file:
+with open("calcul/Rebond sur sol.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
         cut = line[:-2].split(";")

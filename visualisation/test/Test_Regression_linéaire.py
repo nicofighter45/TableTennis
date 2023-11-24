@@ -5,8 +5,8 @@ import random as rd
 
 import matplotlib.pyplot as plt
 
-from abstract import *
-from incertitudes import *
+from visualisation.tools.abstract import *
+from visualisation.tools.incertitudes import *
 
 incertitude_values = (99999999, 999999999)
 

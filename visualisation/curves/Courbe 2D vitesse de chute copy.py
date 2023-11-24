@@ -1,19 +1,27 @@
+import sys
+
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 
-from data_reception import *
-from processing import *
-from speed import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
 
-Taille_pix, x, h = data("TableTennis/Résultat des expérience + graphe/Rebond table.txt")
+sys.path.insert(0, 'TableTennis/Interpolation_de_point')
+import visualisation.test.TEST_d_interpolation as it
+
+Taille_pix, x, h = data("TableTennis/calcul/Rebond table.txt")
 rebilitation_de_liste(x)
 rebilitation_de_liste_min(h)
 convertisseur(x, Taille_pix)
 convertisseur(h, Taille_pix)
-h = vitesse(h)
-x = vitesse(x)
-t = [k * 10e-3 for k in range(len(h))]
+fonction_interpolatrice_de_x = it.interpolation(x, 4)
+fonction_interpolatrice_de_x = it.der(fonction_interpolatrice_de_x)
+fonction_interpolatrice_de_h = it.interpolation(h, 4)
+fonction_interpolatrice_de_h = it.der(fonction_interpolatrice_de_h)
+t = [k * 10e-3 for k in range(int((len(h) - 8) * 100))]
+h = [fonction_interpolatrice_de_h(k + 8) for k in t]
+x = [fonction_interpolatrice_de_x(k + 8) for k in t]
 fig = plt.figure(tight_layout=True)
 gs = gridspec.GridSpec(2, 1)
 h = np.array(h)

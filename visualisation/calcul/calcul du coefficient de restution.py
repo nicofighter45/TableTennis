@@ -1,8 +1,8 @@
-from data_reception import *
-from processing import *
-from speed import *
+from visualisation.tools.calculus import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
 
-Taille_pix, h, x = data("TableTennis/Résultat des expérience + graphe/Rebond sur sol.txt")
+Taille_pix, h, x = data("TableTennis/calcul/Rebond sur sol.txt")
 
 
 def coefficient_de_rebond(liste):

@@ -1,15 +1,14 @@
 import math as mt
 
-import data_reception as dt
-import speed as sp
-from processing import *
+from visualisation.tools import calculus as sp, data_reception as dt
+from visualisation.tools.processing import *
 
 m = 7e-3
 rho = 1.293
 S = 8 / 3 * mt.pi * (4e-2) ** 2
 g = 9.81
 
-Taille_pix, h, x = dt.data("TableTennis/Résultat des expérience + graphe/Rebond sur raquette.txt")
+Taille_pix, h, x = dt.data("TableTennis/calcul/Rebond sur raquette.txt")
 
 
 def coefficient_de_frottement(position):

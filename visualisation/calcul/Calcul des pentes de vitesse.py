@@ -1,13 +1,13 @@
 import sys
 
-from data_reception import *
-from processing import *
-from speed import *
+from visualisation.tools.calculus import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
 
 sys.path.insert(0, 'TableTennis/Interpolation_de_point')
-import Test_Regression_linéaire as li
+import visualisation.test.Test_Regression_linéaire as li
 
-Taille_pix, h, x = data("TableTennis/Résultat des expérience + graphe/Courbe du robot.txt")
+Taille_pix, h, x = data("TableTennis/calcul/Courbe du robot.txt")
 rebilitation_de_liste(h)
 h = premièrevaleurhaute(h)
 h = descente(h)[:-1]

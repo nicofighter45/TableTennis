@@ -1,11 +1,11 @@
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 
-from data_reception import *
-from processing import *
-from speed import *
+from visualisation.tools.calculus import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
 
-Taille_pix, x, h = data("TableTennis/Résultat des expérience + graphe/Rebond table.txt")
+Taille_pix, x, h = data("TableTennis/calcul/Courbe du robot.txt")
 rebilitation_de_liste(x)
 rebilitation_de_liste_min(h)
 convertisseur(x, Taille_pix)
@@ -21,13 +21,13 @@ ax2 = fig.add_subplot(gs[1, 0])
 fig.subplots_adjust(wspace=0.5, hspace=0.5)
 ax1.set_title('acceleration sur Uy ', loc="center")
 ax2.set_title('acceleration sur Uz ', loc="center")
-ax2.plot(t, x, "b-")
-ax1.plot(t, h, "g-")
-ax2.legend(["Ay"], loc="upper right")
-ax1.legend(["Az"], loc="upper right")
+ax2.plot(t, h, "b-")
+ax1.plot(t, x, "g-")
+ax2.legend(["Az"], loc="upper right")
+ax1.legend(["Ay"], loc="upper right")
 ax2.set_xlabel('Temps')
-ax2.set_ylabel('Az')
+ax2.set_ylabel('Vz')
 ax1.set_xlabel('Temps')
-ax1.set_ylabel('Ay')
+ax1.set_ylabel('Vy')
 plt.show()
 plt.clf()

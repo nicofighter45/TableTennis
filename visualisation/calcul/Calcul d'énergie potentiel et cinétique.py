@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from data_reception import *
-from processing import *
-from speed import *
+from visualisation.tools.calculus import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
 
-Taille_pix, h, x = data("TableTennis/Visualisation/Résultat des expérience + graphe/Rebond table.txt")
+Taille_pix, h, x = data("TableTennis/Visualisation/calcul/Rebond table.txt")
 
 
 def courbe(h):
