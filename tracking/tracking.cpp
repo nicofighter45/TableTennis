@@ -28,8 +28,8 @@ void initTracking() {
 	roiSetup = true;
 
 	// default orange range, the best one we figured out for now
-	lower_color = HSVColor{ 5, 50, 50};
-	upper_color = HSVColor{ 45, 250, 250 };
+	lower_color = HSVColor{ 25, 120, 150};
+	upper_color = HSVColor{ 40, 255, 255 };
 }
 
 

@@ -121,7 +121,7 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 
 	if (center != NULL_POS) {
 		if (autoState) {
-			watchedZoom = 16;
+			watchedZoom = 4;
 			if (center.x + width / (2 * watchedZoom) >= width) {
 				watchedPos.x = width - width / watchedZoom - 1;
 			}
