@@ -18,7 +18,7 @@ int currentLoadedFrame;
 int watchedOpacity;
 float watchedZoom;
 Pos watchedPos;
-bool shouldBreak;
+bool isPromptActive;
 bool autoState;
 Pos reloadFromCamera;
 bool roiSetup;
@@ -26,4 +26,8 @@ Rect roi;
 
 Scalar getScalarFromHSVColor(HSVColor color) {
 	return Scalar(color.H, color.S, color.V);
+}
+
+int sq(int value) {
+	return value * value;
 }

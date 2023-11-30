@@ -21,7 +21,6 @@ void initTracking() {
 	actualWatchedFrame = 0;
 	watchedOpacity = 25; // from 0 to 100
 	watchedZoom = 1; // from 1 to 16
-	shouldBreak = false;
 	watchedPos = { 0, 0 };
 	autoState = true;
 	reloadFromCamera = NULL_POS;
@@ -125,6 +124,10 @@ void launchTracking(VideoCapture capture) {
 			reloadFromCamera = analyser.findBall();
 			if (reloadFromCamera != NULL_POS) {
 				center = analyser.findBall();
+				if (sq(center.x - reloadFromCamera.x) + sq(center.y - reloadFromCamera.y) 
+					>= sq(spacingBetweenCentersToStop)) {
+					autoState = false;
+				}
 				reloadFromCamera = NULL_POS;
 				auto finish = chrono::high_resolution_clock::now();
 				ms = chrono::duration_cast<chrono::milliseconds>(finish - start).count();
@@ -141,47 +144,52 @@ void launchTracking(VideoCapture capture) {
 
 		}
 
-		cout.rdbuf(out.rdbuf());
+		// cout.rdbuf(out.rdbuf());
+		cout << "prompt";
 		if (center == NULL_POS) {
 			showWindow(NULL_POS, readed_frame, ms);
 		}
 		else {
 			showWindow(inverse(center), analyser.getMixedMatrice(conversion), ms);
 		}
-		cout.rdbuf(stream_buffer_cout);
+		// cout.rdbuf(stream_buffer_cout);
 
 		if (roiSetup) {
 			cout.rdbuf(out.rdbuf());
 			chooseROI(analyser.getMixedMatrice(conversion));
 			cout.rdbuf(stream_buffer_cout);
-
-			cout << "ROI: " << roi << endl;
-			autoState = true;
-			center = NULL_POS;
-		}
-		if (currentLoadedFrame == actualWatchedFrame) {
-			if (watchedOpacity != conversion * 100) {
-				conversion = static_cast<float>(watchedOpacity) / 100;
-				shouldCalculate = false;
-
-			}
-			else {
+			if (!roiSetup) {
+				center = NULL_POS;
 				shouldCalculate = true;
+				capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
+				cout << "ROI: " << roi << endl;
 			}
-			continue;
-		}
-		shouldCalculate = true;
-		if (currentLoadedFrame == actualWatchedFrame + 1) {
-			analyser.setIsInitialSearch(true);
-			capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
-			currentLoadedFrame--;
-		}
-		else if (currentLoadedFrame == actualWatchedFrame - 1) {
-			currentLoadedFrame++;
 		}
 		else {
-			capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
-			currentLoadedFrame = actualWatchedFrame;
+			if (currentLoadedFrame == actualWatchedFrame) {
+				if (watchedOpacity != conversion * 100) {
+					conversion = static_cast<float>(watchedOpacity) / 100;
+					shouldCalculate = false;
+
+				}
+				else {
+					shouldCalculate = true;
+				}
+				continue;
+			}
+			shouldCalculate = true;
+			if (currentLoadedFrame == actualWatchedFrame + 1) {
+				analyser.setIsInitialSearch(true);
+				capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
+				currentLoadedFrame--;
+			}
+			else if (currentLoadedFrame == actualWatchedFrame - 1) {
+				currentLoadedFrame++;
+			}
+			else {
+				capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
+				currentLoadedFrame = actualWatchedFrame;
+			}
 		}
 		if (!capture.read(readed_frame)) {
 			cout << "End Video calculation" << endl;
