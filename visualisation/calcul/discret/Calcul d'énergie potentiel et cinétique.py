@@ -6,10 +6,7 @@ from visualisation.tools.calculus import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 
-Taille_pix, h, x = data("TableTennis/output/MVI_0009/tracked-2.txt")
-
-
-def courbe(h):
+def courbe(h,nombre):
     rebilitation_de_liste(h)
     h = premièrevaleurhaute(h)
     convertisseur(h, Taille_pix)
@@ -20,12 +17,12 @@ def courbe(h):
     plt.plot(t, potentiel, label="Énergie potentiel")
     plt.plot(t, cinetique, label="Énergie cinétique")
     plt.plot(t, Mecanique, label="Énergie mécanique")
-    plt.title("Évolution de l'énergie au cours du temps")
+    plt.title("Évolution de l'énergie au cours du temps / courbe {}".format(nombre))
     plt.ylabel("Énergie en Joule")
     plt.xlabel("Temps en seconde")
     plt.legend()
     plt.show()
     plt.clf()
-
-
-courbe(h)
+for k in range (15) :
+    Taille_pix, h, x = data("TableTennis/output/4-jets-de-balle/tracked-{}.txt".format(k))
+    courbe(x,k)

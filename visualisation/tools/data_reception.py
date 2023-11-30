@@ -13,7 +13,7 @@ def data(texte):
 
 def premièrevaleurhaute(liste):
     p = 0
-    for k in range(40):
+    for k in range(len(liste)//3):
         if liste[k] <= liste[k + 1]:
             p = k
     return liste[p + 1:]
