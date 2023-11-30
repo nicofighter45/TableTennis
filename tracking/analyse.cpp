@@ -81,7 +81,6 @@ Pos Analyser::calculateCenter(Pos position) {
     center = { static_cast<double>(totalX) / number_of_pixel_in_range,  static_cast<double>(totalY) / number_of_pixel_in_range };
     if (center != NULL_POS) {
         isInitialSearch = false;
-        addCubeToImage(ref(maskMatrice), center, 1, white);
     }
     return center;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 }
@@ -154,6 +153,9 @@ Mat Analyser::getMixedMatrice(float conversion) {
                 
             }
         }
+    }
+    if (center != NULL_POS) {
+        addCubeToImage(ref(mixedMatrice), center, 1, black);
     }
     return mixedMatrice;
 }

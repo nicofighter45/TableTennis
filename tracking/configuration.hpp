@@ -21,7 +21,7 @@ const int searchPixelMaxSpacing = 200;
 const int maxSearchAreaSize = 100;
 const int minimumPixelNeeded = 100;
 const int morePixelStart = 30;
-const int timeSpacing = 20;
+const int spacingBetweenCentersToStop = 20;
 
 const Vec3b white = Vec3b(255, 255, 255);
 const Vec3b black = Vec3b(0, 0, 0);
@@ -41,7 +41,7 @@ extern int currentLoadedFrame;
 extern int watchedOpacity;
 extern float watchedZoom;
 extern Pos watchedPos;
-extern bool shouldBreak;
+extern bool isPromptActive;
 extern bool autoState;
 extern Pos reloadFromCamera;
 extern bool roiSetup;
@@ -49,9 +49,7 @@ extern Rect roi;
 
 Scalar getScalarFromHSVColor(HSVColor color);
 
-void openCOUT();
-
-void closeCOUT();
+int sq(int value);
 
 
 #endif

@@ -8,7 +8,7 @@ using namespace std;
 using namespace cv;
 
 void initialisePrompts() {
-	shouldBreak = true;
+	isPromptActive = true;
 	namedWindow(windowName, WINDOW_NORMAL);
 	namedWindow(configurationWindowName, WINDOW_NORMAL);
 	resizeWindow(windowName, Size(width * windowScalar, height * windowScalar));
@@ -32,6 +32,7 @@ void createTrackbar(string name, int max_value, int& variable) {
 	createTrackbar(name, configurationWindowName, NULL, max_value, [](int value, void* userdata) {
 		int& variable = *static_cast<int*>(userdata);
 		variable = value;
+		isPromptActive = false;
 	}, &variable);
 	setTrackbarPos(name, configurationWindowName, variable);
 }
@@ -41,10 +42,11 @@ void chooseROI(Mat readed_frame) {
 	Size windowSize(width * windowScalar, height * windowScalar);
 
 	int mouseData[2] = { 0, 0 };
+	isPromptActive = true;
 
 	setMouseCallback(windowName, roiMouseCallback, mouseData);
 
-	while (true) {
+	while (isPromptActive) {
 
 		Mat temp_frame = readed_frame.clone();
 
@@ -62,6 +64,8 @@ void chooseROI(Mat readed_frame) {
 		int key = waitKeyEx(10);
 		if (key == 32) { //espace
 			actualWatchedFrame += 1;
+			autoState = true;
+			roiSetup = false;
 			setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
 			break;
 		}
@@ -116,6 +120,7 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 	Point imagePosition(0, 0);
 
 	int mouseData[2] = { 0, 0 };
+	isPromptActive = true;
 
 	setMouseCallback(windowName, mouseCallback, mouseData);
 
@@ -149,7 +154,7 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 		watchedZoom = 1;
 	}
 
-	while (shouldBreak) {
+	while (isPromptActive) {
 
 		Mat matrice = originalMatrice(Rect(watchedPos.x, watchedPos.y, width / watchedZoom, height / watchedZoom));
 
@@ -212,9 +217,6 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 			break;
 		}
 		if (autoState) {
-			if (center != NULL_POS && ms <= timeSpacing) {
-				this_thread::sleep_for(chrono::milliseconds(timeSpacing -ms));
-			}
 			actualWatchedFrame += 1;
 			setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
 			break;
@@ -257,8 +259,16 @@ void mouseCallback(int event, int x, int y, int flags, void* userdata) {
 		*((int*)userdata + 1) = y;
 		setNewWatchedPos(watchedPos.x + dx, watchedPos.y + dy, window_width, window_height);
 	}
+	if (flags == EVENT_MOUSEWHEEL) {
+		int delta = static_cast<int>(getMouseWheelDelta(flags)/120);
+		cout << "bou " << getMouseWheelDelta(flags) << endl;
+		actualWatchedFrame += delta;
+		setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
+		isPromptActive = false;
+	}
 	else if (flags == EVENT_MOUSEWHEEL) {
-		cout << "temp" << endl;
+		int delta = getMouseWheelDelta(flags);
+		cout << "bou2 " << delta << endl;
 	}
 }
 
