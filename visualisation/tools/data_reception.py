@@ -1,3 +1,4 @@
+Taille_pix =  137.1e-2/911
 def data(texte):
     with open(texte, "r") as file:
         h, x = [], []
@@ -6,7 +7,7 @@ def data(texte):
             cut = line[:-2].split(";")
             h.append(float(cut[0]))
             x.append(float(cut[1]))
-    Taille_pix, h, x = h[0] / x[0], h[1:], x[1:]
+    h, x = h[1:], x[1:]
     return Taille_pix, h, x
 
 

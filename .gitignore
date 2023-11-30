@@ -8,3 +8,4 @@
 *.pdb
 x64/
 .idea/
+__pycache__/

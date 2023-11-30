@@ -1,5 +1,6 @@
 import math as mt
-
+import sys
+sys.path.insert(0, 'TableTennis')
 from visualisation.tools import calculus as sp, data_reception as dt
 from visualisation.tools.processing import *
 
@@ -8,7 +9,7 @@ rho = 1.293
 S = 8 / 3 * mt.pi * (4e-2) ** 2
 g = 9.81
 
-Taille_pix, h, x = dt.data("TableTennis/calcul/Rebond sur raquette.txt")
+Taille_pix,h, x = dt.data("TableTennis/visualisation/temp txt file/magnus position.txt")
 
 
 def coefficient_de_frottement(position):

@@ -1,10 +1,11 @@
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-
+import sys
+sys.path.insert(0, 'TableTennis')
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 
-Taille_pix, h, x = data("TableTennis/calcul/test1-tracked.txt")
+Taille_pix, h, x = data("TableTennis/visualisation/temp txt file/Rebond sur raquette.txt")
 rebilitation_de_liste(h)
 convertisseur(h, Taille_pix)
 convertisseur(x, Taille_pix)

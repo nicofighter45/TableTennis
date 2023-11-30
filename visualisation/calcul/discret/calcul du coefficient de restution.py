@@ -1,7 +1,8 @@
+import sys
+sys.path.insert(0, 'TableTennis')
 from visualisation.tools.calculus import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
-
 Taille_pix, h, x = data("TableTennis/calcul/Rebond sur sol.txt")
 
 

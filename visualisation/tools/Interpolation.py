@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
-
+import sys
+sys.path.insert(0, 'TableTennis')
 from visualisation.tools.abstract import *
 
 intervalle = 1

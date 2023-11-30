@@ -1,19 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from data_reception import *
-from processing import *
-from speed import *
 import sys
-sys.path.insert(0, 'TableTennis/Visualisation/Interpolation_de_point')
-import TEST_d_interpolation as it
-Taille_pix, h,x = data('TableTennis/Visualisation/Résultat des expérience + graphe/Rebond sur raquette.txt')
+sys.path.insert(0, 'TableTennis')
+from visualisation.tools.calculus import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
+import visualisation.tools.Interpolation as it
+Taille_pix, h,x = data('TableTennis/output/MVI_0009/tracked-2.txt')
 rebilitation_de_liste(h)
 h=premièrevaleurhaute(h)
 convertisseur(h,Taille_pix)
 def courbe(h):
     interpolation_de_h = it.approximation(h,3)
     vitesse = it.der(interpolation_de_h)
-    t=[k*10e-3 for k in range(100*(len(h)-6))]
+    t=[k*10e-3 for k in range(100*(len(h)-7))]
     h = [interpolation_de_h(4*3+k) for k in t ]
     v = [vitesse(4*3+k) for k in t ]
     cinetique = energie_cinétique2(v)

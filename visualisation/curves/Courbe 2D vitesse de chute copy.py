@@ -1,14 +1,12 @@
 import sys
-
+import sys
+sys.path.insert(0, 'TableTennis')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
-
+from 
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
-
-sys.path.insert(0, 'TableTennis/Interpolation_de_point')
-import visualisation.test.TEST_d_interpolation as it
 
 Taille_pix, x, h = data("TableTennis/calcul/Rebond table.txt")
 rebilitation_de_liste(x)
