@@ -3,9 +3,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "simulations/friction.h"
-#include "simulations/magnus.h"
-#include "simulations/gravity.h"
+#include "../simulations/friction.h"
+#include "../simulations/magnus.h"
+#include "../simulations/gravity.h"
 #include "loader.hpp"
 
 using namespace std;

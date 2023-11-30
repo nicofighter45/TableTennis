@@ -156,6 +156,7 @@ void launchTracking(VideoCapture capture) {
 			cout.rdbuf(stream_buffer_cout);
 
 			cout << "ROI: " << roi << endl;
+			autoState = true;
 			center = NULL_POS;
 		}
 		if (currentLoadedFrame == actualWatchedFrame) {
