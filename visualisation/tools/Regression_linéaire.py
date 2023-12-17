@@ -61,7 +61,3 @@ def curv_trace(liste1, liste2, U1, U2, nom_graphe, y_label, x_label):
     ax.set_xlabel(x_label)
     plt.legend()
     plt.show()
-
-
-liste1 = [1, 2, 3, 4, 5]
-liste2 = [3.1, 4.9, 7.1, 8.8, 11.3]

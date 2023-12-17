@@ -28,13 +28,10 @@ def courbe(h):
     plt.clf()
 
 
-courbe(x)
-
-
 def courbe2(h):
     rebilitation_de_liste(h)
     h = premièrevaleurhaute(h)
-    convertisseur(h)
+    convertisseur(h,Taille_pix)
     t = [k * 10e-3 for k in range(len(h))]
     cinetique = np.array(energie_cinétique1(h)[:-1])
     plt.plot(t[1:-1], cinetique, label="Énergie cinétique de la vitesse selon Uy")

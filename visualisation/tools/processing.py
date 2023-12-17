@@ -34,14 +34,14 @@ def premièrevaleurhaute(liste):
     for k in range(17):
         if liste[k] <= liste[k + 1]:
             p = k
-    return (liste[p + 1:])
+    return (liste[p + 1:].copy())
 
 
 def descente(liste):
     p = 0
     while p + 1 < len(liste) and liste[p] >= liste[p + 1]:
         p += 1
-    return (liste[:p + 1])
+    return (liste[:p + 1].copy())
 
 
 def monte(liste):
@@ -62,3 +62,7 @@ def rebilitation_de_liste_max(liste):
     maxi = max(liste)
     for k in range(len(liste)):
         liste[k] = abs(maxi - liste[k])
+
+def Bond(liste) :
+    liste = descente(liste)
+    

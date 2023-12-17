@@ -9,7 +9,7 @@ rho = 1.293
 S = 8 / 3 * mt.pi * (4e-2) ** 2
 g = 9.81
 
-Taille_pix,h, x = dt.data("TableTennis/visualisation/temp txt file/magnus position.txt")
+Taille_pix,h, x = dt.data("TableTennis/output/4-jets-de-balle/tracked-0.txt")
 
 
 def coefficient_de_frottement(position):
