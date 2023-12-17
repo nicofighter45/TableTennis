@@ -5,7 +5,7 @@
 
 
 std::string const errorMsg("An error occured, we're deeply sorry :(");
-std::string const textPath("C:/Users/fagot/OneDrive/Documents/MPSI/TableTennis/data/en.txt");
+std::string const textPath("C:/Users/fagot/Code/TableTennis/data/en.txt");
 extern std::vector<std::string> paragraphs;
 void openFile();
 std::string replace(std::string str, std::string from, std::string to);

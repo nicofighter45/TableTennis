@@ -40,13 +40,13 @@ auto runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
         Vect3D magnusForce = vectorialProduct(speed, rotationVector, coefficient_magnus);
         cout << speed_size << " " << coefficient << " " << coefficient_magnus << " "
             << magnusForce.getX() << " " << magnusForce.getY() << " " << magnusForce.getZ() << " b " << gravity_and_archimede_const << endl << endl;
-        acceleration.setValue(coefficient * speed.getX() + magnusForce.getX(),
+        acceleration = Vect3D(coefficient * speed.getX() + magnusForce.getX(),
             coefficient * speed.getY() + magnusForce.getY(),
             coefficient * speed.getZ() + gravity_and_archimede_const + magnusForce.getZ());
-        speed.addValue(old_acceleration.getX() * interval,
+        speed += Vect3D(old_acceleration.getX() * interval,
             old_acceleration.getY() * interval,
             old_acceleration.getZ() * interval);
-        position.addValue(old_speed.getX() * interval,
+        position += Vect3D(old_speed.getX() * interval,
             old_speed.getY() * interval,
             old_speed.getZ() * interval);
 

@@ -6,7 +6,10 @@
 #include "../simulations/friction.h"
 #include "../simulations/magnus.h"
 #include "../simulations/gravity.h"
+#include "../simulations/RK4.h"
 #include "loader.hpp"
+#include "../tools/transfer.hpp"
+#include "../tracking/tracking.hpp"
 
 using namespace std;
 
@@ -58,6 +61,12 @@ void run()
     getline(cin, simulationType);
     cout << replace(paragraphs[1], "{type}", simulationType) << endl;
 
+    if (simulationType == "0") {
+        initTracking();
+        setupTracking();
+        return;
+    }
+
     string iniP, iniS;
 
     cout << paragraphs[2] << endl;
@@ -71,26 +80,36 @@ void run()
     Vect3D initialPosition = iniP;
     Vect3D initialSpeed = iniS;
 
-    cout << endl << paragraphs[4] << endl;
-
     if (simulationType == "1")
     {
-        runGravitySimulation(initialPosition, initialSpeed);
+
+        auto vectors = runGravitySimulation(initialPosition, initialSpeed);
+
     }
     else if (simulationType == "2")
     {
-        //print2DGraph(runFrictionSimulation(initialPosition, initialSpeed), "friction");
+
+        auto vectors = runFrictionSimulation(initialPosition, initialSpeed);
+
     }
     else if (simulationType == "3")
     {
-        auto vectors = runMagnusSimulation(initialPosition, initialSpeed);
 
-        //print2DGraph(get<0>(vectors), "magnus position");
-        //print2DGraph(get<1>(vectors), "magnus speed");
-        //print2DGraph(get<2>(vectors), "magnus acceleration");
+        auto vectors = runMagnusSimulation(initialPosition, initialSpeed);
+        allVectorsToTxt(get<0>(vectors), get<1>(vectors), get<2>(vectors));
+
+    }
+    else if (simulationType == "4") {
+
+        auto vectors = runRK4simulation(initialPosition, initialSpeed);
+        allVectorsToTxt(get<0>(vectors), get<1>(vectors), get<2>(vectors));
+
     }
     else
     {
+
         cerr << errorMsg << endl;
+        
     }
+
 }

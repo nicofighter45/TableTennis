@@ -25,6 +25,7 @@ void initTracking() {
 	autoState = true;
 	reloadFromCamera = NULL_POS;
 	roiSetup = true;
+	shouldCalculate = true;
 
 	// default orange range, the best one we figured out for now
 	lower_color = HSVColor{ 25, 120, 150};
@@ -111,7 +112,7 @@ void launchTracking(VideoCapture capture) {
 
 	cout << "ROI: " << roi << endl;
 
-	bool shouldCalculate = true;
+	bool reload = true;
 	float conversion = static_cast<float>(watchedOpacity) / 100;
 	Analyser analyser(ref(readed_frame));
 	Pos center = NULL_POS;
@@ -119,13 +120,12 @@ void launchTracking(VideoCapture capture) {
 
 	while (true) {
 		int ms = 0;
-		if (shouldCalculate) {
+		if (shouldCalculate && reload) {
 			auto start = chrono::high_resolution_clock::now();
 			reloadFromCamera = analyser.findBall();
 			if (reloadFromCamera != NULL_POS) {
 				center = analyser.findBall();
-				if (sq(center.x - reloadFromCamera.x) + sq(center.y - reloadFromCamera.y) 
-					>= sq(spacingBetweenCentersToStop)) {
+				if (distance(center, reloadFromCamera) >= spacingBetweenCentersToStop) {
 					autoState = false;
 				}
 				reloadFromCamera = NULL_POS;
@@ -144,15 +144,16 @@ void launchTracking(VideoCapture capture) {
 
 		}
 
-		// cout.rdbuf(out.rdbuf());
-		cout << "prompt";
-		if (center == NULL_POS) {
-			showWindow(NULL_POS, readed_frame, ms);
+		if (not roiSetup) {
+			cout.rdbuf(out.rdbuf());
+			if (center == NULL_POS) {
+				showWindow(NULL_POS, readed_frame, ms);
+			}
+			else {
+				showWindow(inverse(center), analyser.getMixedMatrice(conversion), ms);
+			}
+			cout.rdbuf(stream_buffer_cout);
 		}
-		else {
-			showWindow(inverse(center), analyser.getMixedMatrice(conversion), ms);
-		}
-		// cout.rdbuf(stream_buffer_cout);
 
 		if (roiSetup) {
 			cout.rdbuf(out.rdbuf());
@@ -164,20 +165,24 @@ void launchTracking(VideoCapture capture) {
 				capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
 				cout << "ROI: " << roi << endl;
 			}
+			else {
+				capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
+				currentLoadedFrame = actualWatchedFrame;
+			}
 		}
 		else {
 			if (currentLoadedFrame == actualWatchedFrame) {
 				if (watchedOpacity != conversion * 100) {
 					conversion = static_cast<float>(watchedOpacity) / 100;
-					shouldCalculate = false;
+					reload = false;
 
 				}
 				else {
-					shouldCalculate = true;
+					reload = true;
 				}
 				continue;
 			}
-			shouldCalculate = true;
+			reload = true;
 			if (currentLoadedFrame == actualWatchedFrame + 1) {
 				analyser.setIsInitialSearch(true);
 				capture.set(CAP_PROP_POS_FRAMES, actualWatchedFrame);
@@ -225,10 +230,21 @@ void saveTracking(map < int, Pos > positionsResults) {
 	}
 	int file_k = 0;
 	int nb_of_frame_not_null = 0;
+	int first_to_remove = 0;
+	vector<string> lines;
 	for (int i = 0; i <= total_frames; i++) {
 		if (positionsResults[i] == NULL_POS || positionsResults[i] == Pos{ 0, 0 }) {
 			if (nb_of_frame_not_null == 0) {
 				continue;
+			}
+			cout << first_to_remove << endl;
+			for (string line : lines) {
+				if (first_to_remove > 0) {
+					first_to_remove--;
+				}
+				else {
+					file << line << endl;
+				}
 			}
 			file.close();
 			if (nb_of_frame_not_null <= 5) {
@@ -246,10 +262,28 @@ void saveTracking(map < int, Pos > positionsResults) {
 				cerr << "Cannot save tracking data" << endl;
 			}
 			nb_of_frame_not_null = 0;
+			first_to_remove = 0;
 			continue;
 		}
 		nb_of_frame_not_null++;
-		file << positionsResults[i].x << ";" << positionsResults[i].y << ";" << endl;
+		if (nb_of_frame_not_null == 6) {
+			if (distance(positionsResults[i], positionsResults[i-5]) < 10.0) {
+				cout << first_to_remove << endl;
+				first_to_remove++;
+				nb_of_frame_not_null--;
+			}
+		}
+		lines.push_back(to_string(positionsResults[i].x) + ";"
+			+ to_string(positionsResults[i].y) + ";");
+	}
+	cout << first_to_remove << endl;
+	for (string line : lines) {
+		if (first_to_remove > 0) {
+			first_to_remove--;
+		}
+		else {
+			file << line << endl;
+		}
 	}
 	file.close();
 	if (nb_of_frame_not_null <= 5) {

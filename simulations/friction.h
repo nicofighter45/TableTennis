@@ -27,10 +27,10 @@ vector<tuple<double, double, double>> runFrictionSimulation(Vect3D initialPositi
     while (position.getZ() > 0)
     {
         speed_size = speed.size();
-        coefficient = -frottement_const * speed_size;
-        acceleration.setValue(coefficient * speed.getX(), coefficient * speed.getY(), coefficient * speed.getZ() + gravity_and_archimede_const);
-        speed.addValue(old_acceleration.getX() * interval, old_acceleration.getY() * interval, old_acceleration.getZ() * interval);
-        position.addValue(old_speed.getX() * interval, old_speed.getY() * interval, old_speed.getZ() * interval);
+        coefficient = -friction_constant * speed_size;
+        acceleration = Vect3D(coefficient * speed.getX(), coefficient * speed.getY(), coefficient * speed.getZ() + gravity_and_archimede_const);
+        speed = Vect3D(old_acceleration.getX() * interval, old_acceleration.getY() * interval, old_acceleration.getZ() * interval);
+        position = Vect3D(old_speed.getX() * interval, old_speed.getY() * interval, old_speed.getZ() * interval);
 
         positions.push_back(position.getValues());
         old_speed = speed;
@@ -70,9 +70,9 @@ Vect3D getFinalStateFriction(Vect3D initialPosition, Vect3D initialSpeed)
     {
         speed_size = speed.size();
         coefficient = -e * speed_size;
-        acceleration.setValue(coefficient * speed.getX(), coefficient * speed.getY(), coefficient * speed.getZ() - gravity);
-        speed.addValue(old_acceleration.getX() * interval, old_acceleration.getY() * interval, old_acceleration.getZ() * interval);
-        position.addValue(old_speed.getX() * interval, old_speed.getY() * interval, old_speed.getZ() * interval);
+        acceleration = Vect3D(coefficient * speed.getX(), coefficient * speed.getY(), coefficient * speed.getZ() - gravity);
+        speed += Vect3D(old_acceleration.getX() * interval, old_acceleration.getY() * interval, old_acceleration.getZ() * interval);
+        position += Vect3D(old_speed.getX() * interval, old_speed.getY() * interval, old_speed.getZ() * interval);
 
         old_speed = speed;
         old_acceleration = acceleration;
