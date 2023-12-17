@@ -23,6 +23,7 @@ bool autoState;
 Pos reloadFromCamera;
 bool roiSetup;
 Rect roi;
+bool shouldCalculate;
 
 Scalar getScalarFromHSVColor(HSVColor color) {
 	return Scalar(color.H, color.S, color.V);
@@ -30,4 +31,8 @@ Scalar getScalarFromHSVColor(HSVColor color) {
 
 int sq(int value) {
 	return value * value;
+}
+
+double distance(Pos pos1, Pos pos2) {
+	return sqrt(sq(pos1.x-pos2.x) + sq(pos1.y-pos2.y));
 }

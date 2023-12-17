@@ -70,8 +70,6 @@ void chooseROI(Mat readed_frame) {
 			break;
 		}
 	}
-
-	roiSetup = false;
 }
 
 void roiMouseCallback(int event, int x, int y, int flags, void* userdata) {
@@ -110,6 +108,19 @@ void roiMouseCallback(int event, int x, int y, int flags, void* userdata) {
 	
 		roi = Rect(x, y, roi_width, roi_height);
 
+	}
+	else if (event == EVENT_MOUSEWHEEL) {
+		int delta = static_cast<int>(getMouseWheelDelta(flags) / 120);
+		actualWatchedFrame += delta;
+		if (actualWatchedFrame < 0) {
+			actualWatchedFrame = 0;
+		}
+		else if (actualWatchedFrame >= total_frames) {
+			actualWatchedFrame = total_frames - 1;
+		}
+		setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
+		isPromptActive = false;
+		shouldCalculate = false;
 	}
 }
 
@@ -202,6 +213,7 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 		}
 		else if (key == 32) { //espace
 			autoState = not autoState;
+			shouldCalculate = true;
 			break;
 		}
 		else if (key == 99){ // c
@@ -259,16 +271,19 @@ void mouseCallback(int event, int x, int y, int flags, void* userdata) {
 		*((int*)userdata + 1) = y;
 		setNewWatchedPos(watchedPos.x + dx, watchedPos.y + dy, window_width, window_height);
 	}
-	if (flags == EVENT_MOUSEWHEEL) {
+	else if (event == EVENT_MOUSEWHEEL) {
 		int delta = static_cast<int>(getMouseWheelDelta(flags)/120);
-		cout << "bou " << getMouseWheelDelta(flags) << endl;
 		actualWatchedFrame += delta;
+		if (actualWatchedFrame < 0) {
+			actualWatchedFrame = 0;
+		}
+		else if (actualWatchedFrame >= total_frames) {
+			actualWatchedFrame = total_frames - 1;
+		}
 		setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
 		isPromptActive = false;
-	}
-	else if (flags == EVENT_MOUSEWHEEL) {
-		int delta = getMouseWheelDelta(flags);
-		cout << "bou2 " << delta << endl;
+		autoState = false;
+		shouldCalculate = false;
 	}
 }
 

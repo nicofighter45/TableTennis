@@ -14,7 +14,7 @@ static Vect3D getVector(double time, Vect3D initialPosition, Vect3D initialSpeed
                   +gravity_and_archimede_const / 2 * sq(time) + initialSpeed.getZ() * time + initialPosition.getZ());
 }
 
-vector<Vect3D> runGravitySimulation(Vect3D initialPosition, Vect3D initialSpeed)
+auto runGravitySimulation(Vect3D initialPosition, Vect3D initialSpeed)
 {
     vector<Vect3D> positions(1, initialPosition);
 

@@ -63,26 +63,12 @@ double Vect3D::getZ() const
 
 double Vect3D::size() const
 {
-    return std::sqrt(sq(x) + sq(y) + sq(z));
+    return sqrt(sq(x) + sq(y) + sq(z));
 }
 
 string Vect3D::toString() const
 {
-    return "X = " + to_string(x) + "\nY = " + to_string(y) + "\nZ = " + to_string(z);
-}
-
-void Vect3D::addValue(double xt, double yt, double zt)
-{
-    x += xt;
-    y += yt;
-    z += zt;
-}
-
-void Vect3D::setValue(double xt, double yt, double zt)
-{
-    x = xt;
-    y = yt;
-    z = zt;
+    return "x: " + to_string(x) + " y: " + to_string(y) + " z: " + to_string(z);
 }
 
 tuple<double, double, double> Vect3D::getValues() {
@@ -94,7 +80,12 @@ double sq(double number) {
 }
 
 Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v, double size) {
-    const double x(u.getY() * v.getZ() - u.getZ() * v.getY()), y(v.getX() * u.getZ() - u.getX() * v.getZ()), z(u.getX() * v.getY() - u.getY() * v.getX());
-    size /= std::sqrt(sq(x) + sq(y) + sq(z));
+    const double x(u.getY() * v.getZ() - u.getZ() * v.getY()), 
+        y(v.getX() * u.getZ() - u.getX() * v.getZ()), 
+        z(u.getX() * v.getY() - u.getY() * v.getX());
+    if (x == 0 and y == 0 and z == 0) {
+        return Vect3D(0, 0, 0);
+    }
+    size /= sqrt(sq(x) + sq(y) + sq(z));
     return Vect3D(x * size, y * size, z * size);
 }

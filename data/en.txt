@@ -1,9 +1,11 @@
 Welcome to tennis table c++ simulation !
 
-Here are the available simulations, please enter the corresponding number :
+Enter 0 for tracking
+For a simulation, enter the corresponding number :
 1) Without friction
 2) With friction
-3) Magnus effect
+3) With Magnus effect
+4) RK4 Magnus
 
 
 Nice, you've chosen simulation {type}!

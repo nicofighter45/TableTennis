@@ -46,10 +46,12 @@ extern bool autoState;
 extern Pos reloadFromCamera;
 extern bool roiSetup;
 extern Rect roi;
+extern bool shouldCalculate;
 
 Scalar getScalarFromHSVColor(HSVColor color);
 
 int sq(int value);
 
+double distance(Pos pos1, Pos pos2);
 
 #endif
