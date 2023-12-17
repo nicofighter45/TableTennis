@@ -5,13 +5,8 @@ sys.path.insert(0, 'TableTennis')
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 
-Taille_pix, h, x = data("TableTennis/calcul/Rebond table.txt")
-rebilitation_de_liste_max(h)
-rebilitation_de_liste_min(x)
-convertisseur(x, Taille_pix)
-convertisseur(h, Taille_pix)
+Taille_pix, h, x = data("TableTennis/output/4-jets-de-balle/tracked-14.txt")
 t = [k * 10e-3 for k in range(len(h))]
-print(h)
 fig = plt.figure(tight_layout=True)
 gs = gridspec.GridSpec(2, 1)
 ax1 = fig.add_subplot(gs[0, 0])
