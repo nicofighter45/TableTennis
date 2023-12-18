@@ -5,6 +5,7 @@ sys.path.insert(0, 'TableTennis')
 from visualisation.tools.calculus import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
+from visualisation.tools.incertitudes import *
 
 def courbe(h,nombre):
     rebilitation_de_liste(h)
@@ -25,9 +26,15 @@ def courbe(h,nombre):
     plt.ylabel("Énergie en Joule")
     plt.xlabel("Temps en seconde")
     plt.legend()
-    plt.show()
+    #plt.show()
     plt.clf()
+    return(max1)
 
+coefficient = []
 for k in range (15) :
     Taille_pix, h, x = data("TableTennis/output/4-jets-de-balle/tracked-{}.txt".format(k))
-    courbe(x,k)
+    liste = courbe(x,k)
+    for k in range (len(liste)-1) :
+        if liste[k+1]/liste[k] < 1 :
+            coefficient.append(mt.sqrt(liste[k+1]/liste[k]))
+print(moyenne(coefficient),incertitude_type_A(coefficient),max(coefficient),min(coefficient),len(coefficient),coefficient)
