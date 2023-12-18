@@ -35,7 +35,7 @@ public:
 
 double sq(double number);
 
-Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v, double size);
+Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v);
 
 inline Vect3D operator+(const Vect3D& vect1, const Vect3D& vect2) {
     return Vect3D(vect1.getX() + vect2.getX(), 

@@ -79,13 +79,7 @@ double sq(double number) {
     return number * number;
 }
 
-Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v, double size) {
-    const double x(u.getY() * v.getZ() - u.getZ() * v.getY()), 
-        y(v.getX() * u.getZ() - u.getX() * v.getZ()), 
-        z(u.getX() * v.getY() - u.getY() * v.getX());
-    if (x == 0 and y == 0 and z == 0) {
-        return Vect3D(0, 0, 0);
-    }
-    size /= sqrt(sq(x) + sq(y) + sq(z));
-    return Vect3D(x * size, y * size, z * size);
+Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v) {
+    return Vect3D(u.getY() * v.getZ() - u.getZ() * v.getY(),
+        v.getX() * u.getZ() - u.getX() * v.getZ(), u.getX() * v.getY() - u.getY() * v.getX());
 }
