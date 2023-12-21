@@ -30,7 +30,6 @@ def get_screen_size():
 
 
 def createTimeCurve(data, label):
-
     fig, axs = pyplot.subplots(3, 1, label=label, gridspec_kw=dict(hspace=0))
     for i in range(3):
         axs[i].plot(time, data[i])
@@ -50,14 +49,16 @@ def create_3d_subplot(data, label):
 
 width, height = get_screen_size()
 width, height = width//2, height//2
+space = 40
+height -= space
 createTimeCurve(positions, "Position")
 pyplot.get_current_fig_manager().window.setGeometry(0, 0, width, height)
 createTimeCurve(speeds, "Speed")
 pyplot.get_current_fig_manager().window.setGeometry(width, 0, width, height)
 createTimeCurve(accelerations, "Acceleration")
-pyplot.get_current_fig_manager().window.setGeometry(0, height, width, height)
+pyplot.get_current_fig_manager().window.setGeometry(0, height + space, width, height)
 create_3d_subplot(positions, "Position")
-pyplot.get_current_fig_manager().window.setGeometry(width, height, width, height)
+pyplot.get_current_fig_manager().window.setGeometry(width, height + space, width, height)
 
 pyplot.show()
 

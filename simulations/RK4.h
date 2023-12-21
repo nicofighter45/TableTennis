@@ -34,16 +34,17 @@ auto runRK4simulation(Vect3D initialPosition, Vect3D initialSpeed)
     Vect3D old_position(initialPosition);
     Vect3D speed(initialSpeed);
     Vect3D old_speed(speed);
-    Vect3D acceleration(0, 0, 0);
+    Vect3D acceleration(next_acceleration(speed));
 
     vector<tuple<double, double, double>> positions(1, initialPosition.getValues());
     vector<tuple<double, double, double>> speeds(1, initialSpeed.getValues());
     vector<tuple<double, double, double>> accelerations(1, tuple(0, 0, 0));
 
     int frame = 0;
+    int bounce = 0;
 
-    while (position.getX() >= -2 and position.getX() <= 2
-        and position.getY() >= -2 and position.getY() <= 2
+    while (position.getX() >= -10 and position.getX() <= 10
+        and position.getY() >= -10 and position.getY() <= 10
         and position.getZ() >= -1 and position.getZ() <= 10
         and frame < 10000){
 
@@ -58,7 +59,20 @@ auto runRK4simulation(Vect3D initialPosition, Vect3D initialSpeed)
         
         if (position.getZ() <= 0) {
 
-            double percentage = (old_position.getZ() + position.getZ()) / (old_position.getZ() - position.getZ());
+            if (bounce > 15) {
+                break;
+            }
+
+            bounce++;
+
+            double percentage = abs((old_position.getZ() + position.getZ()) / (old_position.getZ() - position.getZ()));
+            if (percentage < 0 or percentage > 1) {
+                cerr << "Percentage can't be out of 0 to 1 :" << endl
+                    << "Old_pos: " << old_position << endl
+                    << "Pos: " << position << endl
+                    << "Percentage: " << percentage << endl;
+                break;
+            }
             double new_X = old_position.getX()
                 + (old_position.getX() - position.getX()) * percentage
                 + Rdflat * (old_position.getX() - position.getX()) * (1 - percentage);
