@@ -271,4 +271,3 @@ def plot_Lagrange(y_interpolation):
     plt.ylabel('y')
     plt.title('Interpolation Lagrange de degré')
     plt.show()
-

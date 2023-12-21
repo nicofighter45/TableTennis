@@ -1,3 +1,10 @@
+def exponentiation_rapide(degre,valeur) :
+    liste=[1]
+    for k in range (degre+1) :
+        liste.append(liste[-1]*valeur)
+    return(liste)
+
+
 class indicatrice:
     def __init__(self, t1, t2):
         self.intervalle = (t1, t2)
@@ -96,8 +103,9 @@ class polynome:
 
     def __call__(self, valeur):
         somme = 0
+        liste = exponentiation_rapide(self.degre,valeur)
         for k in range(self.degre + 1):
-            somme += self.coefficient[k] * valeur ** k
+            somme += self.coefficient[k]*liste[k]
         return somme
 
     def __add__(self, a):
