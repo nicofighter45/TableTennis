@@ -13,9 +13,6 @@ auto runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
 
     double const rotation(0.001);
     Vect3D const rotationVector(-1, 0, 0);
-    double const S0(1);
-
-    double const magnus_const(S0 * rotation / mass);
 
     Vect3D position(initialPosition);
     Vect3D speed(initialSpeed);
@@ -36,10 +33,10 @@ auto runMagnusSimulation(Vect3D initialPosition, Vect3D initialSpeed)
     {
         speed_size = speed.size();
         coefficient = - friction_constant * speed_size;
-        Vect3D magnusForce = magnus_const * vectorialProduct(rotationVector, speed);
+        Vect3D magnusForce = magnus_constant * vectorialProduct(rotationVector, speed);
         acceleration = Vect3D(coefficient * speed.getX() + magnusForce.getX(),
             coefficient * speed.getY() + magnusForce.getY(),
-            coefficient * speed.getZ() + gravity_and_archimede_const + magnusForce.getZ());
+            coefficient * speed.getZ() - gravity + magnusForce.getZ());
         speed += Vect3D(old_acceleration.getX() * interval,
             old_acceleration.getY() * interval,
             old_acceleration.getZ() * interval);

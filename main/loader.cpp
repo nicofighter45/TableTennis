@@ -18,7 +18,7 @@ vector<string> paragraphs;
 void openFile()
 {
     ifstream textFile(textPath);
-    if (!textFile) cerr << errorMsg << "bou" << endl;
+    if (!textFile) cerr << errorMsg << endl;
     string line;
     string currentParagraph("");
     int space = 0;

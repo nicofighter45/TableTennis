@@ -28,7 +28,7 @@ vector<tuple<double, double, double>> runFrictionSimulation(Vect3D initialPositi
     {
         speed_size = speed.size();
         coefficient = -friction_constant * speed_size;
-        acceleration = Vect3D(coefficient * speed.getX(), coefficient * speed.getY(), coefficient * speed.getZ() + gravity_and_archimede_const);
+        acceleration = Vect3D(coefficient * speed.getX(), coefficient * speed.getY(), coefficient * speed.getZ() - gravity);
         speed = Vect3D(old_acceleration.getX() * interval, old_acceleration.getY() * interval, old_acceleration.getZ() * interval);
         position = Vect3D(old_speed.getX() * interval, old_speed.getY() * interval, old_speed.getZ() * interval);
 
@@ -53,7 +53,7 @@ vector<tuple<double, double, double>> runFrictionSimulation(Vect3D initialPositi
 Vect3D getFinalStateFriction(Vect3D initialPosition, Vect3D initialSpeed)
 {
 
-    double const e((rho * Cx * surface) / (2 * mass));
+    double const e((rho * Cd * surface) / (2 * mass));
 
     Vect3D position(initialPosition);
     Vect3D speed(initialSpeed);
