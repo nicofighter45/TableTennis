@@ -32,19 +32,19 @@ Physique (Mécanique)
 
 ### Bibliographie commentée (650 max)
 
-Les différents effets que l’on peut appliquer à la balle de Tennis de Table (lifté, coupé, latéraux, … ) rendent son mouvement imprévisible car il est très contre-intuitif. Cela peut être expliqué par différents paramètres tels que les forces de frottements fluides, la force de Magnus [[1]](###Références) et la mécanique du rebond.
+Les différents effets que l’on peut appliquer à la balle de Tennis de Table (lifté, coupé, latéraux, … ) rendent son mouvement imprévisible car il est très contre-intuitif. Cela peut être expliqué par différents paramètres tels que les forces de frottements fluides, la force de Magnus [[1]](#Références) et la mécanique du rebond.
 
-Lorsque la balle tourne sur elle-même, elle accélère ou décélère le fluide l’entourant entraînant une dépression induisant une Force de Magnus [[1]](###Références) à l’image de la balle de golf. Cette force est proportionnelle au coefficient de viscosité du fluide, à la vitesse de déplacement et la vitesse de rotation de la balle.
+Lorsque la balle tourne sur elle-même, elle accélère ou décélère le fluide l’entourant entraînant une dépression induisant une Force de Magnus [[1]](#Références) à l’image de la balle de golf. Cette force est proportionnelle au coefficient de viscosité du fluide, à la vitesse de déplacement et la vitesse de rotation de la balle.
 
-La balle étant assez légère et se déplaçant à une vitesse relativement rapide négliger les force de frottement fluide n’est pas possible. Le coefficient de Reynold qui nous donne le type de force de frottement s’appliquant à la balle est de l’ordre de XXX plaçant la balle dans un régime Supercritique : c’est à dire une force de frottement proportionnel au carré de la vitesse de la balle. [[2]](###Références)
+La balle étant assez légère et se déplaçant à une vitesse relativement rapide négliger les force de frottement fluide n’est pas possible. Le coefficient de Reynold qui nous donne le type de force de frottement s’appliquant à la balle est de l’ordre de XXX plaçant la balle dans un régime Supercritique : c’est à dire une force de frottement proportionnel au carré de la vitesse de la balle. [[2]](#Références)
 
 Le calcul des coefficients liée à la force de Magnus et au frottement fluide ne sont pas simple 
 
-Ensuite la balle de tennis de table semble admettre des discontinuités d’accélération et de vitesse lors des rebonds. De plus, on observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution [[7]](###Références). Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse d’après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol et la rotation de la balle.
+Ensuite la balle de tennis de table semble admettre des discontinuités d’accélération et de vitesse lors des rebonds. De plus, on observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution [[7]](#Références). Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse d’après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol et la rotation de la balle.
 
-Pour simuler le déplacement de la balle de tennis de table, l’on doit passer par l’approximation de son mouvement à partir des équations différentielles caractérisant son mouvement car elle n’est pas linéaire. Ainsi, à la place d’une méthode d’Euler classique, pour nos simulations la méthodes de Runge-Kutta[[6]](###Références).
+Pour simuler le déplacement de la balle de tennis de table, l’on doit passer par l’approximation de son mouvement à partir des équations différentielles caractérisant son mouvement car elle n’est pas linéaire. Ainsi, à la place d’une méthode d’Euler classique, pour nos simulations la méthodes de Runge-Kutta[[6]](#Références).
 
-Nous avons cherché à approximer le mouvement de la balle de tennis de table pour tout d’abord une vitesse et une accélération s’approchant de la réalité et pour acquérir plus de point avec les nombre de point fini que l’on avait déjà ainsi les Spline 2D [[5]](###Références5) ont permis cela.
+Nous avons cherché à approximer le mouvement de la balle de tennis de table pour tout d’abord une vitesse et une accélération s’approchant de la réalité et pour acquérir plus de point avec les nombre de point fini que l’on avait déjà ainsi les Spline 2D [[5]](#Références) ont permis cela.
 
 - La mécanique 
 - effet Magnus
