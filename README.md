@@ -12,11 +12,11 @@ D'un côté le tennis de table en lui-même est un sport, et de l'autre la créa
 
 ### Positionnements thématiques
 
-Informatique (Informatique pratique, Traitement d'images, Simulation)
+- Informatique (Informatique pratique, Traitement d'images, Simulation)
 
-Mathématique (Analyse)
+- Mathématiques (Analyse)
 
-Physique (Mécanique)
+- Physique (Mécanique)
 
 
 ### Mots clés
@@ -56,11 +56,29 @@ Comment réaliser une simulation numérique réaliste du déplacement d'une ball
 
 ### Objectifs
 
-Version Nicolas
-Réaliser une simulation numérique fidèle à la réalité du comportement des balles de tennis de table. Pour ce faire, il faudra réaliser un suivi automatisé de la balle en utilisant un programme coder en c++ qui utilise la colorimétrie de l’image pour repérer la balle dans celle-ci, récupérer avec sa position différents coefficients puis les utiliser pour calculer à partir de n’importe quelle situation initiale grâce à la méthode de Runge-Kutta 4, le déplacement de la balle dans l’air et après son sur la table rebond.
+Version Nicolas :
 
-Version Antoine
-Réaliser une simulation numérique fidèle à la réalité du comportement des balles de tennis de table. Pour ce faire, il faudra réaliser un suivi automatisé de la balle, récupérer avec sa position différents coefficients <insères tes trucs> puis les utiliser pour calculer le déplacement de la balle.
+Réaliser une simulation numérique fidèle à la réalité du comportement des balles de tennis de table :
+- Faire un suivi automatisé de la balle
+  - Utiliser un robot pour lancer des balles de façon régulière
+  - Utiliser c++ pour retrouver automatiquement la balle dans l'image à partir de sa colorimétrie
+  - Calculer à partir de la position dans l'image, la position réelle de la balle
+- Récupérer avec sa position différents coefficients
+- Utiliser ces coefficients dans une simulation
+  - Utiliser Runge-Kutta 4 pour résoudre les équations différentielles
+  - Modéliser le rebond de la balle
+  - Réaliser une représentation graphique de la simulation
+---
+Version Antoine :
+
+Réaliser une simulation numérique fidèle à la réalité du comportement des balles de tennis de table :
+- Faire un suivi automatisé de la balle
+- Traiter des données de position, vitesse et accélération
+  - En faire des représentations graphiques
+  - Récupérer les différents coefficients liée au modèle de mouvement de la balle pris en compte ( Magnus, frottement fluide )
+  - Approximer les valeurs pour essayer de passer d’un mouvement discret à un mouvement pseudo continu
+- Utiliser ces coefficients dans une simulation
+
 
 ### Références
 1. [The Dynamics of a Golf Ball 1 | Nature](sources/The-dynamics-of-a-golf-ball.pdf)
