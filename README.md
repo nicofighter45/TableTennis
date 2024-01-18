@@ -2,7 +2,7 @@
 
 ## Motivations
 
-Lorsque les athlètes des Jeux Olympiques s'entraînent, ils ont besoin de quelqu'un pour renvoyer la balle. Ainsi prédire la trajectoire de la balle dans toutes les situations possibles s'avère vitale pour la réalisation d'un jeu vidéo ou même d'un robot humanoïde jouant au tennis de table.
+Lorsque les athlètes des Jeux Olympiques s'entraînent, ils ont besoin de quelqu'un pour renvoyer la balle. Ainsi prédire la trajectoire de la balle dans toutes les situations possibles s'avère vital pour la réalisation d'un jeu vidéo ou même d'un robot humanoïde jouant au tennis de table.
 
 ## Ancrage
 
@@ -12,11 +12,11 @@ D'un côté le tennis de table en lui-même est un sport, et de l'autre la créa
 
 ### Positionnements thématiques
 
-- Informatique (Informatique pratique, Traitement d'images, Simulation)
+1. Informatique (Informatique pratique)
 
-- Mathématiques (Analyse)
+2. Physique (Mécanique)
 
-- Physique (Mécanique)
+3. Mathématiques (Analyse)
 
 
 ### Mots clés
@@ -26,13 +26,13 @@ D'un côté le tennis de table en lui-même est un sport, et de l'autre la créa
 | Tennis de Table      | Table Tennis             |
 | Frottement fluide    | Fluid Friction           |
 | Suivi                | Tracking                 |
-| B-spline             | B-Spline                 |
+| Courbe de Bézier     | B-Spline                 |
 | Simulation Numérique | Computational Simulation |
 
 
 ### Bibliographie commentée (650 max)
 
-Les différents effets que l’on peut appliquer à la balle de Tennis de Table (lifté, coupé, latéraux, … ) rendent son mouvement imprévisible car il est très contre-intuitif. Cela peut être expliqué par différents paramètres tels que les forces de frottements fluides, la force de Magnus [[1]](#Références) et la mécanique du rebond.
+Les différents effets que l’on peut appliquer à la balle de Tennis de Table (lifté, coupé, latéraux, … ) rendent son mouvement difficilement prévisible. Cela peut être expliqué par différents paramètres tels que les forces de frottements fluides, la force de Magnus [[1]](#Références) et la mécanique du rebond.
 
 Lorsque la balle tourne sur elle-même, elle accélère ou décélère le fluide l’entourant entraînant une dépression induisant une Force de Magnus [[1]](#Références) à l’image de la balle de golf. Cette force dépend du coefficient de viscosité du fluide, de la vitesse de déplacement et de la vitesse de rotation de la balle.
 
@@ -42,13 +42,18 @@ Le calcul des coefficients liés à la force de Magnus et aux frottements fluide
 
 On calcule numériquement avec l’aide d’une caméra et d’un programme c++ développé pour l’occasion, sa position dans l’image de laquelle on déduit celle dans la réalité, comme dans cette étude japonaise [[3]](#Références).
 
-Il faut ensuite approximer la position pour retirer les défauts de la capture de cette position à la caméra en utilisant des courbes Spline 2D [[5]](#Références). On peut, grâce à cette étape déduire la vitesse et l’accélération de façon à obtenir les différents coefficients.
 
-En revanche, l’accélération et la vitesse de la balle de tennis de table semblent admettre des discontinuités lors des rebonds. On observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution [[7]](#Références). Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse d’après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol ainsi que la rotation de la balle.
 
-Pour simuler le déplacement de la balle de tennis de table, une résolution numérique des équations différentielles est nécessaire car ces dernières sont trop complexes pour obtenir une solution explicite. On opte également pour une méthode plus sophistiquée que la méthode d’Euler afin de gagner en précision, la méthode de Runge-Kutta 4 [[6]](#Références).
+à réécrire :
 
-Enfin, on crée un petit programme qui vient à partir d’une situation initiale calculée grâce à la simulation, la trajectoire de la balle dans l’air avec précision.
+"Il faut ensuite approximer la position pour retirer les défauts de la capture de cette position à la caméra en utilisant des courbes Spline 2D [[5]](#Références). On peut, grâce à cette étape déduire la vitesse et l’accélération de façon à obtenir les différents coefficients."
+
+
+En revanche, l’accélération et la vitesse de la balle de tennis de table semblent admettre des discontinuités lors des rebonds. On observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution [[7]](#Références). Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol ainsi que la rotation de la balle.
+
+Pour simuler le déplacement de la balle de tennis de table, une résolution numérique des équations différentielles est nécessaire car ces dernières sont insolvables de façon explicite. On opte pour une méthode plus sophistiquée que la méthode d’Euler afin de gagner en précision, la méthode de Runge-Kutta 4 [[6]](#Références) coder en c++.
+
+Enfin, on crée un petit programme qui vient, à partir d’une situation initiale, calculer grâce à la simulation, la trajectoire de la balle dans l’air avec précision.
 
 ### Problématique
 
