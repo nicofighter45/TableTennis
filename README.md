@@ -34,22 +34,20 @@ D'un côté le tennis de table en lui-même est un sport, et de l'autre la créa
 
 Les différents effets que l’on peut appliquer à la balle de Tennis de Table (lifté, coupé, latéraux, … ) rendent son mouvement difficilement prévisible. Cela peut être expliqué par différents paramètres tels que les forces de frottements fluides, la force de Magnus [[1]](#Références) et la mécanique du rebond.
 
-Lorsque la balle tourne sur elle-même, elle accélère ou décélère le fluide l’entourant entraînant une dépression induisant une Force de Magnus [[1]](#Références) à l’image de la balle de golf. Cette force dépend du coefficient de viscosité du fluide, de la vitesse de déplacement et de la vitesse de rotation de la balle.
+La balle étant assez légère et se déplaçant à une vitesse relativement élevée, il est nécessaire de prendre en compte la force de frottements exercée par l'air : c'est la force de trainée. Le nombre de Reynold qui nous donne le type de force de frottement s’appliquant à la balle est de l’ordre de $10^5$ plaçant la balle dans un régime critique où la une force de frottement est proportionnel au carré de la vitesse de la balle. [[2]](#Références)
 
-La balle étant assez légère et se déplaçant à une vitesse relativement rapide négliger les force de frottement fluide n’est pas possible. Le coefficient de Reynold qui nous donne le type de force de frottement s’appliquant à la balle est de l’ordre de $10^5$ plaçant la balle dans un régime Supercritique : c’est à dire une force de frottement proportionnel au carré de la vitesse de la balle. [[2]](#Références)
+Lorsque on donne de l'effet à la balle, elle accélère ou décélère le fluide l’entourant entraînant une dépression induisant une Force de Magnus, perpendiculaire à son vecteur vitesse. Ce type de mouvement est également observable avec une balle de golf [[1]](#Références). Cette force dépend du coefficient de viscosité du fluide, de la vitesse de déplacement et de la vitesse de rotation de la balle.
 
-Le calcul des coefficients liés à la force de Magnus et aux frottements fluides ne sont pas simples. En effet, les entreprises gouvernementales telles que la NASA [[4]](#Références) ont utilisé des souffleries pour pouvoir calculer ces coefficients avec précisions. Dans notre cas, on va se contenter pour des raisons de simplicité dans la prise des mesures, d’un simple lancé de balle à l’aide d’un robot.
+La mesure des coefficients liés à la force de trainée et à la force de Magnus ne sont pas simples. En effet, les entreprises gouvernementales telles que la NASA [[4]](#Références) ont utilisé des souffleries pour pouvoir mesurer ces coefficients avec précisions. Dans notre cas, on va prendre des mesures à l'aide d'un robot lanceur de balles et d'une caméra pour pouvoir enregistrer la position de la balle.
 
-On calcule numériquement avec l’aide d’une caméra et d’un programme c++ développé pour l’occasion, sa position dans l’image de laquelle on déduit celle dans la réalité, comme dans cette étude japonaise [[3]](#Références).
-
+On calcule numériquement à l'aide d’un programme c++ développé pour l’occasion, la position de la balle dans l’image puis on en déduit sa position réelle, comme dans cette étude japonaise [[3]](#Références).
 
 
 à réécrire :
 
 "Il faut ensuite approximer la position pour retirer les défauts de la capture de cette position à la caméra en utilisant des courbes Spline 2D [[5]](#Références). On peut, grâce à cette étape déduire la vitesse et l’accélération de façon à obtenir les différents coefficients."
 
-
-En revanche, l’accélération et la vitesse de la balle de tennis de table semblent admettre des discontinuités lors des rebonds. On observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution [[7]](#Références). Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol ainsi que la rotation de la balle.
+En revanche, l’accélération et la vitesse de la balle de tennis de table semblent admettre des discontinuités lors des rebonds. On observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution. Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol ainsi que la rotation de la balle.
 
 Pour simuler le déplacement de la balle de tennis de table, une résolution numérique des équations différentielles est nécessaire car ces dernières sont insolvables de façon explicite. On opte pour une méthode plus sophistiquée que la méthode d’Euler afin de gagner en précision, la méthode de Runge-Kutta 4 [[6]](#Références) coder en c++.
 
@@ -86,10 +84,9 @@ Réaliser une simulation numérique fidèle à la réalité du comportement des 
 
 
 ### Références
-1. [The Dynamics of a Golf Ball 1 | Nature](sources/The-dynamics-of-a-golf-ball.pdf)
+1. [The Dynamics of a Golf Ball 1 | Nature 85 (1910), 251–257](sources/The-dynamics-of-a-golf-ball.pdf)
 2. [Bubbles, Drops, and Particles Roland Clift, John R. Grace, Martien E. Weber](sources/Bubbles-drops-and-particles.epub)
 3. [Robotic Table Tennis based on Physical Models of Aerodynamics and Rebounds, Akira Nakashima, Yuki Ogawa, Chunfang Liu and Yoshikazu Hayakawa, International Conference on Robotics and Biomimetics, December 7-11, 2011, Phuket, Thailand](sources/Robotic-Table-Tennis-based-on-Physical-Models-of-Aerodynamics-and-Rebounds.pdf)
 4. [NACA test of spheres with reference to reynolds number, turbulence, and surface roughness](sources/NACA-test-of-spheres-with-reference-to-reynolds-number-turbulence-and-surface-roughness.pdf)
 5. [Interpolation et approximation de données à l’aide de courbes et surfaces paramétriques de type B-splines](sources/Splines-3D.pdf)
 6. [Analyse numérique et équations différentielles, Jean-Pierre Demailly](sources/Analyse-numérique-et-équations-différentielles-Jean-Pierre-DEMAILLY.pdf)
-7. [Tennis de table : physique du rebond](sources/Tennis-de-table-physique-du-rebond.pdf)
