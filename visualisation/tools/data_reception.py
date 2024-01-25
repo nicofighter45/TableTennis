@@ -11,6 +11,12 @@ def data(texte):
     h, x = h[1:], x[1:]
     return Taille_pix, h, x
 
+def vitesse(position):
+    vitesse = []
+    p = 1
+    for k in range(len(position) - 1):
+        vitesse.append((position[k + 1] - position[k]) / (1e-2 * p))
+    return vitesse
 
 def premièrevaleurhaute(liste):
     p = 0
@@ -81,9 +87,18 @@ def bond_division(liste):
     min = 0
     for k in range (1,len(liste)-1) :
         if liste[k] < liste[k+1] and liste[k] < liste[k-1] :
-            subdivision.append((min,k))
+            subdivision.append([min,k])
             min = k+1
     return(subdivision)
+
+def premier_rebond(t):
+    fin = -1
+    v = vitesse(t)
+    for i in range(1, len(t)):
+        if v[i - 1] > 0 and v[i] < 0:
+            fin = i
+    if fin == -1 : raise TypeError("Pas de rebond")
+    else : return t[0:fin]
 
 def haut_du_bond(liste):
     liste1=[]
