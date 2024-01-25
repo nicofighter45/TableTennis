@@ -34,7 +34,7 @@ D'un côté le tennis de table en lui-même est un sport, et de l'autre la créa
 
 Les différents effets que l’on peut appliquer à la balle de Tennis de Table (lifté, coupé, latéraux, … ) rendent son mouvement difficilement prévisible. Cela peut être expliqué par différents paramètres tels que les forces de frottements fluides, la force de Magnus [[1]](#Références) et la mécanique du rebond.
 
-La balle étant assez légère et se déplaçant à une vitesse relativement élevée, il est nécessaire de prendre en compte la force de frottements exercée par l'air : c'est la force de trainée. Le nombre de Reynold qui nous donne le type de force de frottement s’appliquant à la balle est de l’ordre de $10^5$ plaçant la balle dans un régime critique où la une force de frottement est proportionnel au carré de la vitesse de la balle. [[2]](#Références)
+La balle étant assez légère et se déplaçant à une vitesse relativement élevée, il est nécessaire de prendre en compte la force de frottements exercée par l'air : c'est la force de trainée. Le nombre de Reynold qui nous donne le type de force de frottement s’appliquant à la balle est de l’ordre de 100 mille plaçant la balle dans un régime critique où la une force de frottement est proportionnel au carré de la vitesse de la balle. [[2]](#Références)
 
 Lorsque on donne de l'effet à la balle, elle accélère ou décélère le fluide l’entourant entraînant une dépression induisant une Force de Magnus, perpendiculaire à son vecteur vitesse. Ce type de mouvement est également observable avec une balle de golf [[1]](#Références). Cette force dépend du coefficient de viscosité du fluide, de la vitesse de déplacement et de la vitesse de rotation de la balle.
 

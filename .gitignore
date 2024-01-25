@@ -4,6 +4,7 @@ __pycache__/
 .idea/
 
 x64/
+output/simulations/
 *.exe
 *.pdb
 *.sln
