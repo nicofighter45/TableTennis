@@ -9,7 +9,7 @@ from visualisation.tools.incertitudes import *
 
 def courbe(h,nombre):
     rebilitation_de_liste(h)
-    h = premièrevaleurhaute(h)
+    h = premièrevaleurhaute(h,1)
     convertisseur(h, Taille_pix)
     t = [k * 10e-3 for k in range(len(h))]
     potentiel = np.array(energie_potentielle(h))
@@ -26,7 +26,7 @@ def courbe(h,nombre):
     plt.ylabel("Énergie en Joule")
     plt.xlabel("Temps en seconde")
     plt.legend()
-    #plt.show()
+    plt.show()
     plt.clf()
     return(max1)
 

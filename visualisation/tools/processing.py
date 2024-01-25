@@ -29,12 +29,10 @@ def convertisseur(liste, Taille_pix):
         liste[k] = liste[k] * Taille_pix
 
 
-def premièrevaleurhaute(liste):
-    p = 0
-    for k in range(17):
-        if liste[k] <= liste[k + 1]:
-            p = k
-    return (liste[p + 1:].copy())
+def premièrevaleurhaute(t, epsilon):
+    for i in range(1, len(t)):
+        if abs(t[i] - t[i-1]) > epsilon:
+            return t[i:]
 
 
 def descente(liste):
