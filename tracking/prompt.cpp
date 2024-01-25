@@ -69,6 +69,10 @@ void chooseROI(Mat readed_frame) {
 			setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
 			break;
 		}
+		if (key == 114) { // r
+			shouldCalculate = not shouldCalculate;
+			break;
+		}
 	}
 }
 
@@ -107,6 +111,15 @@ void roiMouseCallback(int event, int x, int y, int flags, void* userdata) {
 		}
 	
 		roi = Rect(x, y, roi_width, roi_height);
+
+		if (x + roi_width > width) {
+			roi = Rect(x, y, width - x, roi_height);
+			if (y + roi_height > height) {
+				roi = Rect(x, y, width - x, height - y);
+			}
+		}else if (y + roi_height > height) {
+			roi = Rect(x, y, roi_width, height - y);
+		}
 
 	}
 	else if (event == EVENT_MOUSEWHEEL) {
@@ -179,19 +192,17 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 		imshow(windowName, window_image);
 
 		int key = waitKeyEx(10);
-		if (key == 2424832) {  //left_arrow_key
-			if (actualWatchedFrame > 0) {
-				actualWatchedFrame -= 1;
-				setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
-				break;
-			}
+		if (key == 2424832 && actualWatchedFrame > 0) {  //left_arrow_key
+			actualWatchedFrame -= 1;
+			setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
+			break;
 		}
-		else if (key == 2555904) {  //right_arrow_key
+		if (key == 2555904) {  //right_arrow_key
 			actualWatchedFrame += 1;
 			setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
 			break;
 		}
-		else if (key == 2621440) {  //down_arrow_key
+		if (key == 2621440) {  //down_arrow_key
 			if (watchedOpacity < 75) {
 				watchedOpacity += 25;
 			}
@@ -201,7 +212,7 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 			setTrackbarPos("Opacity", configurationWindowName, watchedOpacity);
 			break;
 		}
-		else if (key == 2490368) {  //up_arrow_key
+		if (key == 2490368) {  //up_arrow_key
 			if (watchedOpacity > 25) {
 				watchedOpacity -= 25;
 			}
@@ -211,19 +222,19 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 			setTrackbarPos("Opacity", configurationWindowName, watchedOpacity);
 			break;
 		}
-		else if (key == 32) { //espace
+		if (key == 32) { //espace
 			autoState = not autoState;
 			shouldCalculate = true;
 			break;
 		}
-		else if (key == 99){ // c
+		if (key == 99){ // c
 			reloadFromCamera = inverse(center);
 			break;
 		}
-		else if (key == 114){ // r
+		if (key == 114){ // r
 			break;
 		}
-		else if (key == 115) { // s
+		if (key == 115) { // s
 			roiSetup = true;
 			autoState = false;
 			break;

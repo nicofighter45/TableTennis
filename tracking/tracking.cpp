@@ -118,10 +118,11 @@ void launchTracking(VideoCapture capture) {
 	Pos center = NULL_POS;
 	map < int, Pos > positionsResults;
 
+
 	while (true) {
+		auto loop_time_start = chrono::high_resolution_clock::now();
 		int ms = 0;
 		if (shouldCalculate && reload) {
-			auto start = chrono::high_resolution_clock::now();
 			reloadFromCamera = analyser.findBall();
 			if (reloadFromCamera != NULL_POS) {
 				center = analyser.findBall();
@@ -129,20 +130,16 @@ void launchTracking(VideoCapture capture) {
 					autoState = false;
 				}
 				reloadFromCamera = NULL_POS;
-				auto finish = chrono::high_resolution_clock::now();
-				ms = chrono::duration_cast<chrono::milliseconds>(finish - start).count();
-				cout << "Frame " << capture.get(CAP_PROP_POS_FRAMES) - 1 << " center " << center << " in "
-					<< ms << "ms" << endl;
 			}
 			else {
 				center = NULL_POS;
-				auto finish = chrono::high_resolution_clock::now();
-				ms = chrono::duration_cast<chrono::milliseconds>(finish - start).count();
-				cout << "Frame " << capture.get(CAP_PROP_POS_FRAMES) - 1 << " no center in " << ms << "ms" << endl;
+				cout << "Frame " << capture.get(CAP_PROP_POS_FRAMES) - 1 << " no center" << endl;
 			}
 			positionsResults[currentLoadedFrame] = center;
 
 		}
+
+		auto loop_time_second = chrono::high_resolution_clock::now();
 
 		if (not roiSetup) {
 			cout.rdbuf(out.rdbuf());
@@ -154,6 +151,8 @@ void launchTracking(VideoCapture capture) {
 			}
 			cout.rdbuf(stream_buffer_cout);
 		}
+
+		auto loop_time_third = chrono::high_resolution_clock::now();
 
 		if (roiSetup) {
 			cout.rdbuf(out.rdbuf());
@@ -196,6 +195,20 @@ void launchTracking(VideoCapture capture) {
 				currentLoadedFrame = actualWatchedFrame;
 			}
 		}
+		auto loop_time_last = chrono::high_resolution_clock::now();
+		cout << "Loop calc" <<
+			chrono::duration_cast<chrono::milliseconds>
+			(loop_time_second - loop_time_start).count() << "ms" << endl
+			<< "Loop visu" <<
+			chrono::duration_cast<chrono::milliseconds>
+			(loop_time_third - loop_time_second).count() << "ms" << endl
+			<< "Loop new" <<
+			chrono::duration_cast<chrono::milliseconds>
+			(loop_time_last - loop_time_third).count() << "ms" << endl
+			<< "Loop total" <<
+			chrono::duration_cast<chrono::milliseconds>
+			(loop_time_last - loop_time_start).count() << "ms" << endl
+			<< endl;
 		if (!capture.read(readed_frame)) {
 			cout << "End Video calculation" << endl;
 			shutDownPrompt();
