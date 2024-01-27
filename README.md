@@ -2,11 +2,11 @@
 
 ## Motivations
 
-Lorsque les athlètes des Jeux Olympiques s'entraînent, ils ont besoin de quelqu'un pour renvoyer la balle. Ainsi prédire la trajectoire de la balle dans toutes les situations possibles s'avère vital pour la réalisation d'un jeu vidéo ou même d'un robot humanoïde jouant au tennis de table.
+Le tennis de table est un sport de balle où les échanges sont extrêmement rapides. Cela implique donc d'avoir de bons réflexes et une bonne lecture de la trajectoire de la balle. Il m'a donc semblé intéressant d'identifier les différentes forces s’exerçant sur la balle pour prévoir précisément sa trajectoire.
 
 ## Ancrage
 
-D'un côté le tennis de table en lui-même est un sport, et de l'autre la création d'une simulation numérique en relation avec ce sport peut être utile dans la création d'un jeu vidéo.
+Le tennis de table est une discipline sportive où les effets de balles sont au cœur de la dynamique de jeu rendant les trajectoires de balles difficiles à prévoir après rebond. L'étude de la mécanique du rebond est donc essentiel a une prévision précise de la trajectoire de balle.
 
 ## Mise en Cohérence des Objectifs du TIPE (MCOT)
 
@@ -42,12 +42,9 @@ La mesure des coefficients liés à la force de trainée et à la force de Magnu
 
 On calcule numériquement à l'aide d’un programme c++ développé pour l’occasion, la position de la balle dans l’image puis on en déduit sa position réelle, comme dans cette étude japonaise [[3]](#Références).
 
+Ensuite, en approximant le mouvement de la balle par des courbes de Bézier [[5]](#Références), on déduit de la position la vitesse et l'accélération.
 
-à réécrire :
-
-"Il faut ensuite approximer la position pour retirer les défauts de la capture de cette position à la caméra en utilisant des courbes Spline 2D [[5]](#Références). On peut, grâce à cette étape déduire la vitesse et l’accélération de façon à obtenir les différents coefficients."
-
-En revanche, l’accélération et la vitesse de la balle de tennis de table semblent admettre des discontinuités lors des rebonds. On observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution. Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol ainsi que la rotation de la balle.
+En revanche, l’accélération et la vitesse de la balle de tennis de table admettent des discontinuités lors des rebonds. On observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution. Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol ainsi que la rotation de la balle.
 
 Pour simuler le déplacement de la balle de tennis de table, une résolution numérique des équations différentielles est nécessaire car ces dernières sont insolvables de façon explicite. On opte pour une méthode plus sophistiquée que la méthode d’Euler afin de gagner en précision, la méthode de Runge-Kutta 4 [[6]](#Références) coder en c++.
 
@@ -78,9 +75,9 @@ Réaliser une simulation numérique fidèle à la réalité du comportement des 
 - Faire un suivi automatisé de la balle
 - Traiter des données de position, vitesse et accélération
   - En faire des représentations graphiques
-  - Récupérer les différents coefficients liée au modèle de mouvement de la balle pris en compte ( Magnus, frottement fluide )
-  - Approximer les valeurs pour essayer de passer d’un mouvement discret à un mouvement pseudo continu
-- Utiliser ces coefficients dans une simulation
+  - Déterminer les différents coefficients caractérisant les forces s'exerçant sur la balle ( Magnus, frottement fluide )
+  - Écrire un rpogramme permettant d'ajuster les pointts expérimentaux par une fonction polynomiale continue
+- Utiliser ces coefficients dans une simulation permettant de déterminer la trajectoire de la balle étant donné les conditions initiales
 
 
 ### Références
