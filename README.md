@@ -6,7 +6,7 @@ Le tennis de table est un sport de balle où les échanges sont extrêmement rap
 
 ## Ancrage
 
-Le tennis de table est une discipline sportive où les effets de balles sont au cœur de la dynamique de jeu rendant les trajectoires de balles difficiles à prévoir après rebond. L'étude de la mécanique du rebond est donc essentiel a une prévision précise de la trajectoire de balle.
+Le tennis de table est une discipline sportive où les effets de balles sont au cœur de la dynamique de jeu rendant les trajectoires de balles difficiles à prévoir après rebond. L'étude de la mécanique du rebond et des frottements fluides est donc essentiel pour prévoir la trajectoire de balle.
 
 ## Mise en Cohérence des Objectifs du TIPE (MCOT)
 
@@ -75,7 +75,7 @@ Réaliser une simulation numérique fidèle à la réalité du comportement des 
 - Traiter des données de position, vitesse et accélération
   - En faire des représentations graphiques
   - Déterminer les différents coefficients caractérisant les forces s'exerçant sur la balle ( Magnus, frottement fluide )
-  - Écrire un rpogramme permettant d'ajuster les pointts expérimentaux par une fonction polynomiale continue
+  - Écrire un programme permettant d'ajuster les pointts expérimentaux par une fonction polynomiale continue
 - Utiliser ces coefficients dans une simulation permettant de déterminer la trajectoire de la balle étant donné les conditions initiales
 
 
