@@ -62,7 +62,6 @@ Réaliser une simulation numérique fidèle à la réalité du comportement des 
 - Faire un suivi automatisé de la balle
   - Utiliser un robot pour lancer des balles de façon régulière
   - Utiliser c++ pour retrouver automatiquement la balle dans l'image à partir de sa colorimétrie
-  - Calculer à partir de la position dans l'image, la position réelle de la balle
 - Récupérer avec sa position différents coefficients
 - Utiliser ces coefficients dans une simulation
   - Utiliser Runge-Kutta 4 pour résoudre les équations différentielles
@@ -81,9 +80,11 @@ Réaliser une simulation numérique fidèle à la réalité du comportement des 
 
 
 ### Références
-1. [The Dynamics of a Golf Ball 1 | Nature 85 (1910), 251–257](sources/The-dynamics-of-a-golf-ball.pdf)
-2. [Bubbles, Drops, and Particles Roland Clift, John R. Grace, Martien E. Weber](sources/Bubbles-drops-and-particles.epub)
-3. [Robotic Table Tennis based on Physical Models of Aerodynamics and Rebounds, Akira Nakashima, Yuki Ogawa, Chunfang Liu and Yoshikazu Hayakawa, International Conference on Robotics and Biomimetics, December 7-11, 2011, Phuket, Thailand](sources/Robotic-Table-Tennis-based-on-Physical-Models-of-Aerodynamics-and-Rebounds.pdf)
-4. [NACA test of spheres with reference to reynolds number, turbulence, and surface roughness](sources/NACA-test-of-spheres-with-reference-to-reynolds-number-turbulence-and-surface-roughness.pdf)
-5. [Interpolation et approximation de données à l’aide de courbes et surfaces paramétriques de type B-splines](sources/Splines-3D.pdf)
-6. [Analyse numérique et équations différentielles, Jean-Pierre Demailly](sources/Analyse-numérique-et-équations-différentielles-Jean-Pierre-DEMAILLY.pdf)
+|Numéro|Auteur|Titre|Référence/URL|
+|---|---|---|---|
+|1|J. J. Thomson|The Dynalmics of a Golf Ball|[Nature 85 (1910), 251-257](sources/The-dynamics-of-a-golf-ball.pdf)|
+|2|Roland Clift, John R. Grace, Martien E. Weber|Bubbles, Drops, and Particles|[1978](sources/Bubbles-drops-and-particles.epub)|
+|3|Akira Nakashima, Yuki Ogawa, Chunfang Liu, Yoshikazu Hayakawa|Robotic table tennis based on physical models of aerodynamics and rebounds|[Internation Conference on Robotics and Biomimetics, (2011), Karon Beach, Thailand](sources/Robotic-Table-Tennis-based-on-Physical-Models-of-Aerodynamics-and-Rebounds.pdf)|
+|4|Sighard F. Hoerner|Tests of Spheres with Reference to Reynolds Number, Turbulence, and Surface Roughness|[NACA-TM-777 (1935)](sources/NACA-test-of-spheres-with-reference-to-reynolds-number-turbulence-and-surface-roughness.pdf)|
+|5|A. Valdescault, A. Batailly, S. Jones|Interpolation et approximation de données à l’aide de courbes et surfaces paramétriques de type B-splines|[Université McGill, Laboratoire de dynamique des structures et vibrations (2012)](sources/Splines-3D.pdf)|
+|6|Jean-Pierre Demailly|Analyse numérique et équations différentielles|[EDP Sciences, 2016 (237-247)](sources/Analyse-numérique-et-équations-différentielles-Jean-Pierre-DEMAILLY.pdf)|
