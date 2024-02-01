@@ -121,3 +121,10 @@ def haut_du_bond(liste):
         (max,indice) = maxindice(liste[k[0]:k[1]])
         liste1.append((max,indice+k[0]))
     return(liste1)
+
+def coherence(liste) :
+    k = 0
+    while k < len(liste) :
+        if liste[k] > 3 : liste.pop(k)
+        k+=1
+    return(liste)

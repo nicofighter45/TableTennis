@@ -11,12 +11,13 @@ def courbe(h,nombre):
     rebilitation_de_liste(h)
     h = premièrevaleurhaute(h,1)
     convertisseur(h, Taille_pix)
+    h=coherence(h)
     t = [k * 10e-3 for k in range(len(h))]
     potentiel = np.array(energie_potentielle(h))
     max = localmaxexperimentale(h)
     max1,max2 = [max[k][0]for k in range (len(max))],[max[k][1]*10e-3 for k in range (len(max))]
     max1 = energie_potentielle(max1)
-    cinetique = np.array([0] + energie_cinétique1(h))
+    cinetique = [0] + energie_cinétique1(h)
     Mecanique = potentiel + cinetique
     plt.plot(t, potentiel, label="Énergie potentiel")
     plt.plot(t, cinetique, label="Énergie cinétique")
@@ -31,8 +32,8 @@ def courbe(h,nombre):
     return(max1)
 
 coefficient = []
-for k in range (15) :
-    Taille_pix, h, x = data("TableTennis/output/4-jets-de-balle/tracked-{}.txt".format(k))
+for k in range (30) :
+    Taille_pix, h, x = data("TableTennis/output/5-jets-de-balle/tracked-{}.txt".format(k))
     liste = courbe(x,k)
     for k in range (len(liste)-1) :
         if liste[k+1]/liste[k] < 1 :

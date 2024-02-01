@@ -23,7 +23,10 @@ def energie_cinétique1(position):
     liste = []
     v = vitesse(position)
     for k in v:
-        liste.append(1 / 2 * m * k ** 2)
+        e = 1 / 2 * m * k ** 2
+        if e < 0.5 :
+            liste.append(e)
+        else : liste.append(liste[-1])
     return liste
 
 
