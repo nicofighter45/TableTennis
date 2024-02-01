@@ -11,6 +11,20 @@ def data(texte):
     h, x = h[1:], x[1:]
     return Taille_pix, h, x
 
+def ajouter_ligne_fichier(nom_fichier, ligne):
+    try:
+        with open(nom_fichier, 'a') as fichier:
+            fichier.write(ligne + '\n')
+        print("La ligne a été ajoutée avec succès au fichier", nom_fichier)
+    except IOError:
+        print("Erreur : Impossible d'ouvrir ou d'écrire dans le fichier", nom_fichier)
+
+def result(nom_fichier,experience, moy , incertitude, maximu, minimum, nombre_de_coefficient) :
+    ajouter_ligne_fichier(nom_fichier,str(experience))
+    ajouter_ligne_fichier(nom_fichier,"Le coefficient de restitution est de "+ str(moy))
+    ajouter_ligne_fichier(nom_fichier,"L'incertitude sur la valeur est de "+ str(incertitude))
+    ajouter_ligne_fichier(nom_fichier,"Le maximum est le minimum sont " + str(maximu) +" et "+ str(minimum))
+    ajouter_ligne_fichier(nom_fichier,"Avec en tout " + str(nombre_de_coefficient) +" valeurs déterminées")
 def vitesse(position):
     vitesse = []
     p = 1

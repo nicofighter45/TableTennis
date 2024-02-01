@@ -18,6 +18,6 @@ def coefficient_de_rebond(liste):
 h, x = h[1:], x[1:]
 rebilitation_de_liste(x)
 rebilitation_de_liste(h)
-h = premièrevaleurhaute(h)
+h = premièrevaleurhaute(h,1)
 print(maximum(h))
 print(coefficient_de_rebond(h))
