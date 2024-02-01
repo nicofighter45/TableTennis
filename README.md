@@ -47,7 +47,7 @@ On calcule numériquement à l'aide d’un programme c++ développé pour l’oc
 
 "Il faut ensuite approximer la position pour retirer les défauts de la capture de cette position à la caméra en utilisant des courbes Spline 2D [[5]](#Références). On peut, grâce à cette étape déduire la vitesse et l’accélération de façon à obtenir les différents coefficients."
 
-En revanche, l’accélération et la vitesse de la balle de tennis de table semblent admettre des discontinuités lors des rebonds. On observe une perte de vitesse entre avant et après le rebond caractérisée par un coefficient de restitution. Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol ainsi que la rotation de la balle.
+En revanche, nos mesures d’accélération et de vitesse de la balle de tennis de table  admetten des discontinuités lors des rebonds. On observe une perte de vitesse entre avant et après le rebond que l'on peut caractériser par un coefficient de restitution. Ce coefficient quantifie le rapport entre la vitesse initiale et la vitesse après le rebond, il dépend de différents paramètres : les matériaux de la balle et du sol ainsi que la rotation de la balle.
 
 Pour simuler le déplacement de la balle de tennis de table, une résolution numérique des équations différentielles est nécessaire car ces dernières sont insolvables de façon explicite. On opte pour une méthode plus sophistiquée que la méthode d’Euler afin de gagner en précision, la méthode de Runge-Kutta 4 [[6]](#Références) coder en c++.
 
@@ -65,7 +65,6 @@ Réaliser une simulation numérique fidèle à la réalité du comportement des 
 - Faire un suivi automatisé de la balle
   - Utiliser un robot pour lancer des balles de façon régulière
   - Utiliser c++ pour retrouver automatiquement la balle dans l'image à partir de sa colorimétrie
-  - Calculer à partir de la position dans l'image, la position réelle de la balle
 - Récupérer avec sa position différents coefficients
 - Utiliser ces coefficients dans une simulation
   - Utiliser Runge-Kutta 4 pour résoudre les équations différentielles

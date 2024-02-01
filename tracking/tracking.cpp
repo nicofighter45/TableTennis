@@ -228,7 +228,7 @@ void saveTracking(map < int, Pos > positionsResults) {
 	cin >> name;
 	cout << endl;
 
-	string directoryPath = "C:/Users/fagot/Code/TableTennis/output/" + name + "/";
+	string directoryPath = "D:/TableTennis/output/" + name + "/";
 
 	if (!filesystem::exists(directoryPath)) {
 		if (filesystem::create_directories(directoryPath)) {
@@ -281,7 +281,6 @@ void saveTracking(map < int, Pos > positionsResults) {
 		nb_of_frame_not_null++;
 		if (nb_of_frame_not_null == 6) {
 			if (distance(positionsResults[i], positionsResults[i-5]) < 10.0) {
-				cout << first_to_remove << endl;
 				first_to_remove++;
 				nb_of_frame_not_null--;
 			}
@@ -289,7 +288,6 @@ void saveTracking(map < int, Pos > positionsResults) {
 		lines.push_back(to_string(positionsResults[i].x) + ";"
 			+ to_string(positionsResults[i].y) + ";");
 	}
-	cout << first_to_remove << endl;
 	for (string line : lines) {
 		if (first_to_remove > 0) {
 			first_to_remove--;
