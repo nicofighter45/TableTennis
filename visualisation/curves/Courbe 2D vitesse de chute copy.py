@@ -8,9 +8,9 @@ from visualisation.tools.Interpolation import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 
-Taille_pix, x, h = data("TableTennis/output/4-jets-de-balle/tracked-0.txt")
-rebilitation_de_liste(x)
-rebilitation_de_liste_min(h)
+Taille_pix, h, x = data("TableTennis/output/4-jets-de-balle/tracked-0.txt")
+rebilitation_de_liste(h)
+rebilitation_de_liste_min(x)
 convertisseur(x, Taille_pix)
 convertisseur(h, Taille_pix)
 fonction_interpolatrice_de_x = approximation(x, 4)
@@ -41,7 +41,6 @@ ax1.set_ylabel('Vy en m.s-1')
 for pos in max_positions:
     plt.scatter(t[pos], x[pos], color='red', label='Maximums')
     plt.text(t[pos], x[pos], f"Max: {x[pos]:.2f}", ha='center', va='bottom')
-
 for pos in min_positions:
     plt.scatter(t[pos], x[pos], color='blue', label='Minimums')
     plt.text(t[pos], x[pos], f"Min: {x[pos]:.2f}", ha='center', va='top')

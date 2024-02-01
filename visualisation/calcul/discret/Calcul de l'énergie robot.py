@@ -11,7 +11,7 @@ Taille_pix, h, x = data("TableTennis/visualisation/temp txt file/Rebond sur raqu
 
 def courbe(h):
     rebilitation_de_liste(h)
-    h = premièrevaleurhaute(h)
+    h = premièrevaleurhaute(h,1)
     convertisseur(h, Taille_pix)
     t = [k * 10e-3 for k in range(len(h))]
     potentiel = np.array(energie_potentielle(h))
@@ -30,7 +30,7 @@ def courbe(h):
 
 def courbe2(h):
     rebilitation_de_liste(h)
-    h = premièrevaleurhaute(h)
+    h = premièrevaleurhaute(h,0.001)
     convertisseur(h,Taille_pix)
     t = [k * 10e-3 for k in range(len(h))]
     cinetique = np.array(energie_cinétique1(h)[:-1])
