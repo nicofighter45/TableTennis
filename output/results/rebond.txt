@@ -1,0 +1,5 @@
+Rebond sur table
+Le coefficient de restitution est de 0.8206757768812729
+L'incertitude sur la valeur est de 0.006906900496389307
+Le maximum est le minimum sont 0.8531141688307707 et 0.7555748940566701
+Avec en tout 15 valeurs déterminées

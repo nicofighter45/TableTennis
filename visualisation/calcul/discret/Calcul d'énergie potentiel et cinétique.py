@@ -36,5 +36,8 @@ for k in range (15) :
     liste = courbe(x,k)
     for k in range (len(liste)-1) :
         if liste[k+1]/liste[k] < 1 :
-            coefficient.append(mt.sqrt(liste[k+1]/liste[k]))
-print(moyenne(coefficient),incertitude_type_A(coefficient),max(coefficient),min(coefficient),len(coefficient),coefficient)
+            coef = mt.sqrt(liste[k+1]/liste[k])
+            if not coef > 0.9 : coefficient.append(coef)
+moy , incertitude, maximu, minimum, nombre_de_coefficient = str(moyenne(coefficient)),str(incertitude_type_A(coefficient)), str(max(coefficient)),str(min(coefficient)),str(len(coefficient))
+print(moy , incertitude, maximu, minimum, nombre_de_coefficient,coefficient)
+result("TableTennis/output/results/rebond.txt", "Rebond sur table",moy , incertitude, maximu, minimum, nombre_de_coefficient)
