@@ -41,4 +41,4 @@ for k in range (30) :
             if not coef > 0.9 : coefficient.append(coef)
 moy , incertitude, maximu, minimum, nombre_de_coefficient = str(moyenne(coefficient)),str(incertitude_type_A(coefficient)), str(max(coefficient)),str(min(coefficient)),str(len(coefficient))
 print(moy , incertitude, maximu, minimum, nombre_de_coefficient,coefficient)
-result("TableTennis/output/results/rebond.txt", "Rebond sur table",moy , incertitude, maximu, minimum, nombre_de_coefficient)
+#result("TableTennis/output/results/rebond.txt", "Rebond sur table",moy , incertitude, maximu, minimum, nombre_de_coefficient)

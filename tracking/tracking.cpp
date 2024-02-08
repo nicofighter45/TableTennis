@@ -236,73 +236,71 @@ void saveTracking(map < int, Pos > positionsResults) {
 		}
 	}
 
-	ofstream file;
-	file.open(directoryPath + "tracked-0.txt");
-	if (!file.is_open()) {
-		cerr << "Cannot save tracking data" << endl;
-	}
 	int file_k = 0;
-	int nb_of_frame_not_null = 0;
-	int first_to_remove = 0;
-	vector<string> lines;
-	for (int i = 0; i <= total_frames; i++) {
-		if (positionsResults[i] == NULL_POS || positionsResults[i] == Pos{ 0, 0 }) {
-			if (nb_of_frame_not_null == 0) {
-				continue;
+	bool not_null = false;
+	vector<vector<int>> lines;
+	vector<vector<int>> lines_removed;
+	vector<int> local;
+	vector<int> local2;
+	lines.push_back(local);
+	lines_removed.push_back(local2);
+	cout << positionsResults.size() << endl;
+	for (int i = 0; i <= 5362; i++) {
+		if ((i >= 1 && distance(positionsResults[i], positionsResults[i - 1]) > 100)) {
+			file_k += 1;
+			vector<int> local3;
+			vector<int> local4;
+			lines.push_back(local3);
+			lines_removed.push_back(local4);
+			not_null = true;
+			lines[file_k].push_back(i);
+		}else if (positionsResults[i] == NULL_POS || positionsResults[i] == Pos{ 0, 0 }) {
+			cout << i << " is null" << endl;
+			if (not_null) {
+				not_null = false;
+				file_k += 1;
+				vector<int> local3;
+				vector<int> local4;
+				lines.push_back(local3);
+				lines_removed.push_back(local4);
 			}
-			cout << first_to_remove << endl;
-			for (string line : lines) {
-				if (first_to_remove > 0) {
-					first_to_remove--;
-				}
-				else {
-					file << line << endl;
-				}
-			}
-			file.close();
-			if (nb_of_frame_not_null <= 5) {
-				streambuf* stream_buffer_cout = cout.rdbuf();
-				ofstream out("output.txt");
-				cout.rdbuf(out.rdbuf());
-				filesystem::remove(directoryPath + "tracked-" + to_string(file_k) + ".txt");
-				cout.rdbuf(stream_buffer_cout);
-			}
-			else {
-				file_k++;
-			}
-			file.open(directoryPath + "tracked-" + to_string(file_k) + ".txt");
-			if (!file.is_open()) {
-				cerr << "Cannot save tracking data" << endl;
-			}
-			nb_of_frame_not_null = 0;
-			first_to_remove = 0;
-			continue;
-		}
-		nb_of_frame_not_null++;
-		if (nb_of_frame_not_null == 6) {
-			if (distance(positionsResults[i], positionsResults[i-5]) < 10.0) {
-				first_to_remove++;
-				nb_of_frame_not_null--;
-			}
-		}
-		lines.push_back(to_string(positionsResults[i].x) + ";"
-			+ to_string(positionsResults[i].y) + ";");
-	}
-	for (string line : lines) {
-		if (first_to_remove > 0) {
-			first_to_remove--;
 		}
 		else {
-			file << line << endl;
+			not_null = true;
+			lines[file_k].push_back(i);
+			if (lines[file_k].size() >= 6) {
+				if (distance(positionsResults[i], positionsResults[i - 5]) < 10.0) {
+					lines_removed[file_k].push_back(i - 5);
+				}
+			}
 		}
 	}
-	file.close();
-	if (nb_of_frame_not_null <= 5) {
-		streambuf* stream_buffer_cout = cout.rdbuf();
-		ofstream out("output.txt");
-		cout.rdbuf(out.rdbuf());
-		filesystem::remove(directoryPath + "tracked-" + to_string(file_k) + ".txt");
-		cout.rdbuf(stream_buffer_cout);
+
+	int k = 0;
+	for (vector<int> list : lines) {
+		if (list.size() <= 5) {
+			continue;
+		}
+		ofstream file;
+		file.open(directoryPath + "tracked-" + to_string(k) + ".txt");
+		if (!file.is_open()) {
+			cerr << "Cannot save tracking data" << endl;
+		}
+		for (int i : list) {
+			bool do_it = true;
+			for (int j : lines_removed[k]) {
+				if (j == i) {
+					do_it = false;
+					break;
+				}
+			}
+			if (!do_it) {
+				continue;
+			}
+			file << positionsResults[i].x << ";" << positionsResults[i].y << ";" << endl;
+		}
+		file.close();
+		k++;
 	}
 }
 
