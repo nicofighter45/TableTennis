@@ -199,8 +199,7 @@ void launchTracking(VideoCapture capture) {
 		auto loop_time_end = chrono::high_resolution_clock::now();
 		cout << "Loop in " <<
 			chrono::duration_cast<chrono::milliseconds>
-			(loop_time_end - loop_time_start).count() << "ms" << endl
-			<< endl;
+			(loop_time_end - loop_time_start).count() << "ms" << endl;
 		if (!capture.read(readed_frame)) {
 			cout << "End Video calculation" << endl;
 			shutDownPrompt();
