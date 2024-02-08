@@ -20,7 +20,7 @@ void allVectorsToTxt(vector<tuple<double, double, double>> positions,
 		return;
 	}
 
-	string directoryPath = "C:/Users/fagot/Code/TableTennis/output/simulations/";
+	string directoryPath = "D:/TableTennis/output/simulations/";
 
 	if (!filesystem::exists(directoryPath)) {
 		if (filesystem::create_directories(directoryPath)) {
@@ -45,6 +45,6 @@ void allVectorsToTxt(vector<tuple<double, double, double>> positions,
 	}
 	file.close();
 
-	system("py C:/Users/fagot/Code/TableTennis/visualisation/simulation/classic_graphs.py");
+	system("py D:/TableTennis/visualisation/simulation/classic_graphs.py");
 
 }

@@ -40,8 +40,8 @@ auto runRK4simulation(Vect3D initialPosition, Vect3D initialSpeed)
     int frame = 0;
     int bounce = 0;
 
-    while (position.getX() >= -10 and position.getX() <= 10
-        and position.getY() >= -10 and position.getY() <= 10
+    while (position.getX() >= -1 and position.getX() <= 1
+        and position.getY() >= -0.5 and position.getY() <= 1.5
         and position.getZ() >= -1 and position.getZ() <= 10
         and frame < 10000){
 

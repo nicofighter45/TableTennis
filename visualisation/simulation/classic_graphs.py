@@ -5,7 +5,7 @@ time_step = 0.001
 
 positions, speeds, accelerations, time = [[], [], []], [[], [], []], [[], [], []], []
 
-lines = open("C:/Users/fagot/Code/TableTennis/output/simulations/transfer.txt", "r").readlines()
+lines = open("D:/TableTennis/output/simulations/transfer.txt", "r").readlines()
 for line in lines:
     line.removesuffix("\n")
     inputs = line.split(";;")

@@ -244,8 +244,7 @@ void saveTracking(map < int, Pos > positionsResults) {
 	vector<int> local2;
 	lines.push_back(local);
 	lines_removed.push_back(local2);
-	cout << positionsResults.size() << endl;
-	for (int i = 0; i <= 5362; i++) {
+	for (int i = 0; i <= total_frames; i++) {
 		if ((i >= 1 && distance(positionsResults[i], positionsResults[i - 1]) > 100)) {
 			file_k += 1;
 			vector<int> local3;
@@ -255,7 +254,6 @@ void saveTracking(map < int, Pos > positionsResults) {
 			not_null = true;
 			lines[file_k].push_back(i);
 		}else if (positionsResults[i] == NULL_POS || positionsResults[i] == Pos{ 0, 0 }) {
-			cout << i << " is null" << endl;
 			if (not_null) {
 				not_null = false;
 				file_k += 1;
