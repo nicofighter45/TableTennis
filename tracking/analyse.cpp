@@ -142,22 +142,27 @@ Mat& Analyser::getMaskMatrice() {
     return ref(maskMatrice);
 }
 
-Mat Analyser::getMixedMatrice(float conversion) {
-    Mat mixedMatrice = actualMatrice.clone();
+Mat& Analyser::getMatriceWithCenter() {
+    addCubeToImage(ref(actualMatrice), center, 1, black);
+    return ref(actualMatrice);
+}
+
+Mat& Analyser::getMixedMatrice(float conversion) {
     for (int x = 0; x < height; x++) {
         for (int y = 0; y < width; y++) {
-            Vec3b& mixedPixel = mixedMatrice.at<Vec3b>(x, y);
             Vec3b maskPixel = maskMatrice.at<Vec3b>(x, y);
-            if (maskPixel != Vec3b(0, 0,0 )) {
-                mixedPixel = mixPixels(mixedPixel, maskPixel, conversion);
-                
+            if (maskPixel != Vec3b(0, 0, 0)) {
+                Vec3b& mixedPixel = actualMatrice.at<Vec3b>(x, y);
+                mixedPixel[0] = static_cast<int>(mixedPixel[0] * conversion + (1 - conversion) * maskPixel[0]);
+                mixedPixel[1] = static_cast<int>(mixedPixel[1] * conversion + (1 - conversion) * maskPixel[1]);
+                mixedPixel[2] = static_cast<int>(mixedPixel[2] * conversion + (1 - conversion) * maskPixel[2]);
             }
         }
     }
     if (center != NULL_POS) {
-        addCubeToImage(ref(mixedMatrice), center, 1, black);
+        addCubeToImage(ref(actualMatrice), center, 1, black);
     }
-    return mixedMatrice;
+    return ref(actualMatrice);
 }
 
 Vec3b reducePixelStrength(const Vec3b& originalPixel, float conversion) {
@@ -165,13 +170,6 @@ Vec3b reducePixelStrength(const Vec3b& originalPixel, float conversion) {
         static_cast<int>(originalPixel[1] * conversion),
         static_cast<int>(originalPixel[2] * conversion));
 }
-
-Vec3b mixPixels(const Vec3b& pixel1, const Vec3b& pixel2, float conversion) {
-    return Vec3b(static_cast<int>(pixel1[0] * conversion + pixel2[0] * (1-conversion)),
-        static_cast<int>(pixel1[1] * conversion + pixel2[1] * (1-conversion)),
-        static_cast<int>(pixel1[2] * conversion + pixel2[2] * (1-conversion)));
-}
-
 
 bool pixelIsInHSVRange(Mat& matrice, Pos position) {
     HSVColor color = RGBtoHSV(ref(matrice.at<Vec3b>(position.x, position.y)));

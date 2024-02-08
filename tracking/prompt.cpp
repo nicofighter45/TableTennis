@@ -73,6 +73,10 @@ void chooseROI(Mat readed_frame) {
 			shouldCalculate = not shouldCalculate;
 			break;
 		}
+		if (key == 97) { // a
+			indication = not indication;
+			break;
+		}
 	}
 }
 
@@ -237,6 +241,10 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 		if (key == 115) { // s
 			roiSetup = true;
 			autoState = false;
+			break;
+		}
+		if (key == 97) { // a
+			indication = not indication;
 			break;
 		}
 		if (autoState) {

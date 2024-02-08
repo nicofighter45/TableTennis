@@ -26,6 +26,7 @@ void initTracking() {
 	reloadFromCamera = NULL_POS;
 	roiSetup = true;
 	shouldCalculate = true;
+	indication = false;
 
 	// default orange range, the best one we figured out for now
 	lower_color = HSVColor{ 25, 120, 150};
@@ -118,7 +119,6 @@ void launchTracking(VideoCapture capture) {
 	Pos center = NULL_POS;
 	map < int, Pos > positionsResults;
 
-
 	while (true) {
 		auto loop_time_start = chrono::high_resolution_clock::now();
 		int ms = 0;
@@ -139,20 +139,21 @@ void launchTracking(VideoCapture capture) {
 
 		}
 
-		auto loop_time_second = chrono::high_resolution_clock::now();
-
 		if (not roiSetup) {
 			cout.rdbuf(out.rdbuf());
 			if (center == NULL_POS) {
 				showWindow(NULL_POS, readed_frame, ms);
 			}
 			else {
-				showWindow(inverse(center), analyser.getMixedMatrice(conversion), ms);
+				if (indication) {
+					showWindow(inverse(center), analyser.getMixedMatrice(conversion), ms);
+				}
+				else {
+					showWindow(inverse(center), analyser.getMatriceWithCenter(), ms);
+				}
 			}
 			cout.rdbuf(stream_buffer_cout);
 		}
-
-		auto loop_time_third = chrono::high_resolution_clock::now();
 
 		if (roiSetup) {
 			cout.rdbuf(out.rdbuf());
@@ -195,19 +196,10 @@ void launchTracking(VideoCapture capture) {
 				currentLoadedFrame = actualWatchedFrame;
 			}
 		}
-		auto loop_time_last = chrono::high_resolution_clock::now();
-		cout << "Loop calc" <<
+		auto loop_time_end = chrono::high_resolution_clock::now();
+		cout << "Loop in " <<
 			chrono::duration_cast<chrono::milliseconds>
-			(loop_time_second - loop_time_start).count() << "ms" << endl
-			<< "Loop visu" <<
-			chrono::duration_cast<chrono::milliseconds>
-			(loop_time_third - loop_time_second).count() << "ms" << endl
-			<< "Loop new" <<
-			chrono::duration_cast<chrono::milliseconds>
-			(loop_time_last - loop_time_third).count() << "ms" << endl
-			<< "Loop total" <<
-			chrono::duration_cast<chrono::milliseconds>
-			(loop_time_last - loop_time_start).count() << "ms" << endl
+			(loop_time_end - loop_time_start).count() << "ms" << endl
 			<< endl;
 		if (!capture.read(readed_frame)) {
 			cout << "End Video calculation" << endl;

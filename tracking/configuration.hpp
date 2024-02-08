@@ -45,6 +45,7 @@ extern bool isPromptActive;
 extern bool autoState;
 extern Pos reloadFromCamera;
 extern bool roiSetup;
+extern bool indication;
 extern Rect roi;
 extern bool shouldCalculate;
 
