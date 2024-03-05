@@ -32,6 +32,7 @@ Pos Analyser::findBall() {
         if (position == NULL_POS) {
             break;
         }
+        maskMatrice.at<Vec3b>(position.x, position.y) = black;
         if (pixelIsInHSVRange(actualMatrice, position)) {
             isInitialSearch = false;
             return calculateCenter(position);
@@ -91,6 +92,7 @@ Pos Analyser::initialCalculation() {
     for (int x = searchPixelSpacing - 1 + roi.y; x < roi.y + roi.height - searchPixelSpacing;  x += searchPixelSpacing) {
         for (int y = searchPixelSpacing - 1 + roi.x; y < roi.x + roi.width - searchPixelSpacing; y += searchPixelSpacing) {
             Pos position = { x, y};
+            maskMatrice.at<Vec3b>(x, y) = white;
             if (first != NULL_POS) {
                 return calculateCenter(position);
             }

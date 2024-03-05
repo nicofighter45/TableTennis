@@ -66,6 +66,11 @@ double Vect3D::size() const
     return sqrt(sq(x) + sq(y) + sq(z));
 }
 
+bool Vect3D::isNull() const
+{
+    return *this == Vect3D(0, 0, 0);
+}
+
 string Vect3D::toString() const
 {
     return "x: " + to_string(x) + " y: " + to_string(y) + " z: " + to_string(z);
@@ -82,4 +87,12 @@ double sq(double number) {
 Vect3D vectorialProduct(const Vect3D& u, const Vect3D& v) {
     return Vect3D(u.getY() * v.getZ() - u.getZ() * v.getY(),
         v.getX() * u.getZ() - u.getX() * v.getZ(), u.getX() * v.getY() - u.getY() * v.getX());
+}
+
+Vect3D Vect3D::normalize() {
+    Vect3D vector = *this;
+    if (vector.isNull()) {
+        return vector;
+    }
+    return vector/vector.size();
 }

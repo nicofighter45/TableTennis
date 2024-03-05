@@ -67,49 +67,26 @@ void run()
         return;
     }
 
-    string iniP, iniS;
+    while (true) {
+        string iniP, iniS, iniR;
 
-    cout << paragraphs[2] << endl;
-    getline(cin, iniP);
+        cout << paragraphs[2] << endl;
+        getline(cin, iniP);
 
-    cout << paragraphs[3] << endl;
-    getline(cin, iniS);
+        cout << paragraphs[3] << endl;
+        getline(cin, iniS);
 
-    cout << endl << paragraphs[4] << endl;
+        cout << paragraphs[4] << endl;
+        getline(cin, iniR);
 
-    Vect3D initialPosition = iniP;
-    Vect3D initialSpeed = iniS;
+        cout << endl << paragraphs[5] << endl;
 
-    if (simulationType == "1")
-    {
+        Vect3D initialPosition = iniP;
+        Vect3D initialSpeed = iniS;
+        Vect3D initialRotation = iniR;
 
-        auto vectors = runGravitySimulation(initialPosition, initialSpeed);
-
+        auto vectors = runRK4simulation(initialPosition, initialSpeed, initialRotation);
+        allVectorsToTxt(get<0>(vectors), get<1>(vectors), get<2>(vectors), get<3>(vectors));
     }
-    else if (simulationType == "2")
-    {
-
-        auto vectors = runFrictionSimulation(initialPosition, initialSpeed);
-
-    }
-    else if (simulationType == "3")
-    {
-
-        auto vectors = runMagnusSimulation(initialPosition, initialSpeed);
-        allVectorsToTxt(get<0>(vectors), get<1>(vectors), get<2>(vectors));
-
-    }
-    else if (simulationType == "4") {
-
-        auto vectors = runRK4simulation(initialPosition, initialSpeed);
-        allVectorsToTxt(get<0>(vectors), get<1>(vectors), get<2>(vectors));
-
-    }
-    else
-    {
-
-        cerr << errorMsg << endl;
-        
-    }
-
+    
 }

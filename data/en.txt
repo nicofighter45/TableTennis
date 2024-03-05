@@ -1,11 +1,7 @@
 Welcome to tennis table c++ simulation !
 
 Enter 0 for tracking
-For a simulation, enter the corresponding number :
-1) Without friction
-2) With friction
-3) With Magnus effect
-4) RK4 Magnus
+Enter something else for Runge Khutta 4
 
 
 Nice, you've chosen simulation {type}!
@@ -15,6 +11,9 @@ Enter initial position Values: (Ex: 0 0 0.15)
 
 
 Enter initial speed Values: (Ex: 0 4 1)
+
+
+Enter initial rotation Values: (Ex: 0.01 0 0)
 
 
 Solving differential equation

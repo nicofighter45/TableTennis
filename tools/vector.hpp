@@ -27,6 +27,10 @@ public:
 
     double size() const;
 
+    bool isNull() const;
+
+    Vect3D normalize();
+
     std::tuple<double, double, double> getValues();
 
     std::string toString() const;
@@ -41,6 +45,10 @@ inline Vect3D operator+(const Vect3D& vect1, const Vect3D& vect2) {
     return Vect3D(vect1.getX() + vect2.getX(), 
                     vect1.getY() + vect2.getY(),
                         vect1.getZ() + vect2.getZ());
+}
+
+inline bool operator==(const Vect3D& vect1, const Vect3D& vect2) {
+    return vect1.getX() == vect2.getX() && vect1.getY() == vect2.getY() && vect1.getZ() == vect2.getZ();
 }
 
 inline Vect3D operator+=(const Vect3D& vect1, const Vect3D& vect2) {

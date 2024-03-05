@@ -26,7 +26,7 @@ void initTracking() {
 	reloadFromCamera = NULL_POS;
 	roiSetup = true;
 	shouldCalculate = true;
-	indication = false;
+	indication = true;
 
 	// default orange range, the best one we figured out for now
 	lower_color = HSVColor{ 25, 120, 150};
@@ -139,6 +139,8 @@ void launchTracking(VideoCapture capture) {
 
 		}
 
+		auto end_calculus = chrono::high_resolution_clock::now();
+
 		if (not roiSetup) {
 			cout.rdbuf(out.rdbuf());
 			if (center == NULL_POS) {
@@ -197,9 +199,12 @@ void launchTracking(VideoCapture capture) {
 			}
 		}
 		auto loop_time_end = chrono::high_resolution_clock::now();
-		cout << "Loop in " <<
+		cout << "Calculus in " <<
 			chrono::duration_cast<chrono::milliseconds>
-			(loop_time_end - loop_time_start).count() << "ms" << endl;
+			(end_calculus - loop_time_start).count() << "ms" << endl;
+		cout << "Window in " <<
+			chrono::duration_cast<chrono::milliseconds>
+			(loop_time_end - end_calculus).count() << "ms" << endl;
 		if (!capture.read(readed_frame)) {
 			cout << "End Video calculation" << endl;
 			shutDownPrompt();
