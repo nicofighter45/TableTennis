@@ -18,7 +18,9 @@ def courbe(h,nombre):
     max1,max2 = [max[k][0]for k in range (len(max))],[max[k][1]*10e-3 for k in range (len(max))]
     max1 = energie_potentielle(max1)
     cinetique = [0] + energie_cinétique1(h)
+    lissage(cinetique,2)
     Mecanique = potentiel + cinetique
+    #moyen = moy_energie_meca(Mecanique,10e-)
     plt.plot(t, potentiel, label="Énergie potentiel")
     plt.plot(t, cinetique, label="Énergie cinétique")
     plt.plot(t, Mecanique, label="Énergie mécanique")
@@ -29,14 +31,15 @@ def courbe(h,nombre):
     plt.legend()
     plt.show()
     plt.clf()
+    print(max1)
     return(max1)
 
 coefficient = []
-for k in range (30) :
+for k in range (20) :
     Taille_pix, h, x = data("TableTennis/output/5-jets-de-balle/tracked-{}.txt".format(k))
     liste = courbe(x,k)
     for k in range (len(liste)-1) :
-        if liste[k+1]/liste[k] < 1 :
+        if 0.6<liste[k+1]/liste[k] < 1 :
             coef = mt.sqrt(liste[k+1]/liste[k])
             if not coef > 0.9 : coefficient.append(coef)
 moy , incertitude, maximu, minimum, nombre_de_coefficient = str(moyenne(coefficient)),str(incertitude_type_A(coefficient)), str(max(coefficient)),str(min(coefficient)),str(len(coefficient))
