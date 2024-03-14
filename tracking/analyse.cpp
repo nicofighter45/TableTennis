@@ -10,12 +10,15 @@ Analyser::Analyser(Mat& tActualMatrice)
     : actualMatrice(tActualMatrice) {
     isInitialSearch = true;
     actualIndex = 0;
+    actualMinusIndex = 0;
+    center = NULL_POS;
     previous = center;
     maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
 }
 
 Pos Analyser::findBall() {
     actualIndex = 0;
+    actualMinusIndex = 0;
     maskMatrice = Mat(actualMatrice.size(), actualMatrice.type(), Scalar(0, 0, 0));
     if(reloadFromCamera != NULL_POS){
         reloadFromCamera.x = static_cast<int>(reloadFromCamera.x);
@@ -27,17 +30,25 @@ Pos Analyser::findBall() {
     }
     center.x = static_cast<int>(center.x);
     center.y = static_cast<int>(center.y);
-    while (actualIndex != 8 * searchPixelMaxSpacing / searchPixelSpacing) {
-        Pos position = getSearchPos();
-        if (position == NULL_POS) {
+
+    Pos position = getSearchPos(center);
+
+    while (true) {
+        if (position == NULL_POS || position.x - center.x > searchPixelMaxSpacing
+            || position.x - center.x < -searchPixelMaxSpacing 
+            || position.y - center.y > searchPixelMaxSpacing
+            || position.y - center.y < -searchPixelMaxSpacing) {
+            cout << position << " end" << endl;
             break;
         }
-        maskMatrice.at<Vec3b>(position.x, position.y) = black;
+        maskMatrice.at<Vec3b>(position.x, position.y) = white;
         if (pixelIsInHSVRange(actualMatrice, position)) {
             isInitialSearch = false;
             return calculateCenter(position);
         }
+        position = getSearchPos(position);
     }
+    cout << "intial calc" << endl;
     return initialCalculation();
 }
 
@@ -104,39 +115,31 @@ Pos Analyser::initialCalculation() {
     return NULL_POS;
 }
 
-Pos Analyser::getSearchPos() {
-    int straightDecal = static_cast<int>(searchPixelSpacing);
-    int diagonalDecal = static_cast<int>(straightDecal * 0.7);
-    return getSearchPos(straightDecal, diagonalDecal);
-}
-
-Pos Analyser::getSearchPos(int straightDecal, int diagonalDecal) {
-    Pos position = getPreSearchPos(straightDecal, diagonalDecal);
+Pos Analyser::getSearchPos(Pos prePos) {
+    Pos position = getPreSearchPos(prePos);
     if (position.x < roi.y || position.y < roi.x || position.y >= roi.x + roi.width || position.x >= roi.y + roi.height) {
         return NULL_POS;
     }
-    actualIndex++;
+    if (actualMinusIndex >= static_cast<int>(actualIndex / 2)) {
+        actualMinusIndex = 0;
+        actualIndex++;
+    }
+    else {
+        actualMinusIndex++;
+    }
     return position;
 }
 
-Pos Analyser::getPreSearchPos(int straightDecal, int diagonalDecal) {
-    switch (actualIndex % 8) {
+Pos Analyser::getPreSearchPos(Pos prePos) {
+    switch (actualIndex % 4) {
     case 0:
-        return Pos{ center.x + straightDecal, center.y };
+        return Pos{ prePos.x + searchPixelSpacing, prePos.y };
     case 1:
-        return Pos{ center.x + diagonalDecal, center.y + diagonalDecal};
+        return Pos{ prePos.x, prePos.y + searchPixelSpacing };
     case 2:
-        return Pos{ center.x, center.y + straightDecal };
+        return Pos{ prePos.x - searchPixelSpacing, prePos.y };
     case 3:
-        return Pos{ center.x - diagonalDecal, center.y + diagonalDecal };
-    case 4:
-        return Pos{ center.x - straightDecal, center.y };
-    case 5:
-        return Pos{ center.x - diagonalDecal, center.y - diagonalDecal };
-    case 6:
-        return Pos{ center.x, center.y - straightDecal };
-    case 7:
-        return Pos{ center.x + diagonalDecal, center.y - diagonalDecal };
+        return Pos{ prePos.x , prePos.y - searchPixelSpacing };
     }
 }
 

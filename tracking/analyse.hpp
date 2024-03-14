@@ -14,10 +14,10 @@ private:
 	Mat maskMatrice;
 	bool isInitialSearch;
 	int actualIndex;
+	int actualMinusIndex;
 	Pos previous;
-	Pos getSearchPos(int straightDecal, int diagonalDecal);
-	Pos getPreSearchPos(int straightDecal, int diagonalDecal);
-	Pos getSearchPos();
+	Pos getPreSearchPos(Pos prePos);
+	Pos getSearchPos(Pos prePos);
 	Pos calculateCenter(Pos position);
 	Pos initialCalculation();
 public:
