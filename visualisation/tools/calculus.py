@@ -49,3 +49,18 @@ def trouver_maximums_locaux(grandeurs):
         if grandeurs[i - 1] < grandeurs[i] > grandeurs[i + 1]:
             indices_maximums.append(i)
     return indices_maximums
+
+def moy_energie_meca(mecanique,precision) :
+    liste=[]
+    somme = mecanique[0]
+    p=1
+    for k in range(1,len(mecanique)) :
+        if abs(mecanique[k]/(somme/p)-1) <= precision : 
+            somme+=mecanique[k]
+            p+=1
+        else:
+            liste.append(somme/p)
+            somme=mecanique[k]
+            p=1
+    liste.append(somme/p)
+    return(liste)

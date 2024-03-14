@@ -128,3 +128,8 @@ def coherence(liste) :
         if liste[k] > 3 : liste.pop(k)
         k+=1
     return(liste)
+
+def lissage(liste,precision) :
+    for k in range (2,len(liste)):
+        if abs(liste[k-1]) > 10e-3 and abs(liste[k]/liste[k-1]-1) > precision :
+            liste[k]=liste[k-1]

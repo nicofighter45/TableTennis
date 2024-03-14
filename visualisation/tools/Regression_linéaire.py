@@ -2,14 +2,11 @@
 # donc je me suis dit que ce serait sympa de coder notre propre regression linéaire :
 # avec la méthode des Moindres Carrés
 import random as rd
-
 import matplotlib.pyplot as plt
-
+import sys
+sys.path.insert(0, 'TableTennis')
 from visualisation.tools.abstract import *
 from visualisation.tools.incertitudes import *
-
-incertitude_values = (99999999, 999999999)
-
 
 def linaire(liste1, liste2):
     if len(liste1) != len(liste2):
