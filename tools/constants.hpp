@@ -4,12 +4,11 @@
 double const spacing_per_second(1000);
 double const max_bounce(10);
 
-double const Cd(0.54);
+double const Cd(0.821);
 double const Cm(0.069);
 double const Cbz(0.8);
 double const Cbflat(0.9);
 double const Cbrotation(0.6);
-double const Cbmagnus(0.2);
 
 double const rho(1.0);
 double const air_volumic_mass(1.184);

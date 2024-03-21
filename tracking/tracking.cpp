@@ -123,6 +123,12 @@ void launchTracking(VideoCapture capture) {
 		auto loop_time_start = chrono::high_resolution_clock::now();
 		int ms = 0;
 		if (shouldCalculate && reload) {
+			center = analyser.findBall();
+			if (distance(center, reloadFromCamera) >= spacingBetweenCentersToStop) {
+				autoState = false;
+			}
+			reloadFromCamera = NULL_POS;
+			/*
 			reloadFromCamera = analyser.findBall();
 			if (reloadFromCamera != NULL_POS) {
 				center = analyser.findBall();
@@ -135,6 +141,8 @@ void launchTracking(VideoCapture capture) {
 				center = NULL_POS;
 				cout << "Frame " << capture.get(CAP_PROP_POS_FRAMES) - 1 << " no center" << endl;
 			}
+			*/
+			
 			positionsResults[currentLoadedFrame] = center;
 
 		}

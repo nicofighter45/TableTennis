@@ -9,13 +9,12 @@
 using namespace std;
 
 Vect3D normalToPlan = Vect3D(0, 0, 1);
+Vect3D gravity_force = Vect3D(0, 0, -gravity);
 
 Vect3D next_acceleration(Vect3D speed, Vect3D rotation) {
     Vect3D dragging_force = - friction_constant * speed.size() * speed;
     Vect3D magnus_force = magnus_constant * vectorialProduct(rotation, speed);
-    Vect3D gravity_force = Vect3D(0, 0, -gravity);
     return dragging_force + magnus_force + gravity_force;
-
 }
 
 
