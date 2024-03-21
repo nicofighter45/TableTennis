@@ -7,7 +7,7 @@ from visualisation.tools.calculus import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 
-Taille_pix, x, h = data("TableTennis/calcul/Rebond table.txt")
+Taille_pix, h, x = data("TableTennis/output/5-rebond-sol/tracked-0.txt")
 rebilitation_de_liste(x)
 rebilitation_de_liste_min(h)
 convertisseur(x, Taille_pix)

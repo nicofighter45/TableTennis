@@ -25,11 +25,11 @@ def result(nom_fichier,experience, moy , incertitude, maximu, minimum, nombre_de
     ajouter_ligne_fichier(nom_fichier,"L'incertitude sur la valeur est de "+ str(incertitude))
     ajouter_ligne_fichier(nom_fichier,"Le maximum est le minimum sont " + str(maximu) +" et "+ str(minimum))
     ajouter_ligne_fichier(nom_fichier,"Avec en tout " + str(nombre_de_coefficient) +" valeurs déterminées")
+
 def vitesse(position):
     vitesse = []
-    p = 1
     for k in range(len(position) - 1):
-        vitesse.append((position[k + 1] - position[k]) / (1e-2 * p))
+        vitesse.append((position[k + 1] - position[k]) / (1e-2))
     return vitesse
 
 def premièrevaleurhaute(liste):
@@ -38,6 +38,16 @@ def premièrevaleurhaute(liste):
         if liste[k] <= liste[k + 1]:
             p = k
     return liste[p + 1:]
+
+def rebond(liste):
+    v = vitesse(liste)
+    print(v)
+    liste_rebond = [0]
+    for k in range (len(v)-1) :
+        if v[k] <= 0 and v[k+1] >=0 :
+            print(abs( v[k]- v[k+1] ))
+            liste_rebond.append(k+1)
+    return liste_rebond
 
 def maxindice(x):
     if len(x) == 0  : return (x)
@@ -76,7 +86,7 @@ def maxsubdivition(liste,i,j) :
 def localmax(liste) :
     listmax =[(liste[0],0)]
     for k in range (1,len(liste)-1) :
-        if liste[k-1] <= liste[k]>= liste[k+1] :
+        if liste[k-1] <= liste[k] >= liste[k+1] :
             listmax.append((liste[k],k))
     return(listmax)
 
@@ -96,15 +106,6 @@ def localmaxexperimentale(liste) :
     indice = [ maxsubdivition(max1,k[0],k[1]) for k in listesubdivision]
     return([max[k] for k in indice])
 
-def bond_division(liste):
-    subdivision=[]
-    min = 0
-    for k in range (1,len(liste)-1) :
-        if liste[k] < liste[k+1] and liste[k] < liste[k-1] :
-            subdivision.append([min,k])
-            min = k+1
-    return(subdivision)
-
 def premier_rebond(t):
     fin = -1
     v = vitesse(t)
@@ -113,14 +114,6 @@ def premier_rebond(t):
             fin = i
     if fin == -1 : raise TypeError("Pas de rebond")
     else : return t[0:fin]
-
-def haut_du_bond(liste):
-    liste1=[]
-    sub = bond_division(liste)
-    for k in sub :
-        (max,indice) = maxindice(liste[k[0]:k[1]])
-        liste1.append((max,indice+k[0]))
-    return(liste1)
 
 def coherence(liste) :
     k = 0

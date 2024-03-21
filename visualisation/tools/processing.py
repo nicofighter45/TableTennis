@@ -60,7 +60,3 @@ def rebilitation_de_liste_max(liste):
     maxi = max(liste)
     for k in range(len(liste)):
         liste[k] = abs(maxi - liste[k])
-
-def Bond(liste) :
-    liste = descente(liste)
-    

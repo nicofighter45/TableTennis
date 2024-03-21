@@ -7,9 +7,8 @@ g = 9.81
 
 def vitesse(position):
     vitesse = []
-    p = 1
     for k in range(len(position) - 1):
-        vitesse.append((position[k + 1] - position[k]) / (1e-2 * p))
+        vitesse.append((position[k + 1] - position[k]) / (1e-2))
     return vitesse
 
 def energie_potentielle(position):
