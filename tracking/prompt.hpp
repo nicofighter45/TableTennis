@@ -10,7 +10,8 @@ using namespace cv;
 
 void initialisePrompts();
 void shutDownPrompt();
-void showWindow(Pos center, Mat originalMatrice, int ms);
+void showWindow(Pos center, Mat originalMatrice);
+void showSimpleWindow(Mat originalMatrice);
 void createTrackbar(string name, int max_value, int& variable);
 void mouseCallback(int event, int x, int y, int flags, void* userdata);
 void setNewWatchedPos(int x, int y, int window_width, int window_height);

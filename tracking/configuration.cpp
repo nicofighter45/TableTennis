@@ -22,7 +22,6 @@ bool isPromptActive;
 bool autoState;
 Pos reloadFromCamera;
 bool roiSetup;
-bool indication;
 Rect roi;
 bool shouldCalculate;
 

@@ -18,7 +18,7 @@ const float windowScalar = 0.5;
 const float imageScalar = 1;
 const int searchPixelSpacing = 15;
 const int searchPixelMaxSpacing = 200;
-const int maxSearchAreaSize = 100;
+const int maxSearchAreaSize = 30;
 const int minimumPixelNeeded = 100;
 const int morePixelStart = 30;
 const int spacingBetweenCentersToStop = 20;
@@ -45,7 +45,6 @@ extern bool isPromptActive;
 extern bool autoState;
 extern Pos reloadFromCamera;
 extern bool roiSetup;
-extern bool indication;
 extern Rect roi;
 extern bool shouldCalculate;
 

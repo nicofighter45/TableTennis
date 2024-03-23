@@ -33,5 +33,7 @@ bool pixelIsInHSVRange(Mat& matrice, Pos position);
 Vec3b reducePixelStrength(const Vec3b& originalPixel, float conversion);
 HSVColor RGBtoHSV(Vec3b& vector);
 void addCubeToImage(Mat& matrice, Pos position, int size, Vec3b color);
+void addBarsToImage(Mat& mat, Pos center, int length, Vec3b color);
+void addPixel(Mat& mat, int x, int y, Vec3b color);
 
 #endif
