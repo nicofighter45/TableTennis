@@ -5,8 +5,8 @@ sys.path.insert(0, 'TableTennis')
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 
-Taille_pix, h, x = data("TableTennis/output/4-jets-de-balle/tracked-9.txt")
-rebilitation_de_liste(h)
+Taille_pix, x, h = data("TableTennis/output/1-robotv1/tracked-2.txt")
+rebilitation_de_liste(x)
 convertisseur(h, Taille_pix)
 convertisseur(x, Taille_pix)
 

@@ -3,7 +3,7 @@ sys.path.insert(0, 'TableTennis')
 from visualisation.tools.calculus import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
-Taille_pix, h, x = data("TableTennis/output/4-jets-de-balle/tracked-0.txt")
+Taille_pix, h, x = data("TableTennis/output/1-robotv1/tracked-2.txt")
 
 
 def coefficient_de_rebond(liste):

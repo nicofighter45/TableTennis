@@ -36,16 +36,19 @@ def courbe(h,nombre):
 coefficient = []
 energie_1 =[]
 energie_2 = []
-for k in range (14) :
-    Taille_pix, h, x = data("TableTennis/output/4-rebond-table/tracked-{}.txt".format(k))
+for k in range (20) :
+    Taille_pix, h, x = data("TableTennis/output/5-rebond-sol/tracked-{}.txt".format(k))
     liste = courbe(x,k)
+    rebilitation_de_liste(h)
+    convertisseur(x, Taille_pix)
+    print(rebond(x))
     for k in range (len(liste)-1) :
         if 0.6<liste[k+1]/liste[k] < 1 :
             coef = mt.sqrt(liste[k+1]/liste[k])
             energie_1.append(liste[k+1])
             energie_2.append(liste[k])
             if not coef > 0.9 : coefficient.append(coef)
-moy , incertitude, maximu, minimum, nombre_de_coefficient = str(moyenne(coefficient)),str(incertitude_type_A(coefficient)), str(max(coefficient)),str(min(coefficient)),str(len(coefficient))
-print(moy , incertitude, maximu, minimum, nombre_de_coefficient,coefficient)
-curv_trace(energie_1,energie_2,0,0,"energie","1","2")
+moy, incertitude, maximu, minimum, nombre_de_coefficient = str(moyenne(coefficient)),str(incertitude_type_A(coefficient)), str(max(coefficient)),str(min(coefficient)),str(len(coefficient))
+#print(moy , incertitude, maximu, minimum, nombre_de_coefficient,coefficient)
+#curv_trace(energie_2,energie_1,0,0,"energie","1","2")
 #result("TableTennis/output/results/rebond.txt", "Rebond sur table",moy , incertitude, maximu, minimum, nombre_de_coefficient)

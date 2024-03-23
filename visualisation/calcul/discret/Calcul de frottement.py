@@ -9,7 +9,7 @@ rho = 1.293
 S = 8 / 3 * mt.pi * (4e-2) ** 2
 g = 9.81
 
-Taille_pix,h, x = dt.data("TableTennis/output/4-jets-de-balle/tracked-0.txt")
+Taille_pix,h, x = dt.data("TableTennis/output/1-robotv1/tracked-2.txt")
 
 
 def coefficient_de_frottement(position):
@@ -24,7 +24,7 @@ def coefficient_de_frottement(position):
 
 
 rebilitation_de_liste(h)
-h = premièrevaleurhaute(h)
+h = premièrevaleurhaute(h,10e-3)
 h = descente(h)
 convertisseur(h, Taille_pix)
 print(coefficient_de_frottement(h))
