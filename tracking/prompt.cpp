@@ -73,10 +73,6 @@ void chooseROI(Mat readed_frame) {
 			shouldCalculate = not shouldCalculate;
 			break;
 		}
-		if (key == 97) { // a
-			indication = not indication;
-			break;
-		}
 	}
 }
 
@@ -141,7 +137,27 @@ void roiMouseCallback(int event, int x, int y, int flags, void* userdata) {
 	}
 }
 
-void showWindow(Pos center, Mat originalMatrice, int ms) {
+void showSimpleWindow(Mat originalMatrice) {
+
+	imshow(windowName, originalMatrice);
+
+	int key = waitKeyEx(1);
+	if (key == 32) { //espace
+	}else if (key == 115) { // s
+		roiSetup = true;
+	}else {
+		autoState = true;
+		actualWatchedFrame += 1;
+		setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
+		return;
+	}
+	autoState = false;
+
+}
+
+void showWindow(Pos center, Mat originalMatrice) {
+
+	shouldCalculate = true;
 
 	Size imageSize(width * imageScalar * windowScalar, height * imageScalar * windowScalar);
 	Size windowSize(width * windowScalar, height * windowScalar);
@@ -193,7 +209,7 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 		Mat roi_image = window_image(roi);
 		resize(matrice, roi_image, imageSize);
 
-		imshow(windowName, window_image);
+		imshow(windowName, originalMatrice);
 
 		int key = waitKeyEx(10);
 		if (key == 2424832 && actualWatchedFrame > 0) {  //left_arrow_key
@@ -227,8 +243,7 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 			break;
 		}
 		if (key == 32) { //espace
-			autoState = not autoState;
-			shouldCalculate = true;
+			autoState = true;
 			break;
 		}
 		if (key == 99){ // c
@@ -241,10 +256,6 @@ void showWindow(Pos center, Mat originalMatrice, int ms) {
 		if (key == 115) { // s
 			roiSetup = true;
 			autoState = false;
-			break;
-		}
-		if (key == 97) { // a
-			indication = not indication;
 			break;
 		}
 		if (autoState) {
@@ -301,7 +312,6 @@ void mouseCallback(int event, int x, int y, int flags, void* userdata) {
 		}
 		setTrackbarPos("Frame", configurationWindowName, actualWatchedFrame);
 		isPromptActive = false;
-		autoState = false;
 		shouldCalculate = false;
 	}
 }
@@ -327,6 +337,8 @@ void setNewWatchedPos(int x, int y, int window_width, int window_height) {
 	}
 	watchedPos.x = static_cast<int>(watchedPos.x * width / window_width);
 	watchedPos.y = static_cast<int>(watchedPos.y * height / window_height);
+	isPromptActive = false;
+	shouldCalculate = false;
 }
 
 void printCircle(Mat& mat, Pos center) {

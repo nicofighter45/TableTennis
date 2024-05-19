@@ -26,10 +26,9 @@ void initTracking() {
 	reloadFromCamera = NULL_POS;
 	roiSetup = true;
 	shouldCalculate = true;
-	indication = true;
 
 	// default orange range, the best one we figured out for now
-	lower_color = HSVColor{ 25, 120, 150};
+	lower_color = HSVColor{ 18, 100, 100};
 	upper_color = HSVColor{ 40, 255, 255 };
 }
 
@@ -123,12 +122,14 @@ void launchTracking(VideoCapture capture) {
 		auto loop_time_start = chrono::high_resolution_clock::now();
 		int ms = 0;
 		if (shouldCalculate && reload) {
+			/*
 			center = analyser.findBall();
 			if (distance(center, reloadFromCamera) >= spacingBetweenCentersToStop) {
 				autoState = false;
 			}
 			reloadFromCamera = NULL_POS;
-			/*
+			*/
+			
 			reloadFromCamera = analyser.findBall();
 			if (reloadFromCamera != NULL_POS) {
 				center = analyser.findBall();
@@ -139,9 +140,7 @@ void launchTracking(VideoCapture capture) {
 			}
 			else {
 				center = NULL_POS;
-				cout << "Frame " << capture.get(CAP_PROP_POS_FRAMES) - 1 << " no center" << endl;
 			}
-			*/
 			
 			positionsResults[currentLoadedFrame] = center;
 
@@ -152,14 +151,14 @@ void launchTracking(VideoCapture capture) {
 		if (not roiSetup) {
 			cout.rdbuf(out.rdbuf());
 			if (center == NULL_POS) {
-				showWindow(NULL_POS, readed_frame, ms);
+				showSimpleWindow(readed_frame);
 			}
 			else {
-				if (indication) {
-					showWindow(inverse(center), analyser.getMixedMatrice(conversion), ms);
+				if (autoState) {
+					showSimpleWindow(analyser.getMatriceWithCenter());
 				}
 				else {
-					showWindow(inverse(center), analyser.getMatriceWithCenter(), ms);
+					showWindow(inverse(center), analyser.getMatriceWithCenter());
 				}
 			}
 			cout.rdbuf(stream_buffer_cout);
@@ -209,10 +208,13 @@ void launchTracking(VideoCapture capture) {
 		auto loop_time_end = chrono::high_resolution_clock::now();
 		cout << "Calculus in " <<
 			chrono::duration_cast<chrono::milliseconds>
-			(end_calculus - loop_time_start).count() << "ms" << endl;
+			(end_calculus - loop_time_start).count() << "ms  ";
 		cout << "Window in " <<
 			chrono::duration_cast<chrono::milliseconds>
-			(loop_time_end - end_calculus).count() << "ms" << endl;
+			(loop_time_end - end_calculus).count() << "ms  ";
+		cout << "Total in " <<
+			chrono::duration_cast<chrono::milliseconds>
+			(loop_time_end - loop_time_start).count() << "ms" << endl;
 		if (!capture.read(readed_frame)) {
 			cout << "End Video calculation" << endl;
 			shutDownPrompt();

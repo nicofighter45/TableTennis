@@ -25,7 +25,7 @@ Pos Analyser::findBall() {
         reloadFromCamera.y = static_cast<int>(reloadFromCamera.y);
         return calculateCenter(reloadFromCamera);
     }
-    if (isInitialSearch) {
+    if (isInitialSearch || center == NULL_POS) {
         return initialCalculation();
     }
     center.x = static_cast<int>(center.x);
@@ -38,7 +38,6 @@ Pos Analyser::findBall() {
             || position.x - center.x < -searchPixelMaxSpacing 
             || position.y - center.y > searchPixelMaxSpacing
             || position.y - center.y < -searchPixelMaxSpacing) {
-            cout << position << " end" << endl;
             break;
         }
         maskMatrice.at<Vec3b>(position.x, position.y) = white;
@@ -48,7 +47,6 @@ Pos Analyser::findBall() {
         }
         position = getSearchPos(position);
     }
-    cout << "intial calc" << endl;
     return initialCalculation();
 }
 
@@ -148,7 +146,7 @@ Mat& Analyser::getMaskMatrice() {
 }
 
 Mat& Analyser::getMatriceWithCenter() {
-    addCubeToImage(ref(actualMatrice), center, 1, black);
+    addBarsToImage(ref(actualMatrice), center, 100, black);
     return ref(actualMatrice);
 }
 
@@ -250,4 +248,27 @@ void addCubeToImage(Mat& matrice, Pos position, int size, Vec3b color) {
 
 void Analyser::setIsInitialSearch(bool state) {
     isInitialSearch = state;
+}
+
+void addBarsToImage(Mat& mat, Pos center, int length, Vec3b color) {
+    for (int k = 1; k <= length; k++) {
+        addPixel(mat, center.x + k, center.y + k, color);
+        addPixel(mat, center.x + k + 1, center.y + k, color);
+        addPixel(mat, center.x + k - 1, center.y + k, color);
+        addPixel(mat, center.x - k, center.y + k, color);
+        addPixel(mat, center.x - k + 1, center.y + k, color);
+        addPixel(mat, center.x - k - 1, center.y + k, color);
+        addPixel(mat, center.x + k, center.y - k, color);
+        addPixel(mat, center.x + k + 1, center.y - k, color);
+        addPixel(mat, center.x + k - 1, center.y - k, color);
+        addPixel(mat, center.x - k, center.y - k, color);
+        addPixel(mat, center.x - k + 1, center.y - k, color);
+        addPixel(mat, center.x - k - 1, center.y - k, color);
+    }
+}
+
+void addPixel(Mat& mat, int x, int y, Vec3b color) {
+    if (x >= 0 and y >= 0 and x < height and y < width) {
+        mat.at<Vec3b>(x, y) = color;
+    }
 }
