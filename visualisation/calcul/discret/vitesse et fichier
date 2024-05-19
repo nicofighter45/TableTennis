@@ -1,0 +1,16 @@
+import sys
+sys.path.insert(0, 'TableTennis')
+from visualisation.tools.calculus import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
+from visualisation.tools.incertitudes import *
+from visualisation.tools.Regression_linéaire import *
+
+def vitesse_track(nom,n) :
+    for k in range (n) :
+        Taille_pix, h, x = data("TableTennis/output/"+nom+"/tracked-{}.txt".format(k))
+        v1 = vitesse(x)
+        v2 = vitesse(h)
+        fichier("TableTennis/Vitesse out put/"+nom+"/vitesse-{}.txt".format(k),v1,v2)
+
+vitesse_track("5-rebond-sol",71)

@@ -8,7 +8,7 @@ sys.path.insert(0, 'TableTennis')
 from visualisation.tools.abstract import *
 from visualisation.tools.incertitudes import *
 
-def linaire(liste1, liste2):
+def lineaire(liste1, liste2):
     if len(liste1) != len(liste2):
         raise TypeError("liste pas de même longueur")
     else:
@@ -25,7 +25,7 @@ def incertitudes_linéaire(liste1, liste2, U1, U2):
     liste_a, liste_b, coherence_values = [], [], []
     for k in range(10000):
         liste1b, liste2b = [rd.gauss(j, U1) for j in liste1], [rd.gauss(j, U2) for j in liste2]
-        poly = linaire(liste1b, liste2b)
+        poly = lineaire(liste1b, liste2b)
         data = qualite(liste1, liste2)
         liste_a.append(poly.coef(1))
         liste_b.append(poly.coef(0))
@@ -58,3 +58,5 @@ def curv_trace(liste1, liste2, U1, U2, nom_graphe, y_label, x_label):
     ax.set_xlabel(x_label)
     plt.legend()
     plt.show()
+
+

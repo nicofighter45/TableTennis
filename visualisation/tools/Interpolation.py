@@ -5,6 +5,9 @@ from visualisation.tools.abstract import *
 
 intervalle = 1
 
+def integrale(fonction,t1,t2) :
+    primi = fonction.primitive()
+    return(primi(t2)-primi(t1))
 
 # les fonctions
 def ind_degre(rang, degre, intervalle):
@@ -261,7 +264,6 @@ def plot_Lagrange(y_interpolation):
 
     fonction_interpolation = Lagrange(y_interpolation)
     # Calculer les valeurs interpolées pour l'affichage
-    for k in range (len(y_interpolation)) : print (len(y_interpolation),k,fonction_interpolation(k))
     L = [ fonction_interpolation(k) for k in range(len(y_interpolation))]
     # Afficher la courbe interpolée
     t = [k for k in range(len(L))]
