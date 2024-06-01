@@ -1,5 +1,6 @@
 import collections as c
 Taille_pix =  137.1e-2/911
+print(Taille_pix)
 def data(texte):
     with open(texte, "r") as file:
         h, x = [], []
@@ -46,6 +47,18 @@ def rebond(liste):
         if v[k] <= 0 and v[k+1] >=0 :
             liste_rebond.append(k+1)
     return liste_rebond
+
+def rebond2(liste):
+    v = vitesse(liste)
+    liste_rebond = [0]
+    liste_vitesse_1 = []
+    liste_vitesse_2 = []
+    for k in range (len(v)-1) :
+        if v[k] <= 0 and v[k+1] >=0 :
+            liste_rebond.append(k+1)
+            liste_vitesse_1.append(v[k])
+            liste_vitesse_2.append(abs(v[k+1]))
+    return liste_rebond,liste_vitesse_1,liste_vitesse_2
 
 def maxindice(x):
     if len(x) == 0  : return (x)

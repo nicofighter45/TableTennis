@@ -14,7 +14,7 @@ rho = 1.293
 S = 8 / 3 * mt.pi * (4e-2) ** 2
 g = 9.81
 
-Taille_pix,x,h = data("TableTennis/output/5-rebond-sol/tracked-0.txt")
+Taille_pix,x,h = data("TableTennis/output/5-rebond-sol/tracked-4.txt")
 
 def variation_énergie_mécanique(h):
     cinetique = [0] + energie_cinétique1(h)

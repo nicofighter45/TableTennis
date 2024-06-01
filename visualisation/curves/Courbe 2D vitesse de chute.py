@@ -7,7 +7,7 @@ from visualisation.tools.calculus import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 for k in range(40,99):
-    Taille_pix, h, x = data("TableTennis/output/2-robotv2/tracked-{}.txt".format(k))
+    Taille_pix, h, x = data("TableTennis/output/3-robotv3/tracked-{}.txt".format(k))
     rebilitation_de_liste(x)
     rebilitation_de_liste_min(h)
     convertisseur(x, Taille_pix)

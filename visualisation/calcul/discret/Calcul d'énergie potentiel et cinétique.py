@@ -20,35 +20,34 @@ def courbe(h,nombre):
     cinetique = [0] + energie_cinétique1(h)
     lissage(cinetique,2)
     Mecanique = potentiel + cinetique
-    #moyen = moy_energie_meca(Mecanique,10e-)
     plt.plot(t, potentiel, label="Énergie potentiel")
     plt.plot(t, cinetique, label="Énergie cinétique")
     plt.plot(t, Mecanique, label="Énergie mécanique")
     plt.title("Évolution de l'énergie au cours du temps / courbe {}".format(nombre))
-    plt.scatter(max2,max1 , color='red', label='Points d\'interpolation')
+    plt.scatter(max2,max1 , color='red', label="Maximum d'un rebond")
     plt.ylabel("Énergie en Joule")
     plt.xlabel("Temps en seconde")
     plt.legend()
-    plt.show()
+   #plt.show()
     plt.clf()
     return(max1)
 
 coefficient = []
 energie_1 =[]
 energie_2 = []
-for k in range (20) :
-    Taille_pix, h, x = data("TableTennis/output/5-rebond-sol/tracked-{}.txt".format(k))
+for k in range (2,4) :
+    Taille_pix, h, x = data("TableTennis/output/3-robotv3/tracked-{}.txt".format(k))
     liste = courbe(x,k)
     rebilitation_de_liste(h)
     convertisseur(x, Taille_pix)
     print(rebond(x))
     for k in range (len(liste)-1) :
-        if 0.6<liste[k+1]/liste[k] < 1 :
+        if  0.5 < liste[k+1]/liste[k] < 1 :
             coef = mt.sqrt(liste[k+1]/liste[k])
             energie_1.append(liste[k+1])
             energie_2.append(liste[k])
             if not coef > 0.9 : coefficient.append(coef)
 moy, incertitude, maximu, minimum, nombre_de_coefficient = str(moyenne(coefficient)),str(incertitude_type_A(coefficient)), str(max(coefficient)),str(min(coefficient)),str(len(coefficient))
 #print(moy , incertitude, maximu, minimum, nombre_de_coefficient,coefficient)
-#curv_trace(energie_2,energie_1,0,0,"energie","1","2")
+curv_trace(energie_2,energie_1,7e-3*9.81*137*5.1e-2/911,7e-3*9.81*137.1e-2/911*5,"Régression linéaire entre les énergies deux rebonds succesifs","énergie mécanique rebond précédent","énergie mécanique rebond suivant")
 #result("TableTennis/output/results/rebond.txt", "Rebond sur table",moy , incertitude, maximu, minimum, nombre_de_coefficient)

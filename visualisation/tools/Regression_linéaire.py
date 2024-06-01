@@ -47,7 +47,7 @@ def curv_trace(liste1, liste2, U1, U2, nom_graphe, y_label, x_label):
     ax.plot(t1, x2, color="blue")
     ax.plot(t1, x1, color="orange")
     textstr = '\n'.join((
-        "coef de cohérence : " + str(round(coef, 3)),
+        "coef de cohérence : " + str(abs(round(coef, 3))),
         "pente : " + str(round(coefa[0], 3)) + " ± " + str(round(coefa[1], 3)),
         "Ordonnée à l'origine : " + str(round(coefb[0], 3)) + " ± " + str(round(coefb[1], 3))))
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)

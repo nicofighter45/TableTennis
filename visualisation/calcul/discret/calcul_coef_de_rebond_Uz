@@ -1,0 +1,18 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import sys
+sys.path.insert(0, 'TableTennis')
+from visualisation.tools.calculus import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
+from visualisation.tools.incertitudes import *
+from visualisation.tools.Regression_linéaire import *
+vitesse1tot = []
+vitesse2tot=[]
+for k in range (0,15) :
+    Taille_pix, h, x = data("TableTennis/output/5-rebond-sol/tracked-{}.txt".format(k))
+    convertisseur(x, Taille_pix)
+    liste,vitesse1, vitesse2 = rebond2(x)
+    vitesse1tot +=vitesse1
+    vitesse2tot+=vitesse2
+curv_trace(vitesse1tot,vitesse2tot,Taille_pix/1e-2,Taille_pix/1e-2,"Régression linéaire entre vitesse deux rebonds succesifs","Vitesse du rebond précédent","Vitesse du rebond suivant")

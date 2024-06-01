@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.animation import FuncAnimation
 
 t, x, y, z = [], [], [], []
-with open("Visualisation/magnus position.txt", "r") as file:
+with open("TableTennis/visualisation/temp txt file/magnus position.txt", "r") as file:
     lines = file.readlines()
     for line in lines:
         cut = line.replace("\n", "").split(";")
@@ -22,11 +22,12 @@ T, X, Y, Z = np.array(t), np.array(x), np.array(y), np.array(z)
 
 def tracé_3D():
     ax = plt.figure().add_subplot(projection='3d')
-    ax.plot(x, y, z, label='lancée de balle de tennis de table')
+    ax.plot(x, y, z, label='lancée de balle de tennis de table', color = "r")
     ax.legend()
-    ax.set_xlim(min(x), max(x))
+    ax.set_xlim(-0.15, 0.15)
     ax.set_ylim(min(y), max(y))
     ax.set_zlim(0, max(z))
+    ax.set_xticks([])
     ax.set_aspect('equal')
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
@@ -82,7 +83,7 @@ def courbeanime():
     ax = fig.add_subplot(111, projection='3d')
 
     # Fait la ligne rouge
-    line, = ax.plot([], [], [], color="#ff7f0e", lw=2)
+    line, = ax.plot([], [], [],label='lancée de balle de tennis de table', color="#ff7f0e", lw=2)
 
     def update(frame):
         # Met a jour les frames
@@ -100,7 +101,7 @@ def courbeanime():
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
-    ax.set_title('3D Animation')
+    ax.set_title('3D Animation : lancer de balle de tennis de table')
 
     plt.show()
 
@@ -143,5 +144,6 @@ def optimized_animation():
     plt.show()
 
 
-optimized_animation()
+#optimized_animation()
 tracé_3D()
+courbeanime()
