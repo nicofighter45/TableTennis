@@ -8,7 +8,7 @@ from visualisation.tools.Interpolation import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 for k in range(10):
-    Taille_pix, h, x = data("TableTennis/output/5-rebond-sol/tracked-{}.txt".format(k))
+    Taille_pix, h, x = data("TableTennis/output/7-robotv4/tracked-{}.txt".format(k))
     rebilitation_de_liste(h)
     rebilitation_de_liste_min(x)
     convertisseur(x, Taille_pix)

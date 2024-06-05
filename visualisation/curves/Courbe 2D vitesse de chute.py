@@ -6,14 +6,15 @@ sys.path.insert(0, 'TableTennis')
 from visualisation.tools.calculus import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
-for k in range(40,99):
-    Taille_pix, h, x = data("TableTennis/output/3-robotv3/tracked-{}.txt".format(k))
+for k in range(0,40):
+    Taille_pix, x, h = data("TableTennis/output/9-robotv6/tracked-{}.txt".format(k))
     rebilitation_de_liste(x)
-    rebilitation_de_liste_min(h)
+    for k in range (len(x)) : x[k] = - x[k]
     convertisseur(x, Taille_pix)
     convertisseur(h, Taille_pix)
     h = vitesse(h)
     x = vitesse(x)
+    print(x)
     t = [k * 10e-3 for k in range(len(h))]
     fig = plt.figure(tight_layout=True)
     gs = gridspec.GridSpec(2, 1)
@@ -24,11 +25,11 @@ for k in range(40,99):
     ax2 = fig.add_subplot(gs[1, 0])
     fig.subplots_adjust(wspace=0.5, hspace=0.5)
     ax1.set_title('Vitesse sur Uy ', loc="center")
-    ax2.set_title('Vitesse sur Uz-{} '.format(k), loc="center")
+    ax2.set_title('Vitesse sur Uz ', loc="center")
     ax2.plot(t, x, "b-")
     ax1.plot(t, h, "g-")
-    ax2.legend(["h"], loc="upper right")
-    ax1.legend(["x"], loc="upper right")
+    ax2.legend(["Uz"], loc="upper right")
+    ax1.legend(["Uy"], loc="upper right")
     ax2.set_xlabel('Temps en s')
     ax2.set_ylabel('Vz en m.s-1')
     ax1.set_xlabel('Temps en s')

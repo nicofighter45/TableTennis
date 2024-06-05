@@ -1,6 +1,5 @@
 import collections as c
 Taille_pix =  137.1e-2/911
-print(Taille_pix)
 def data(texte):
     with open(texte, "r") as file:
         h, x = [], []
@@ -67,7 +66,6 @@ def maxindice(x):
     for l in range (len(x)):
         if max < x[l]: max,indice = x[l],l
     return (max,indice)
-
 
 def maximum(liste):
     liste2 = premièrevaleurhaute(liste)
@@ -168,11 +166,3 @@ def fichier(nom, liste2, liste3):
         print(f"Le fichier '{nom}' a été créé avec succès.")
     except IOError as e:
         print(f"Erreur : Impossible de créer ou d'écrire dans le fichier '{nom}'. Détails de l'erreur : {e}")
-
-# Exemple d'utilisation :
-nom_fichier = "mon_fichier.txt"
-liste2 = ["element1_liste2", "element2_liste2", "element3_liste2"]
-liste3 = ["element1_liste3", "element2_liste3", "element3_liste3"]
-fichier(nom_fichier, liste2, liste3)
-
-    
