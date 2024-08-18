@@ -23,6 +23,31 @@ def createTimeCurve(data, label, time):
     fig.canvas.mpl_connect('close_event', on_close)
 
 
+def create2TimeCurve(data, label, time, coords):
+    fig, axs = pyplot.subplots(2, 1, label=label, gridspec_kw=dict(hspace=0))
+    for i in range(2):
+        axs[i].plot(time, data[i])
+        axs[i].yaxis.set_major_locator(ticker.MaxNLocator(nbins=5, prune='both'))
+    pyplot.setp(axs[0].get_xticklabels(), visible=False)
+    axs[1].set_xlabel('Time (s)')
+    axs[0].set(ylabel=label + " " + coords[0] + " (m)")
+    axs[1].set(ylabel=label + " " + coords[1] + " (m)")
+    fig.canvas.mpl_connect('close_event', on_close)
+
+
+def create1TimeCurve(ydata, xdata, color, marker, y_label=None, x_label=None, normed=False, y_pin=10, x_pin=10, label_size=24):
+    fig, ax = pyplot.subplots(1, 1, gridspec_kw=dict(hspace=0))
+    ax.plot(xdata, ydata, color=color, marker=marker, linewidth=3)
+    ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=y_pin, prune='both'))
+    ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=x_pin, prune='both'))
+    if normed:
+        ax.set_aspect(aspect="equal")
+    ax.set_xlabel(x_label, fontsize=label_size)
+    ax.set_xlabel(y_label, fontsize=label_size)
+    fig.canvas.mpl_connect('close_event', on_close)
+    fig.savefig(y_label + " " + x_label, bbox_inches="tight")
+
+
 def update_3d_animation(num, data, ax):
     ax.set_data(data[0][:num], data[1][:num])
     ax.set_3d_properties(data[2][:num])

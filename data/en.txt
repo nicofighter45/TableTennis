@@ -1,6 +1,7 @@
 Welcome to tennis table c++ simulation !
 
 Enter 0 for tracking
+Enter 1 for regression
 Enter something else for Runge Khutta 4
 
 

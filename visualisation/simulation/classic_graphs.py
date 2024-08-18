@@ -7,6 +7,7 @@ positions, speeds, rotations, accelerations, time = \
     ([[], [], []], [[], [], []], [[], [], []], [[], [], []], [])
 
 lines = open("D:/TableTennis/output/simulations/transfer.txt", "r").readlines()
+
 for line in lines:
     line.removesuffix("\n")
     inputs = line.split(";;")

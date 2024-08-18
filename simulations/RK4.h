@@ -45,7 +45,7 @@ auto runRK4simulation(Vect3D initialPosition, Vect3D initialSpeed, Vect3D initia
     while (position.getX() >= -1 and position.getX() <= 1
         and position.getY() >= -0.5 and position.getY() <= 3
         and position.getZ() >= -1 and position.getZ() <= 2
-        and frame < 10000){
+        and frame < max_frame){
 
         position = old_position + interval * old_speed;
 

@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include "configuration.hpp"
+#include <vector>
 
 using namespace cv;
 using namespace std;
@@ -26,6 +27,7 @@ public:
 	Mat& getMixedMatrice(float conversion);
 	Mat& getMaskMatrice();
 	Mat& getMatriceWithCenter();
+	Mat& getMultipleCenterMatrice(vector<Pos> positions);
 	Analyser(Mat& tActualMatrice);
 };
 

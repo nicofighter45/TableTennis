@@ -150,6 +150,13 @@ Mat& Analyser::getMatriceWithCenter() {
     return ref(actualMatrice);
 }
 
+Mat& Analyser::getMultipleCenterMatrice(vector<Pos> positions) {
+    for (Pos pos : positions) {
+        addCubeToImage(ref(actualMatrice), pos, 3, black);
+    }
+    return ref(actualMatrice);
+}
+
 Mat& Analyser::getMixedMatrice(float conversion) {
     for (int x = 0; x < height; x++) {
         for (int y = 0; y < width; y++) {

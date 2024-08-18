@@ -10,6 +10,7 @@
 #include "loader.hpp"
 #include "../tools/transfer.hpp"
 #include "../tracking/tracking.hpp"
+#include "../regression/drag_force.hpp"
 
 using namespace std;
 
@@ -64,6 +65,11 @@ void run()
     if (simulationType == "0") {
         initTracking();
         setupTracking();
+        return;
+    }
+
+    if (simulationType == "1") {
+        cout << "Drag Coef " << getDragCoefficient() << endl;
         return;
     }
 

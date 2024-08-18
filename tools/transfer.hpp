@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-#include <cstdlib>
+#include <Windows.h>
 
 using namespace std;
 
@@ -50,4 +50,46 @@ void allVectorsToTxt(vector<tuple<double, double, double>> positions,
 	file.close();
 	system("py D:/TableTennis/visualisation/simulation/classic_graphs.py");
 
+}
+
+auto txtToAllVectors(){
+	// https://learn.microsoft.com/fr-fr/windows/win32/dlgbox/using-common-dialog-boxes?redirectedfrom=MSDN#open_file
+
+	wchar_t fileName[MAX_PATH] = { 0 };
+	OPENFILENAMEW ofn = { 0 };
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL; // The parent window handle (or NULL if you don't have one).
+	ofn.lpstrFilter = L"txt Files (*.txt)\0*.txt\0"; // Filter for txt files only.
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST; // Flags for dialog behavior.
+
+	if (!GetOpenFileNameW(&ofn)) {
+		// The user canceled the dialog or an error occurred.
+		// You can handle this case accordingly (e.g., return an empty string).
+		cerr << "Can't find the file" << endl;
+	}
+	wstring wideFileName(fileName);
+	string directoryPath = string(wideFileName.begin(), wideFileName.end());
+
+
+	if (!filesystem::exists(directoryPath)) {
+		cerr << "File doesn't exist" << endl;
+	}
+	ifstream file;
+	file.open(directoryPath);
+	if (!file.is_open()) {
+		cerr << "Cannot open tracking data" << endl;
+	}
+	
+	auto read_size = size_t(4096);
+	auto stream = ifstream(directoryPath.data());
+	auto out = string();
+	auto buf = string(read_size, '\0');
+	while (stream.read(&buf[0], read_size)) {
+		out.append(buf, 0, stream.gcount());
+	}
+	out.append(buf, 0, stream.gcount());
+	
+	cout << out << endl;
 }

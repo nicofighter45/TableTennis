@@ -142,7 +142,7 @@ void showSimpleWindow(Mat originalMatrice) {
 	imshow(windowName, originalMatrice);
 
 	int key = waitKeyEx(1);
-	if (key == 32) { //espace
+	if (key == 32) { // espace
 	}else if (key == 115) { // s
 		roiSetup = true;
 	}else {

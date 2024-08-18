@@ -16,18 +16,15 @@ using namespace cv;
 
 
 void initTracking() {
-	// initializer, set default values for all variables that are in configuration.cpp
 	currentLoadedFrame = 0;
 	actualWatchedFrame = 0;
-	watchedOpacity = 25; // from 0 to 100
-	watchedZoom = 1; // from 1 to 16
+	watchedOpacity = 25;
+	watchedZoom = 1;
 	watchedPos = { 0, 0 };
 	autoState = true;
 	reloadFromCamera = NULL_POS;
 	roiSetup = true;
 	shouldCalculate = true;
-
-	// default orange range, the best one we figured out for now
 	lower_color = HSVColor{ 18, 100, 100};
 	upper_color = HSVColor{ 40, 255, 255 };
 }
@@ -122,6 +119,7 @@ void launchTracking(VideoCapture capture) {
 		auto loop_time_start = chrono::high_resolution_clock::now();
 		int ms = 0;
 		if (shouldCalculate && reload) {
+
 			/*
 			center = analyser.findBall();
 			if (distance(center, reloadFromCamera) >= spacingBetweenCentersToStop) {
@@ -151,13 +149,27 @@ void launchTracking(VideoCapture capture) {
 		if (not roiSetup) {
 			cout.rdbuf(out.rdbuf());
 			if (center == NULL_POS) {
-				showSimpleWindow(readed_frame);
+				if (autoState) {
+					showSimpleWindow(readed_frame);
+				}
+				else {
+					showWindow(Pos{ 0, 0 }, readed_frame);
+				}
 			}
 			else {
 				if (autoState) {
 					showSimpleWindow(analyser.getMatriceWithCenter());
 				}
 				else {
+
+					/*
+					vector <Pos> v;
+					for (map < int, Pos>::iterator it = positionsResults.begin(); it != positionsResults.end(); ++it) {
+						v.push_back(it->second);
+					}
+					showWindow(inverse(center), analyser.getMultipleCenterMatrice(v));
+					*/
+
 					showWindow(inverse(center), analyser.getMatriceWithCenter());
 				}
 			}
