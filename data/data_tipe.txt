@@ -17,6 +17,9 @@ hauteur antoine lancés antoine : 84cm
 
 pression : 1023 hPa
 
+balle de rayon : 2 cm
+masse : 2,7 ± 0.1 grammes
+
 
 
 vidéos paramètres (fréquence 1):

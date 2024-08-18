@@ -41,13 +41,23 @@ def premièrevaleurhaute(liste):
 
 def rebond(liste):
     v = vitesse(liste)
-    print(v)
     liste_rebond = [0]
     for k in range (len(v)-1) :
         if v[k] <= 0 and v[k+1] >=0 :
-            print(abs( v[k]- v[k+1] ))
             liste_rebond.append(k+1)
     return liste_rebond
+
+def rebond2(liste):
+    v = vitesse(liste)
+    liste_rebond = [0]
+    liste_vitesse_1 = []
+    liste_vitesse_2 = []
+    for k in range (len(v)-1) :
+        if v[k] <= 0 and v[k+1] >=0 :
+            liste_rebond.append(k+1)
+            liste_vitesse_1.append(v[k])
+            liste_vitesse_2.append(abs(v[k+1]))
+    return liste_rebond,liste_vitesse_1,liste_vitesse_2
 
 def maxindice(x):
     if len(x) == 0  : return (x)
@@ -56,7 +66,6 @@ def maxindice(x):
     for l in range (len(x)):
         if max < x[l]: max,indice = x[l],l
     return (max,indice)
-
 
 def maximum(liste):
     liste2 = premièrevaleurhaute(liste)
@@ -126,3 +135,34 @@ def lissage(liste,precision) :
     for k in range (2,len(liste)):
         if abs(liste[k-1]) > 10e-3 and abs(liste[k]/liste[k-1]-1) > precision :
             liste[k]=liste[k-1]
+
+def partition(liste) :
+    partition = rebond(liste)
+    bond = []
+    for k in range(1,len(partition)) :
+        bond.append(liste[partition[k-1]:partition[k]])
+    return(bond)
+
+def maxlocal(liste) :
+    reb = rebond(liste)
+    parti = partition(liste)
+    print(len(reb)==len(parti))
+    liste = []
+    for k in range(len(parti)) :
+        max1,max2 = maxindice(parti[k])
+        liste.append(rebond)
+
+def fichier(nom, liste2, liste3):
+    # Vérifier que les deux listes ont la même longueur
+    if len(liste2) != len(liste3):
+        print("Erreur : Les deux listes doivent avoir la même longueur.")
+        return
+
+    try:
+        # Ouvrir (ou créer) le fichier en mode écriture
+        with open(nom, 'w', encoding='utf-8') as fichier:
+            for k in range(len(liste2)):
+                fichier.write(f"{liste2[k]};{liste3[k]}\n")
+        print(f"Le fichier '{nom}' a été créé avec succès.")
+    except IOError as e:
+        print(f"Erreur : Impossible de créer ou d'écrire dans le fichier '{nom}'. Détails de l'erreur : {e}")

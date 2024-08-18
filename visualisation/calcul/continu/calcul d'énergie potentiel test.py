@@ -6,9 +6,9 @@ from visualisation.tools.calculus import *
 from visualisation.tools.data_reception import *
 from visualisation.tools.processing import *
 import visualisation.tools.Interpolation as it
-Taille_pix, h,x = data('TableTennis/output/MVI_0009/tracked-2.txt')
+Taille_pix, h,x = data('TableTennis/output/4-rebond-table/tracked-0.txt')
 rebilitation_de_liste(h)
-h=premièrevaleurhaute(h)
+h=premièrevaleurhaute(h,0)
 convertisseur(h,Taille_pix)
 def courbe(h):
     interpolation_de_h = it.approximation(h,3)

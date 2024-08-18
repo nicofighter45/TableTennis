@@ -1,0 +1,10 @@
+import math as mt
+import sys
+import numpy as np
+sys.path.insert(0, 'TableTennis')
+from visualisation.tools.calculus import *
+from visualisation.tools.data_reception import *
+from visualisation.tools.processing import *
+from visualisation.tools.incertitudes import *
+from visualisation.tools.Regression_linéaire import *
+from visualisation.tools.Interpolation import *

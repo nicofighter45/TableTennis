@@ -154,6 +154,9 @@ class polynome:
 
     def der(self):
         return polynome([k * self.coefficient[k] for k in range(1, self.degre + 1)])
+    
+    def primitive(self) :
+        return polynome([0]+[self.coefficient[k]/(k+1) for k in range (self.degre + 1)])
 
     def __str__(self):
         s = ""
